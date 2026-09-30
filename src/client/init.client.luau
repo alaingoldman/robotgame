@@ -1,0 +1,17 @@
+-- Mech game client entry point
+local MechAnimator = require(script.MechAnimator)
+local Boarding = require(script.Boarding)
+local PilotController = require(script.PilotController)
+local Inventory = require(script.Inventory)
+local CordController = require(script.CordController)
+local BatteryHud = require(script.BatteryHud)
+local Climb = require(script.Climb)
+
+MechAnimator.start()
+Boarding.start()
+PilotController.start()
+Inventory.start()
+CordController.start()
+BatteryHud.start()
+Climb.start()
+CordController.Snapped:Connect(BatteryHud.cordSnapped)

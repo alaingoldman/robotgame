@@ -1,0 +1,109 @@
+{
+    "name":  "robotgame",
+    "tree":  {
+                 "$className":  "DataModel",
+                 "ReplicatedStorage":  {
+                                           "Shared":  {
+                                                          "$path":  "src/shared"
+                                                      }
+                                       },
+                 "ServerScriptService":  {
+                                             "Server":  {
+                                                            "$path":  "src/server"
+                                                        }
+                                         },
+                 "StarterPlayer":  {
+                                       "StarterPlayerScripts":  {
+                                                                    "Client":  {
+                                                                                   "$path":  "src/client"
+                                                                               }
+                                                                }
+                                   },
+                 "Workspace":  {
+                                   "$properties":  {
+                                                       "FilteringEnabled":  true
+                                                   },
+                                   "Baseplate":  {
+                                                     "$className":  "Part",
+                                                     "$properties":  {
+                                                                         "Anchored":  true,
+                                                                         "Color":  [
+                                                                                       0.38823,
+                                                                                       0.37254,
+                                                                                       0.38823
+                                                                                   ],
+                                                                         "Locked":  true,
+                                                                         "Position":  [
+                                                                                          0,
+                                                                                          -10,
+                                                                                          0
+                                                                                      ],
+                                                                         "Size":  [
+                                                                                      512,
+                                                                                      20,
+                                                                                      512
+                                                                                  ]
+                                                                     }
+                                                 },
+                                   "SpawnLocation":  {
+                                                         "$className":  "SpawnLocation",
+                                                         "$properties":  {
+                                                                             "Anchored":  true,
+                                                                             "Position":  [
+                                                                                              0,
+                                                                                              0.5,
+                                                                                              0
+                                                                                          ],
+                                                                             "Size":  [
+                                                                                          12,
+                                                                                          1,
+                                                                                          12
+                                                                                      ]
+                                                                         }
+                                                     }
+                               },
+                 "Lighting":  {
+                                  "$properties":  {
+                                                      "Ambient":  [
+                                                                      0.5,
+                                                                      0.5,
+                                                                      0.5
+                                                                  ],
+                                                      "Brightness":  2,
+                                                      "GlobalShadows":  true,
+                                                      "Outlines":  false,
+                                                      "Technology":  "Future"
+                                                  }
+                              },
+                 "MaterialService":  {
+                                         "Weld 4x4 Plastic":  {
+                                                                  "$className":  "MaterialVariant",
+                                                                  "$properties":  {
+                                                                                      "BaseMaterial":  "Plastic",
+                                                                                      "ColorMap":  "rbxassetid://133133290921309",
+                                                                                      "NormalMap":  "rbxassetid://111184109610225",
+                                                                                      "StudsPerTile":  4
+                                                                                  }
+                                                              },
+                                         "Weld 2x2 Plastic":  {
+                                                                  "$className":  "MaterialVariant",
+                                                                  "$properties":  {
+                                                                                      "BaseMaterial":  "Plastic",
+                                                                                      "ColorMap":  "rbxassetid://93972722451997",
+                                                                                      "NormalMap":  "rbxassetid://102954553386109",
+                                                                                      "StudsPerTile":  2
+                                                                                  }
+                                                              }
+                                     },
+                 "SoundService":  {
+                                      "$properties":  {
+                                                          "RespectFilteringEnabled":  true
+                                                      }
+                                  },
+                 "ServerStorage":  {
+                                       "Mechs":  {
+                                                     "$path":  "src/mechs"
+                                                 }
+                                   }
+             }
+}
