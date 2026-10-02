@@ -35,6 +35,7 @@ local EXIT_ZOOM = MechConfig.ExitZoom
 local PILOT_EYE = 2.9 -- camera focus above the seat top: the seated pilot's face
 local REACHED = 2 -- studs (flat) that count as arriving at a waypoint
 local BOARD_BLEND = 0.25 -- seconds to blend the last boarding shot into the default camera
+local ONE_KNEE_CLEAR = 24 -- one-knee climb-in: camera distance kept clear of the armor
 local EXIT_BLEND = 0.4 -- same, from the reveal shot onto the pilot walking out
 
 local player = Players.LocalPlayer
@@ -330,18 +331,32 @@ local function updateBoard(s: Seq, t: number)
 	end
 
 	-- camera: default while walking, then (d) push in on the seated pilot
-	-- while (e) the doors close, and pull back as the mech stands
-	if t < 0 then
-		return
-	end
+	-- while (e) the doors close, and pull back as the mech stands.
+	-- One-knee climb-in: the default camera followed the climbing pilot into
+	-- the armor, so the scripted path starts with the walk instead, from where
+	-- the camera is, and swings a little out and up while the pilot climbs.
 	local camera = workspace.CurrentCamera
 	local close = closeShot(model)
+	local bw = MechPose.boardWalk(model)
+	local early = style == "OneKnee" and bw > 0
+	if t < 0 and not early then
+		return
+	end
 	if t < B.Sealed then
 		scriptable()
 		if not s.camStart then
 			s.camStart = shotFrom(model, camera.CFrame, close.focus)
 		end
-		camera.CFrame = shotCFrame(model, orbit(s.camStart :: Shot, close, smooth(t / B.DoorCloseEnd)))
+		if early then
+			local u = math.clamp((t + bw) / (bw + B.DoorCloseEnd), 0, 1)
+			local shot = orbit(s.camStart :: Shot, close, smooth(u))
+			local out = smooth(u / 0.2) * (1 - smooth((u - 0.65) / 0.35))
+			shot.dist += math.max(0, ONE_KNEE_CLEAR - shot.dist) * out
+			shot.pitch += 12 * out
+			camera.CFrame = shotCFrame(model, shot)
+		else
+			camera.CFrame = shotCFrame(model, orbit(s.camStart :: Shot, close, smooth(t / B.DoorCloseEnd)))
+		end
 		return
 	end
 	-- doors shut: the default camera takes the mech underneath this shot
