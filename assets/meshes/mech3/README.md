@@ -125,4 +125,18 @@ The geometry changes are in `tools/build_v2.py`:
 - **ShoulderPad**: the pad's lower outer flap is pulled 0.22 studs in onto the upper arm.
 - **Wings**: slid 0.2 studs toward the body. They now touch the shoulder pad (gap 0.03, was 0.19). The new WingRoot pivots are ±2.815, in `meta_v2.json`.
 
-Old vs new close-ups are in `renders/Mech3_v2_texture_closeups.png`. To rebuild, run `retexture.py`, `build_v2.py` and then `tex_closeup.py`.
+v2 also fixes the cut seams:
+
+- **Caps.** v1 capped each cut with a convex hull of the part near the cut. At the elbow, where the ball meets the forearm-guard flaps, that hull stuck out of the surface as a thin flat plate. Seen edge-on it showed up as the dark line or spike on both arms. v2 slices the part at the cut plane, chains the slice into closed loops and caps each loop exactly. The caps use a charcoal texel. This applies to every horizontal cut: waist, elbow, wrist, hip, knee and ankle.
+- **Crumbs.** Tiny shells that touch nothing are dropped.
+- **Pad flap.** The upper arm's overlap copy of the pad flap's bottom edge would have floated once the flap was pulled in, so it is dropped too.
+
+Every part is still under 20k triangles; the largest is the Torso at 17,829.
+
+Close-ups (all v2 except the texture sheet, which shows old vs new):
+
+- `renders/Mech3_v2_texture_closeups.png`: old vs new texture.
+- `renders/Mech3_v2_elbows.png`: both elbows from front, side, below and back.
+- `renders/Mech3_v2_joints.png`: shoulder, wrist, knee, ankle, neck, waist and wing roots.
+
+To rebuild, run `retexture.py`, `build_v2.py`, then `tex_closeup.py` and `elbow_closeup.py`.
