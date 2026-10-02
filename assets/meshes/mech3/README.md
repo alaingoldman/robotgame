@@ -101,3 +101,28 @@ The owner imported the GLB as asset **110252059423481**. The game code lives in:
 - `src/client/Mech3Animator.luau` and `Mech3Pilot.luau`.
 
 It is registered in `MechTypes` and its lineup spot is at (-218, -150), next to the CRM-01, with its charging post behind it on the right.
+
+## v2: metal texture, pads and wings on the shoulders (`Mech3_v2.glb`, about 12 MB)
+
+The owner reported that up close the v1 texture looked like paper. The bake had copied the drawing's ink outlines, its speckle dots and its flat cel fills. v2 keeps the **same vertices, UVs and triangles** but changes the material and moves two pieces.
+
+The texture is rebuilt by `tools/retexture.py`, working in texture space one UV island at a time:
+
+1. It sorts the pixels into plate, panel, joint, recess and glow.
+2. It finds the thin dark ink strokes and refills them from the nearest clean texel in the same island.
+3. A 3×3 then 5×5 median filter removes the dots. The real shapes survive: frames, stripes and rims.
+4. Each class is pulled 30% toward a single paint colour.
+5. It adds a low-frequency tonal drift, a fine brushed grain and soft lighter wear along the panel edges.
+
+The material is now glTF PBR (`v2/`):
+
+- `basecolor.png`.
+- `metal_rough.png`: G channel is roughness, B is metalness. Plates are metal 0.72 / rough 0.42. Panels are 0.65 / 0.38. Joints are 0.35 / 0.55.
+- `normal.png`: soft grooves where the drawing's ink seams and the panel boundaries were, in place of black lines.
+
+The geometry changes are in `tools/build_v2.py`:
+
+- **ShoulderPad**: the pad's lower outer flap is pulled 0.22 studs in onto the upper arm.
+- **Wings**: slid 0.2 studs toward the body. They now touch the shoulder pad (gap 0.03, was 0.19). The new WingRoot pivots are ±2.815, in `meta_v2.json`.
+
+Old vs new close-ups are in `renders/Mech3_v2_texture_closeups.png`. To rebuild, run `retexture.py`, `build_v2.py` and then `tex_closeup.py`.
