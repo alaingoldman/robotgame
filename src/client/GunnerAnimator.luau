@@ -313,6 +313,7 @@ local function step(dt: number)
 			set(m, "PeriscopeTurret", CFrame.identity)
 			st.amount = 0
 			st.legsFree = false
+			LegIK.resetFeet(st.walk)
 		else
 			if not st.legsFree then
 				LegIK.adopt(ik)
@@ -337,10 +338,10 @@ local function step(dt: number)
 			st.look += (lookT - st.look) * math.min(1, dt * 2.5)
 			local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
 			local land = math.max(0, comp)
-			local rootT = CFrame.new(shift + s * 0.15 * S * a, -w.drop * w.weight - s * s * bob + breathe * 0.05 * S - land, 0)
+			local rootT = CFrame.new(shift + s * 0.15 * S * a, -w.drop * w.dropK - s * s * bob + breathe * 0.05 * S - land, 0)
 				* CFrame.Angles(0, 0, s * (0.03 * a + 0.04 * r) - shift * 0.02)
 			set(m, "Root", rootT)
-			LegIK.place(ik, w, rootT, air * 0.85)
+			local settled = LegIK.place(ik, w, rootT, air * 0.85, st.root.CFrame, dt)
 			set(m, "Waist", CFrame.Angles(-0.05 * a - SPRINT_LEAN * r + breathe * 0.02 - 0.06 * land, s * (0.1 * a + 0.15 * r) + st.look * 0.25, -shift * 0.012))
 			set(m, "Neck", CFrame.Angles(0.04 * a + 0.25 * r - breathe * 0.02 + 0.06 * air, -s * 0.08 * a + st.look * 0.6, 0))
 			local arm = lerp(ARM_SWING, ARM_SWING_SPRINT, st.sprint) * a
@@ -355,6 +356,15 @@ local function step(dt: number)
 			set(m, "PeriscopeTurret", CFrame.Angles(0, math.sin(now * 0.35) * 0.5 * idle, 0))
 			set(m, "ShieldMount", CFrame.identity)
 
+			if settled and not strike then
+				local sound = st.stepSounds[settled]
+				if sound then
+					sound.Volume = 0.45
+					sound.PlaybackSpeed = 1.05 + math.random() * 0.15
+					sound.TimePosition = 0
+					sound:Play()
+				end
+			end
 			if strike then
 				local sound = st.stepSounds[strike]
 				if sound then

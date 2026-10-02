@@ -25,6 +25,7 @@ local MechTypes = require(Shared:WaitForChild("MechTypes"))
 local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
 local TitanDock = require(Shared:WaitForChild("TitanDock"))
 local TitanPose = require(Shared:WaitForChild("TitanPose"))
+local LegIK = require(Shared:WaitForChild("LegIK")) -- settle steps (planted feet when stopping / turning)
 
 local TitanAnimator = {}
 
@@ -70,6 +71,11 @@ type State = {
 	cells: { BasePart }?,
 	cellKey: string,
 	phase: number,
+	feet: LegIK.Feet, -- planted feet + settle steps when stopped / turning on the spot
+	moving: boolean,
+	walkW: number, -- 0..1 the gait owns the feet (rises as walking starts)
+	settled: string?, -- a settle step just landed (footfall)
+	dt: number,
 	amount: number,
 	sprint: number,
 	lastPhase: number,
@@ -188,6 +194,11 @@ local function setup(model: Model)
 		cells = nil,
 		cellKey = "",
 		phase = 0,
+		feet = LegIK.newFeet(),
+		moving = false,
+		walkW = 0,
+		settled = nil,
+		dt = 1 / 60,
 		amount = 0,
 		sprint = 0,
 		lastPhase = 0,
@@ -403,6 +414,8 @@ end
 
 -- ===== standing pose: idle + walk / sprint ===================================
 
+local TITAN_SETTLE: LegIK.SettleParams = { dist = 0.8, dur = 0.34, lift = 1.4 }
+
 -- Foot offset for one foot at cycle phase p (0..1): stance slides from ahead
 -- to behind at body speed, swing lifts and carries it forward again.
 local function footPath(p: number, duty: number, travel: number, lift: number): (number, number, number)
@@ -411,8 +424,12 @@ local function footPath(p: number, duty: number, travel: number, lift: number): 
 		return -travel / 2 + travel * u, 0, 0
 	end
 	local u = (p - duty) / (1 - duty)
-	local e = TitanPose.smooth(u)
-	return travel / 2 - travel * e, lift * math.sin(math.pi * u), math.sin(math.pi * u)
+	-- Hermite back to front that leaves and lands at the planted foot's speed
+	-- (an eased swing stopped dead relative to the body: the foot skidded at touchdown)
+	local m = travel * (1 - duty) / math.max(duty, 1e-3)
+	local u2, u3 = u * u, u * u * u
+	local z = (2 * u3 - 3 * u2 + 1) * (travel / 2) + (u3 - 2 * u2 + u) * m + (-2 * u3 + 3 * u2) * (-travel / 2) + (u3 - u2) * m
+	return z, lift * math.sin(math.pi * u), math.sin(math.pi * u)
 end
 
 local function standPose(st: State, now: number): { [string]: CFrame }
@@ -442,11 +459,17 @@ local function standPose(st: State, now: number): { [string]: CFrame }
 	pose.Root = pelvis
 
 	local L, R = rig.legs.Left, rig.legs.Right
-	if L then
-		TitanPose.legIK(rig, "Left", L.ankle + Vector3.new(0, yl, zl), pelvis, 0, 0.3 * sl - 0.1 * a * math.max(0, zl / math.max(travel, 1e-3)), pose, true)
-	end
-	if R then
-		TitanPose.legIK(rig, "Right", R.ankle + Vector3.new(0, yr, zr), pelvis, 0, 0.3 * sr - 0.1 * a * math.max(0, zr / math.max(travel, 1e-3)), pose, true)
+	if L and R then
+		-- gait targets while walking; planted anchors + settle steps when
+		-- stopped or turning on the spot (LegIK.settle)
+		local rest = { Left = L.ankle, Right = R.ankle }
+		local gait = { Left = L.ankle + Vector3.new(0, yl, zl), Right = R.ankle + Vector3.new(0, yr, zr) }
+		local targets, gaitK, landed = LegIK.settle(st.feet, st.root.CFrame, rest, gait, st.moving, st.walkW, st.air > 0.01, st.dt, TITAN_SETTLE)
+		st.settled = landed
+		local pl = (0.3 * sl - 0.1 * a * math.max(0, zl / math.max(travel, 1e-3))) * gaitK.Left
+		local prr = (0.3 * sr - 0.1 * a * math.max(0, zr / math.max(travel, 1e-3))) * gaitK.Right
+		TitanPose.legIK(rig, "Left", targets.Left, pelvis, 0, pl, pose, true)
+		TitanPose.legIK(rig, "Right", targets.Right, pelvis, 0, prr, pose, true)
 	end
 
 	-- torso: counter-twist against the hips, lean at a run, breathing
@@ -629,6 +652,9 @@ local function step(dt: number)
 		local rate = if speed > 0.5 then speed / cycle else 0
 		st.lastPhase = st.phase
 		st.phase = (st.phase + dt * rate) % 1
+		st.moving = if st.moving then speed > 0.5 and st.amount > 0.03 else speed > 1.5 and st.amount > 0.1
+		st.walkW += ((if st.moving then 1 else 0) - st.walkW) * math.min(1, dt * (if st.moving then 8 else 5))
+		st.dt = dt
 
 		updateAir(st, dt, now)
 		local pose = standPose(st, now)
@@ -639,6 +665,9 @@ local function step(dt: number)
 			-- powered down / getting up: the kneel owns the body
 			pose = blend(pose, TitanPose.kneel(st.rig, st.kneel), math.min(1, st.kneel * 4))
 			st.amount *= 1 - math.min(1, st.kneel * 4)
+			st.feet = LegIK.newFeet()
+		elseif st.settled and st.air < 0.2 then
+			footfall(st, st.settled, 0.2) -- a settle step re-planted a foot
 		elseif st.amount > 0.3 and st.air < 0.2 then
 			-- heel strikes: left at phase 0, right at 0.5
 			local strength = 0.4 + 0.6 * st.sprint

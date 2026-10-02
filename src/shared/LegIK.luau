@@ -8,6 +8,7 @@
 --   local s = LegIK.stride(rig, length, duty) -- walk drop / lift for a stance length
 --   LegIK.gait(phase01, duty, length, lift)   -- one foot's offset along the cycle
 --   LegIK.solve(rig, "Left", target, rootT)   -- sets Hip / Knee / Ankle Transforms
+--   LegIK.place(rig, walk, rootT, tuck, rootCF, dt) -- gait + settle steps, both legs
 --
 -- Space: targets are ankle-joint positions in HumanoidRootPart space (studs,
 -- -Z forward). `rootT` is the Root motor's Transform for this frame (the
@@ -29,6 +30,7 @@ export type Leg = {
 	kneeA: number,
 	rollA: number, -- hip roll (sideways reach: body sway / roll over the planted foot)
 	kneeMax: number, -- knee pitch at which the leg is straight (bends below it)
+	err: number, -- last solve's remaining error (studs)
 }
 export type Rig = {
 	root: Motor6D,
@@ -77,6 +79,7 @@ function LegIK.new(motors: { [string]: Motor6D }): Rig?
 			kneeA = 0,
 			rollA = 0,
 			kneeMax = 0,
+			err = 0,
 		}
 		local base = root.C0 * root.C1:Inverse()
 		local restAnkle = base * ankleFrame(leg, 0, 0)
@@ -122,8 +125,10 @@ function LegIK.gait(u: number, duty: number, length: number, lift: number): (num
 	local m = -length * (1 - duty) / duty
 	local w2, w3 = w * w, w * w * w
 	local f = (2 * w3 - 3 * w2 + 1) * (-length / 2) + (w3 - 2 * w2 + w) * m + (-2 * w3 + 3 * w2) * (length / 2) + (w3 - w2) * m
-	-- lift peaks early (foot clears the ground fast), sets down gently
-	local up = lift * math.sin(math.pi * math.min(1, w * 1.15)) ^ 0.8
+	-- lift peaks early (foot clears the ground fast) and comes down exactly at
+	-- the end of the swing, when the foot has matched the ground speed (an
+	-- earlier touchdown skidded the foot forward on landing)
+	local up = lift * math.sin(math.pi * w ^ 0.8) ^ 0.8
 	-- toes hang after lift-off, come level, tip up just before the strike
 	local pitch = -0.35 * math.sin(math.pi * math.min(1, w / 0.6)) + 0.22 * math.sin(math.pi * math.clamp((w - 0.7) / 0.3, 0, 1))
 	return f, up, pitch
@@ -170,6 +175,7 @@ function LegIK.solve(rig: Rig, side: string, target: Vector3, rootT: CFrame, foo
 		c = math.clamp(c + math.clamp(dc, -0.2, 0.2), -0.35, 0.35)
 	end
 	leg.hipA, leg.kneeA, leg.rollA = a, b, c
+	leg.err = err
 	leg.hip.Transform = CFrame.Angles(0, 0, c) * CFrame.Angles(a, 0, 0)
 	leg.knee.Transform = CFrame.Angles(b, 0, 0)
 	-- level the foot: rotate it back to its rest orientation (root space)
@@ -191,8 +197,11 @@ export type Walk = {
 	duty: number,
 	lift: number,
 	drop: number, -- body sink that keeps the stance within reach
-	weight: number, -- 0..1 how much the gait owns the feet (eases to rest when stopping)
+	weight: number, -- 0..1 how much the gait owns the feet (rises when walking starts)
 	lastU: number,
+	moving: boolean,
+	dropK: number, -- 0..1 share of the walk drop the body keeps (feet still spread after a stop)
+	feet: Feet,
 }
 export type Params = {
 	stance: number, -- walk stance length (studs, front foot to back foot)
@@ -204,7 +213,18 @@ export type Params = {
 }
 
 function LegIK.newWalk(): Walk
-	return { phase = 0, length = 0, duty = 0.6, lift = 0, drop = 0, weight = 0, lastU = 0 }
+	return {
+		phase = 0,
+		length = 0,
+		duty = 0.6,
+		lift = 0,
+		drop = 0,
+		weight = 0,
+		lastU = 0,
+		moving = false,
+		dropK = 0,
+		feet = LegIK.newFeet(),
+	}
 end
 
 local TAU = math.pi * 2
@@ -219,7 +239,9 @@ function LegIK.advance(rig: Rig, w: Walk, p: Params, dt: number, speed: number, 
 	w.duty = p.duty + (p.dutySprint - p.duty) * sprint
 	w.lift = p.lift + (p.liftSprint - p.lift) * sprint
 	w.drop = LegIK.dropFor(rig, w.length)
-	local moving = amount > 0.05 and speed > 0.5
+	-- hysteresis: a standing mech's physics jitter mustn't flick the gait on
+	local moving = if w.moving then amount > 0.03 and speed > 0.5 else amount > 0.1 and speed > 1.5
+	w.moving = moving
 	w.weight += ((if moving then 1 else 0) - w.weight) * math.min(1, dt * (if moving then 8 else 5))
 	if moving then
 		-- planted feet move back at exactly the body speed: one cycle per
@@ -239,23 +261,164 @@ function LegIK.advance(rig: Rig, w: Walk, p: Params, dt: number, speed: number, 
 	return strike
 end
 
--- Places both feet for this frame: gait offsets (scaled by the walk weight),
--- plus `tuck` (0..1: legs drawn up in the air) and `spread` (studs each
--- foot steps out sideways, e.g. a wider idle stance).
-function LegIK.place(rig: Rig, w: Walk, rootT: CFrame, tuck: number?, spread: number?)
+-- ============================================================ settle steps
+-- When the mech stops or turns on the spot its feet stay planted in the world
+-- (anchors) and re-plant with short, quick steps, one foot at a time,
+-- whenever a foot is off its rest spot under the body; a foot caught
+-- mid-swing by a stop finishes with a step. Walking hands the feet back to
+-- the gait (blended over the walk weight). Works on target positions only,
+-- so animators with their own IK (TitanAnimator) can use it too.
+export type Step = { from: Vector3, t: number }
+export type Feet = {
+	anchor: { [string]: Vector3 }, -- planted world ankle positions
+	step: { [string]: Step },
+	last: { [string]: Vector3 }, -- last frame's world ankle target
+	lastLift: { [string]: number },
+	spread: number, -- largest foot offset from rest (root space, studs)
+}
+export type SettleParams = {
+	dist: number, -- step when a foot is this far off its rest spot (studs)
+	dur: number, -- seconds per step
+	lift: number, -- step clearance (studs)
+}
+LegIK.DefaultSettle = { dist = 0.7, dur = 0.3, lift = 1.2 } :: SettleParams
+
+function LegIK.newFeet(): Feet
+	return { anchor = {}, step = {}, last = {}, lastLift = {}, spread = 0 }
+end
+
+-- Forgets the planted feet (another pose owned the legs: kneel, squat).
+function LegIK.resetFeet(w: Walk)
+	w.feet = LegIK.newFeet()
+	w.dropK = 0
+end
+
+-- Per-side ankle targets (root space). `gait` = the walking targets (with
+-- lift), `rest` = rest spots under the body; `moving` / `weight` from the
+-- walk, `air` = airborne (feet follow `gait`, which then holds the tuck).
+-- Returns the targets, each foot's extra pitch weight (1 = gait pitch,
+-- 0 = flat) and the side whose settle step just landed (or nil).
+function LegIK.settle(feet: Feet, rootCF: CFrame, rest: { [string]: Vector3 }, gait: { [string]: Vector3 }, moving: boolean, weight: number, air: boolean, dt: number, sp: SettleParams?): ({ [string]: Vector3 }, { [string]: number }, string?)
+	local P = sp or LegIK.DefaultSettle
+	local out: { [string]: Vector3 } = {}
+	local gaitK: { [string]: number } = {}
+	local landed: string? = nil
+	local function stepPos(side: string, st: Step): Vector3
+		local to = rootCF:PointToWorldSpace(rest[side])
+		local k = st.t * st.t * (3 - 2 * st.t)
+		return st.from:Lerp(to, k) + Vector3.new(0, P.lift * math.sin(math.pi * st.t), 0)
+	end
+	-- steps in progress run in every mode until they land
+	for side, st in feet.step do
+		st.t = math.min(1, st.t + dt / P.dur)
+		if st.t >= 1 then
+			feet.step[side] = nil
+			feet.anchor[side] = rootCF:PointToWorldSpace(rest[side])
+			landed = side
+		end
+	end
+	if air then
+		table.clear(feet.anchor)
+		table.clear(feet.step)
+		for _, side in SIDES do
+			out[side] = gait[side]
+			gaitK[side] = 1
+		end
+	elseif moving then
+		for _, side in SIDES do
+			local st = feet.step[side]
+			local a = feet.anchor[side]
+			local hold = if st then rootCF:PointToObjectSpace(stepPos(side, st)) elseif a then rootCF:PointToObjectSpace(a) else rest[side]
+			out[side] = hold:Lerp(gait[side], weight)
+			gaitK[side] = weight
+		end
+		if weight > 0.995 then
+			table.clear(feet.anchor)
+			table.clear(feet.step)
+		end
+	else
+		for _, side in SIDES do
+			if not feet.anchor[side] and not feet.step[side] then
+				local last = feet.last[side]
+				if last and (feet.lastLift[side] or 0) > 0.05 then
+					-- caught mid-swing: finish with a step
+					feet.step[side] = { from = last, t = 0 }
+				else
+					feet.anchor[side] = last or rootCF:PointToWorldSpace(rest[side])
+				end
+			end
+		end
+		-- one foot at a time: the one furthest off its spot
+		if not next(feet.step) then
+			local worst, far = nil, P.dist
+			for _, side in SIDES do
+				local a = feet.anchor[side]
+				if a then
+					local d = rootCF:PointToObjectSpace(a) - rest[side]
+					local m = Vector3.new(d.X, 0, d.Z).Magnitude
+					if m > far then
+						worst, far = side, m
+					end
+				end
+			end
+			if worst then
+				feet.step[worst] = { from = feet.anchor[worst], t = 0 }
+				feet.anchor[worst] = nil
+			end
+		end
+		for _, side in SIDES do
+			local st = feet.step[side]
+			out[side] = if st then rootCF:PointToObjectSpace(stepPos(side, st)) else rootCF:PointToObjectSpace(feet.anchor[side])
+			gaitK[side] = 0
+		end
+	end
+	local spread = 0
+	for _, side in SIDES do
+		feet.last[side] = rootCF:PointToWorldSpace(out[side])
+		feet.lastLift[side] = out[side].Y - rest[side].Y
+		local d = out[side] - rest[side]
+		spread = math.max(spread, Vector3.new(d.X, 0, d.Z).Magnitude)
+	end
+	feet.spread = spread
+	return out, gaitK, landed
+end
+
+-- Places both feet for this frame: the gait while walking, settle steps when
+-- stopped / turning on the spot, `tuck` (0..1: legs drawn up in the air).
+-- `rootCF` = the HumanoidRootPart's world CFrame. Returns the side whose
+-- settle step just landed (footstep sound), if any.
+function LegIK.place(rig: Rig, w: Walk, rootT: CFrame, tuck: number?, rootCF: CFrame?, dt: number?, sp: SettleParams?): string?
 	local u0 = (w.phase / TAU - 0.25) % 1
 	local tk = tuck or 0
+	local rest: { [string]: Vector3 } = {}
+	local gait: { [string]: Vector3 } = {}
+	local pitches: { [string]: number } = {}
 	for i, side in SIDES do
 		local u = if i == 1 then u0 else (u0 + 0.5) % 1
 		local f, up, pitch = LegIK.gait(u, w.duty, w.length, w.lift)
-		local k = w.weight
-		-- settling to rest: a foot still off its spot lifts a little on the way in
-		local settle = 4 * k * (1 - k) * math.min(1, math.abs(f) / 3) * 0.8
-		local out = (spread or 0) * (if side == "Left" then -1 else 1)
-		local target = rig.legs[side].rest
-			+ Vector3.new(out, up * k + settle + tk * rig.height * 0.28, -f * k - tk * rig.height * 0.08)
-		LegIK.solve(rig, side, target, rootT, pitch * k - 0.3 * tk)
+		rest[side] = rig.legs[side].rest
+		if tk > 0.01 then
+			-- airborne: legs drawn up under the body
+			gait[side] = rest[side] + Vector3.new(0, tk * rig.height * 0.28, -tk * rig.height * 0.08)
+			pitches[side] = -0.3 * tk
+		else
+			gait[side] = rest[side] + Vector3.new(0, up, -f)
+			pitches[side] = pitch
+		end
 	end
+	local targets, gaitK, landed
+	if rootCF then
+		targets, gaitK, landed = LegIK.settle(w.feet, rootCF, rest, gait, w.moving, w.weight, tk > 0.01, dt or 1 / 60, sp)
+	else
+		targets, gaitK = gait, { Left = 1, Right = 1 }
+	end
+	for _, side in SIDES do
+		LegIK.solve(rig, side, targets[side], rootT, pitches[side] * (if tk > 0.01 then 1 else gaitK[side]))
+	end
+	-- keep the walk drop while the feet are still spread after a stop
+	local half = math.max(1, w.length / 2)
+	w.dropK = math.max(w.weight, math.min(1, w.feet.spread / half))
+	return landed
 end
 
 -- Spring step (value, velocity) toward 0.

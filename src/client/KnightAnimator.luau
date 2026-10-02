@@ -297,6 +297,7 @@ local function step(dt: number)
 			end
 			st.amount = 0
 			st.legsFree = false
+			LegIK.resetFeet(st.walk)
 		else
 			if not st.legsFree then
 				LegIK.adopt(ik)
@@ -324,10 +325,10 @@ local function step(dt: number)
 			-- planted foot; lands into a squat
 			local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
 			local land = math.max(0, comp)
-			local rootT = CFrame.new(shift + s * 0.12 * S * a, -w.drop * w.weight - s * s * bob + breathe * 0.05 * S - land, 0)
+			local rootT = CFrame.new(shift + s * 0.12 * S * a, -w.drop * w.dropK - s * s * bob + breathe * 0.05 * S - land, 0)
 				* CFrame.Angles(0, 0, s * (0.03 * a + 0.04 * r) - shift * 0.02)
 			set(m, "Root", rootT)
-			LegIK.place(ik, w, rootT, air * 0.9)
+			local settled = LegIK.place(ik, w, rootT, air * 0.9, st.root.CFrame, dt)
 			local lean = -0.06 * a - SPRINT_LEAN * r + s2 * 0.03 * r - 0.06 * air - 0.05 * land
 			set(m, "Waist", CFrame.Angles(lean + breathe * 0.025, s * (0.1 * a + 0.15 * r) + st.look * 0.3, -shift * 0.015))
 			set(m, "Neck", CFrame.Angles(0.04 * a + 0.25 * r - s2 * 0.02 * r - breathe * 0.03 + 0.05 * air, -s * 0.08 * a + st.look * 0.7, 0))
@@ -344,6 +345,15 @@ local function step(dt: number)
 			set(m, "WingLeftMount", CFrame.Angles(wing, 0, 0))
 			set(m, "WingRightMount", CFrame.Angles(wing, 0, 0))
 
+			if settled and not strike then
+				local sound = st.stepSounds[settled]
+				if sound then
+					sound.Volume = 0.45
+					sound.PlaybackSpeed = 1.05 + math.random() * 0.15
+					sound.TimePosition = 0
+					sound:Play()
+				end
+			end
 			if strike then
 				local sound = st.stepSounds[strike]
 				if sound then

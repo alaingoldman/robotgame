@@ -522,7 +522,7 @@ local function step(dt: number)
 		local m = st.motors
 		local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
 		local roll = s * (0.035 * a + 0.05 * r)
-		local walkDrop = w.drop * w.weight
+		local walkDrop = w.drop * w.dropK
 		-- idle: a slow weight shift from foot to foot (the feet stay planted)
 		local shift = math.sin(now * 0.5) * 0.3 * S * idle * (1 - math.min(1, cr * 4))
 		local rootT = CFrame.new(drop.X + s * 0.1 * S * a + shift, drop.Y - s * s * bob + breathe * BREATHE * 0.5 - walkDrop, drop.Z)
@@ -535,9 +535,22 @@ local function step(dt: number)
 				LegIK.adopt(ik)
 				st.legsIK = true
 			end
-			LegIK.place(ik, w, rootT, tuck)
+			local settled = LegIK.place(ik, w, rootT, tuck, st.root.CFrame, dt)
+			if settled then
+				-- a settle step re-planted a foot: a lighter footfall
+				local sound = st.stepSounds[settled]
+				if sound then
+					sound.Volume = 0.5
+					sound.PlaybackSpeed = 1.05 + math.random() * 0.15
+					sound.TimePosition = 0
+					sound:Play()
+				end
+			end
 		else
 			-- standing / squatting: MechPose's crouch IK (exact powered-down pose)
+			if st.legsIK then
+				LegIK.resetFeet(w)
+			end
 			st.legsIK = false
 			set(m, "LeftHip", CFrame.Angles(crHip, 0, 0))
 			set(m, "RightHip", CFrame.Angles(crHip, 0, 0))
