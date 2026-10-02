@@ -166,6 +166,13 @@ def add(seg, col, m):
     parts.setdefault((seg, col), []).append(m)
 
 
+def add_sides(col, m):
+    """TASSETS: a +X (robot right) piece goes to tasset_R, its mirror to tasset_L, so each
+    side's hanging skirt plates are their own segment and can swing with that thigh."""
+    add("tasset_R", col, m)
+    add("tasset_L", col, m.mirrored_x())
+
+
 def build_chest():
     seg = "chest"
     # --- dark core (hidden mostly): |X|<=2.95, H 8.7..12.45 (back sheet: grey frame x 210..382, y 140..262)
@@ -302,12 +309,12 @@ def build_pelvis():
         sk = [(0.75, 2.9), (0.95, 3.6), (2.85, 5.55), (3.45, 5.75), (3.5, bot + 0.1), (3.3, bot),
               (1.2, bot + 0.3), (0.75, 2.0)]
         zsk = lambda u, v, zs=zs: zs * (1.9 + 0.12 * (5.5 - v) - 0.05 * (u - 0.75))  # flares out at the bottom
-        add(seg, "white", sym(plate(sk, zsk, 0.55, 0.14, 0.05, inward=inward)))
+        add_sides("white", plate(sk, zsk, 0.55, 0.14, 0.05, inward=inward))  # TASSETS: was sym() on the pelvis
         # layered lower plate with the curved top (261: x 210..265 -> |X| 3.0..1.1, y 448..505 -> H 2.6..0.68)
         lp = [(1.05, bot + 0.35), (3.1, bot + 0.2), (3.15, 2.55), (2.6, 2.75), (2.0, 2.82), (1.4, 2.75),
               (1.05, 2.55)]
         zlp = lambda u, v, zs=zs: zs * (2.55 + 0.12 * (2.6 - v) - 0.05 * (u - 1.0))  # noqa: E731
-        add(seg, "white", sym(plate(lp, zlp, 0.5, 0.1, 0.04, inward=inward)))
+        add_sides("white", plate(lp, zlp, 0.5, 0.1, 0.04, inward=inward))  # TASSETS: was sym() on the pelvis
     # outer side skirt plates in the (Z,H) plane (261 outer edge: (200,350) (186,390) (183,480) (200,515)
     #   -> |X| 3.38 @H5.97, 3.87 @4.6, 3.98 @1.55, 3.38 @0.34): flare out ~7 deg toward the bottom
     #   built as two facets folded along a vertical ridge (u = 0 -> Z +0.15) so the side is not a flat board
@@ -318,11 +325,12 @@ def build_pelvis():
             x = 3.35 + (5.6 - v) * 0.11 + w  # outer face, flaring out toward the bottom
             return (s * x, v, u + 0.15)
         zf = lambda u, v: 0.7 - 0.2 * abs(u)  # noqa: E731  ridge stands 0.2..0.55 proud of the rim
+        tseg = "tasset_R" if s > 0 else "tasset_L"  # TASSETS: the outer side plates swing with the thigh too
         for pr in (side_f, side_b):
-            add(seg, "white", plate(pr, zf, 0.75, 0.13, 0.06, fold_x, frame=fr, inward=-1.0))
+            add(tseg, "white", plate(pr, zf, 0.75, 0.13, 0.06, fold_x, frame=fr, inward=-1.0))
         # blue insert near the back on the outer face (261: x 185..205 -> |X| 3.9..3.2, y 458..490 -> H 2.3..1.2)
         bi = [(0.5, 1.25), (1.45, 1.05), (1.5, 2.35), (0.55, 2.45)]
-        add(seg, "blue", plate(bi, lambda u, v: 0.72 - 0.2 * u, 0.35, 0.06, 0.03, frame=fr, inward=-1.0))
+        add(tseg, "blue", plate(bi, lambda u, v: 0.72 - 0.2 * u, 0.35, 0.06, 0.03, frame=fr, inward=-1.0))
 
 
 def build_pauldrons():
@@ -386,6 +394,10 @@ SOCKETS = {  # cells
     # internal joints between torso segments
     "Waist": (0.0, 6.45, 0.0),   # pelvis <-> abdomen (bottom of the waist bands, 261 y 336)
     "Spine": (0.0, 8.95, 0.1),   # abdomen <-> chest (261 y 262)
+    # TASSETS: hinge of each side's skirt plates (front / back / outer side): over the hip
+    # ball, at the top of the outer side plate (H 5.6), so the plates swing with the thigh
+    "RightTasset": (1.9511 / 0.816, 5.6, 0.0),
+    "LeftTasset": (-1.9511 / 0.816, 5.6, 0.0),
 }
 PIVOTS = {
     "pelvis": (0.0, 0.0, 0.0),
@@ -393,8 +405,11 @@ PIVOTS = {
     "chest": SOCKETS["Spine"],
     "pauldron_R": SOCKETS["RightShoulder"],
     "pauldron_L": SOCKETS["LeftShoulder"],
+    "tasset_R": SOCKETS["RightTasset"],
+    "tasset_L": SOCKETS["LeftTasset"],
 }
-PARENT = {"pelvis": None, "abdomen": "pelvis", "chest": "abdomen", "pauldron_R": "chest", "pauldron_L": "chest"}
+PARENT = {"pelvis": None, "abdomen": "pelvis", "chest": "abdomen", "pauldron_R": "chest", "pauldron_L": "chest",
+          "tasset_R": "pelvis", "tasset_L": "pelvis"}
 
 
 def main():
