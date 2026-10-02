@@ -166,6 +166,12 @@ def add(seg, col, m):
     parts.setdefault((seg, col), []).append(m)
 
 
+def add_lr(seg, col, m):
+    """IRON MAN: a +X (robot right) half goes to <seg>_R, its mirror to <seg>_L."""
+    add(seg + "_R", col, m)
+    add(seg + "_L", col, m.mirrored_x())
+
+
 def add_sides(col, m):
     """TASSETS: a +X (robot right) piece goes to tasset_R, its mirror to tasset_L, so each
     side's hanging skirt plates are their own segment and can swing with that thigh."""
@@ -248,14 +254,17 @@ def build_chest():
     # COCKPIT: the prow plates, pecs, chevron and under-chest accents form the hatch
     # (segment "hatch", hinged at its bottom); thinner (1.1 cells, still a thick door) so
     # the cockpit behind it has depth
-    add("hatch", "white", sym(plate(up, z_up, 1.1, 0.13, 0.05, fold_h(9.8))))
-    add("hatch", "white", sym(plate(lo, z_lo, 1.1, 0.13, 0.05, fold_h(9.8))))
+    # IRON MAN: the chest front opens as several plates - the prow + pec halves are two doors
+    # (door_R / door_L) hinged at their outer edges, the chevron + under-chest accents a lower
+    # plate ("hatch", hinged at its bottom) that drops
+    add_lr("door", "white", plate(up, z_up, 1.1, 0.13, 0.05, fold_h(9.8)))
+    add_lr("door", "white", plate(lo, z_lo, 1.1, 0.13, 0.05, fold_h(9.8)))
     # gold lower pectoral chevrons, stacked 0.3 in front of the white plate
     #   (259: (190,232) (252,240) (255,267) (235,270) (210,280) (195,275))
     pec = [(FX(190), HY(232)), (FX(252), HY(240)), (FX(255), HY(267)), (FX(235), HY(270)),
            (FX(210), HY(280)), (FX(195), HY(275))]
     z_pec = lambda u, v: -3.55 + 0.42 * u + 0.36 * (9.8 - v) + 0.1 * (u - 1.1)  # noqa: E731
-    add("hatch", "gold", sym(plate(pec, z_pec, 1.0, 0.16, 0.06)))  # COCKPIT: on the hatch
+    add_lr("door", "gold", plate(pec, z_pec, 1.0, 0.16, 0.06))  # IRON MAN: on the doors
     # gold outer pec side wrap (259: gold x 190..205 at y 240..280)
     wrap = [(-0.6, 8.35), (0.6, 8.6), (0.5, 10.0), (-0.9, 10.0)]
     for s in (1, -1):
@@ -406,6 +415,10 @@ SOCKETS = {  # cells
     "RightTasset": (1.9511 / 0.816, 5.6, 0.0),
     # COCKPIT: the chest hatch hinge, along the bottom of the chevron (centre of its thickness)
     "HatchHinge": (0.0, 7.9, -2.3),
+    # IRON MAN: the chest doors' vertical hinges at their outer edges (prow plate side edge
+    # |X| 2.82, behind its outer face)
+    "RightDoorHinge": (2.82, 9.8, -1.75),
+    "LeftDoorHinge": (-2.82, 9.8, -1.75),
     "LeftTasset": (-1.9511 / 0.816, 5.6, 0.0),
 }
 PIVOTS = {
@@ -417,9 +430,12 @@ PIVOTS = {
     "tasset_R": SOCKETS["RightTasset"],
     "tasset_L": SOCKETS["LeftTasset"],
     "hatch": SOCKETS["HatchHinge"],
+    "door_R": SOCKETS["RightDoorHinge"],
+    "door_L": SOCKETS["LeftDoorHinge"],
 }
 PARENT = {"pelvis": None, "abdomen": "pelvis", "chest": "abdomen", "pauldron_R": "chest", "pauldron_L": "chest",
-          "tasset_R": "pelvis", "tasset_L": "pelvis", "hatch": "chest"}
+          "tasset_R": "pelvis", "tasset_L": "pelvis", "hatch": "chest",
+          "door_R": "chest", "door_L": "chest"}
 
 
 def main():

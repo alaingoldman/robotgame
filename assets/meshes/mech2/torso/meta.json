@@ -114,8 +114,31 @@
       "parent": "chest",
       "files": [
         "hatch_blue.obj",
-        "hatch_gold.obj",
         "hatch_white.obj"
+      ]
+    },
+    "door_R": {
+      "pivot": [
+        2.3011,
+        7.9968,
+        -1.428
+      ],
+      "parent": "chest",
+      "files": [
+        "door_R_gold.obj",
+        "door_R_white.obj"
+      ]
+    },
+    "door_L": {
+      "pivot": [
+        -2.3011,
+        7.9968,
+        -1.428
+      ],
+      "parent": "chest",
+      "files": [
+        "door_L_gold.obj",
+        "door_L_white.obj"
       ]
     }
   },
@@ -164,6 +187,16 @@
       0.0,
       6.4464,
       -1.8768
+    ],
+    "RightDoorHinge": [
+      2.3011,
+      7.9968,
+      -1.428
+    ],
+    "LeftDoorHinge": [
+      -2.3011,
+      7.9968,
+      -1.428
     ],
     "LeftTasset": [
       -1.9511,
@@ -216,6 +249,16 @@
       0.0,
       7.9,
       -2.3
+    ],
+    "RightDoorHinge": [
+      2.82,
+      9.8,
+      -1.75
+    ],
+    "LeftDoorHinge": [
+      -2.82,
+      9.8,
+      -1.75
     ],
     "LeftTasset": [
       -2.3910539215686275,
@@ -393,6 +436,102 @@
       ]
     },
     {
+      "file": "door_L_gold.obj",
+      "segment": "door_L",
+      "colour": "gold",
+      "hex": "#D4A93A",
+      "tris": 44,
+      "open_edges": 0,
+      "max_uv_stretch": 1.124,
+      "bbox_min": [
+        -2.7439,
+        6.8232,
+        -2.3612
+      ],
+      "bbox_max": [
+        -0.8763,
+        8.16,
+        -0.4827
+      ],
+      "bbox_centre": [
+        -1.8101,
+        7.4916,
+        -1.4219
+      ]
+    },
+    {
+      "file": "door_L_white.obj",
+      "segment": "door_L",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 64,
+      "open_edges": 0,
+      "max_uv_stretch": 1.076,
+      "bbox_min": [
+        -2.3011,
+        7.14,
+        -2.7744
+      ],
+      "bbox_max": [
+        -0.0,
+        8.9923,
+        -0.4533
+      ],
+      "bbox_centre": [
+        -1.1506,
+        8.0662,
+        -1.6138
+      ]
+    },
+    {
+      "file": "door_R_gold.obj",
+      "segment": "door_R",
+      "colour": "gold",
+      "hex": "#D4A93A",
+      "tris": 44,
+      "open_edges": 0,
+      "max_uv_stretch": 1.124,
+      "bbox_min": [
+        0.8763,
+        6.8232,
+        -2.3612
+      ],
+      "bbox_max": [
+        2.7439,
+        8.16,
+        -0.4827
+      ],
+      "bbox_centre": [
+        1.8101,
+        7.4916,
+        -1.4219
+      ]
+    },
+    {
+      "file": "door_R_white.obj",
+      "segment": "door_R",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 64,
+      "open_edges": 0,
+      "max_uv_stretch": 1.076,
+      "bbox_min": [
+        0.0,
+        7.14,
+        -2.7744
+      ],
+      "bbox_max": [
+        2.3011,
+        8.9923,
+        -0.4533
+      ],
+      "bbox_centre": [
+        1.1506,
+        8.0662,
+        -1.6138
+      ]
+    },
+    {
       "file": "hatch_blue.obj",
       "segment": "hatch",
       "colour": "blue",
@@ -417,51 +556,27 @@
       ]
     },
     {
-      "file": "hatch_gold.obj",
-      "segment": "hatch",
-      "colour": "gold",
-      "hex": "#D4A93A",
-      "tris": 88,
-      "open_edges": 0,
-      "max_uv_stretch": 1.124,
-      "bbox_min": [
-        -2.7439,
-        6.8232,
-        -2.3612
-      ],
-      "bbox_max": [
-        2.7439,
-        8.16,
-        -0.4827
-      ],
-      "bbox_centre": [
-        0.0,
-        7.4916,
-        -1.4219
-      ]
-    },
-    {
       "file": "hatch_white.obj",
       "segment": "hatch",
       "colour": "white",
       "hex": "#F2F2F2",
-      "tris": 184,
+      "tris": 56,
       "open_edges": 0,
-      "max_uv_stretch": 1.076,
+      "max_uv_stretch": 1.0,
       "bbox_min": [
-        -2.3011,
+        -1.5912,
         6.4056,
-        -2.7744
+        -2.2629
       ],
       "bbox_max": [
-        2.3011,
-        8.9923,
-        -0.4533
+        1.5912,
+        7.3032,
+        -0.8655
       ],
       "bbox_centre": [
         0.0,
-        7.699,
-        -1.6138
+        6.8544,
+        -1.5642
       ]
     },
     {
