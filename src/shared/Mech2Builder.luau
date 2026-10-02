@@ -6,14 +6,18 @@
 --
 --   * HumanoidRootPart (invisible collision box on the hip line) + Motor6D
 --     "Root" -> Pelvis, Humanoid, model-level "PilotSeat", "MechType".
---   * Armor_Helmet (head + canopy) / Armor_Chest (torso, pauldrons, arms) /
+--   * Armor_Helmet (head) / Armor_Chest (torso, hatch, pauldrons, arms) /
 --     Armor_Legs folders (MechPattern, inventory slots).
---   * Motors: Root, Waist, Spine, Neck, CanopyHinge, Right|Left Shoulder /
+--   * Motors: Root, Waist, Spine, Neck, HatchHinge, Right|Left Shoulder /
 --     Elbow / Wrist, Right|Left Hip / Knee / Ankle, Right|Left PauldronJoint
 --     (the pauldron follows part of the arm swing, Mech2Animator), Right|Left
 --     TassetJoint (the skirt plates follow part of the thigh swing, Mech2Pose).
---   * Head cockpit: the pilot seat sits inside the head; the gold crown is a
---     canopy on "CanopyHinge" that lifts open while parked (Mech2Pose).
+--   * Chest cockpit: the front chest plates (hatch_* meshes) ride a "Hatch"
+--     bone on "HatchHinge" along their bottom edge and fold down and forward
+--     while parked (Mech2Pose.setHatch). Behind them, in the hollowed core, a
+--     lit cockpit built from parts: liner walls, a gold frame lip, a seat,
+--     consoles with screens, a light bar; the pilot shows as a scaled
+--     stand-in (Mech2Animator).
 --   * Battery pack on the back between the gold fins: casing, four charge
 --     cells ("Mech2Cell" 1..4) and a terminal ("BatteryTerminal") for the
 --     charging arc (Mech2Dock).
@@ -56,7 +60,6 @@ local ARM_ROLL = math.rad(17)
 
 local SLOT_OF_BONE: { [string]: string } = {
 	Head = "Helmet",
-	Canopy = "Helmet",
 	RightThigh = "Legs",
 	RightShin = "Legs",
 	RightFoot = "Legs",
@@ -171,6 +174,69 @@ local function buildBattery(folder: Instance, chest: BasePart)
 	a.Parent = ball
 end
 
+-- ===== chest cockpit ========================================================
+-- In the hollowed chest core (torso build.py "COCKPIT": back block at z 0.245,
+-- floor slab top 7.33, roof slab 9.63, side blocks from |x| 2.04; torso frame,
+-- studs). Everything stays behind the closed hatch's inner face (OBJ ray
+-- casts: about z -1.6 at the centre, -0.95 at |x| 1.8), so the shut hatch
+-- never cuts through it.
+local function buildCockpit(model: Model, folder: Instance, chest: BasePart)
+	local ck = Instance.new("Folder")
+	ck.Name = "Cockpit"
+	ck.Parent = folder
+	local function part(name: string, size: Vector3, pos: Vector3, role: string, rot: CFrame?, shape: Enum.PartType?): BasePart
+		return addPart(ck, chest, name, size, CFrame.new(pos - SPINE) * (rot or CFrame.identity), role, shape)
+	end
+	local front, back = -0.95, 0.205
+	local zc, depth = (front + back) / 2, back - front
+	local y0, y1 = 7.36, 9.58
+	local yc, h = (y0 + y1) / 2, y1 - y0
+	local hw = 1.9
+	-- liner: back, floor, roof, side walls (sides run the full depth; floor /
+	-- roof / back sit between them, so no two faces coincide)
+	part("CockpitBack", Vector3.new(hw * 2 - 0.14, h - 0.1, 0.06), Vector3.new(0, yc, back), "dark")
+	part("CockpitFloor", Vector3.new(hw * 2 - 0.14, 0.06, depth - 0.07), Vector3.new(0, y0, zc - 0.035), "dark")
+	part("CockpitRoof", Vector3.new(hw * 2 - 0.14, 0.06, depth - 0.07), Vector3.new(0, y1, zc - 0.035), "dark")
+	for _, sx in { 1, -1 } do
+		part("CockpitWall", Vector3.new(0.06, h + 0.06, depth + 0.06), Vector3.new(sx * (hw - 0.03), yc, zc), "dark")
+		-- side console with a tilted screen facing the pilot
+		part("CockpitConsole", Vector3.new(0.5, 0.75, 0.85), Vector3.new(sx * 1.6, y0 + 0.4, -0.45), "joint")
+		part("CockpitScreen", Vector3.new(0.05, 0.42, 0.62), Vector3.new(sx * 1.33, y0 + 0.62, -0.45), "glow", CFrame.Angles(0, 0, sx * 0.35))
+		-- gold frame lip at the cockpit mouth
+		part("CockpitFrame", Vector3.new(0.14, h + 0.04, 0.14), Vector3.new(sx * (hw - 0.1), yc, front + 0.07), "hi")
+	end
+	part("CockpitFrame", Vector3.new(hw * 2 - 0.34, 0.14, 0.14), Vector3.new(0, y1 - 0.1, front + 0.07), "hi")
+	part("CockpitSill", Vector3.new(hw * 2 - 0.34, 0.14, 0.2), Vector3.new(0, y0 + 0.1, front + 0.1), "hi")
+	-- seat: pan, back, headrest (the pilot stand-in sits on it)
+	local seatTop = y0 + 0.42
+	part("SeatPan", Vector3.new(1.15, 0.2, 0.9), Vector3.new(0, seatTop - 0.1, -0.33), "accent")
+	part("SeatPost", Vector3.new(0.35, seatTop - 0.2 - y0, 0.35), Vector3.new(0, (y0 + seatTop - 0.2) / 2, -0.3), "joint")
+	part("SeatBack", Vector3.new(1.15, 1.25, 0.18), Vector3.new(0, seatTop + 0.6, 0.05) * Vector3.new(1, 1, 1), "accent", CFrame.Angles(0.1, 0, 0))
+	part("SeatHeadrest", Vector3.new(0.6, 0.35, 0.16), Vector3.new(0, seatTop + 1.42, 0.1), "dark")
+	-- light bar along the back wall top + a soft light (shadows on: it stays inside)
+	part("CockpitLightBar", Vector3.new(2.6, 0.08, 0.05), Vector3.new(0, y1 - 0.18, back - 0.06), "glow")
+	local lamp = part("CockpitLamp", Vector3.new(0.5, 0.05, 0.3), Vector3.new(0, y1 - 0.06, zc), "glow")
+	local light = Instance.new("PointLight")
+	light.Name = "CockpitLight"
+	light.Range = 6
+	light.Brightness = 1.1
+	light.Color = Color3.fromRGB(255, 236, 210)
+	light.Shadows = true
+	light.Parent = lamp
+	-- the real seat (invisible); the avatar on it is hidden and shown scaled (Mech2Animator)
+	local seat = Instance.new("Seat")
+	seat.Name = "PilotSeat"
+	seat.Size = Vector3.new(1, 0.2, 0.9)
+	local seatCF = CFrame.new(Vector3.new(0, seatTop - 0.1, -0.33) - SPINE)
+	seat.CFrame = chest.CFrame * seatCF
+	seat.Transparency = 1
+	seat.CanCollide = false
+	seat.CanTouch = false
+	seat.Massless = true
+	seat.Parent = model
+	weld(chest, seat, seatCF)
+end
+
 -- ===== rig ==================================================================
 
 -- Builds the full mech (geometry included); colours default to the
@@ -223,12 +289,25 @@ function Mech2Builder.buildRig(name: string): Model
 	local abdomen = bone("Abdomen", CFrame.new(hip + WAIST))
 	local chest = bone("Chest", CFrame.new(hip + SPINE))
 	local head = bone("Head", CFrame.new(hip + NECK))
-	local canopy = bone("Canopy", head.CFrame * CFrame.new(Mech2Config.CanopyHinge))
+	local hatch = bone("Hatch", CFrame.new(hip + Mech2Config.HatchHinge))
 	motor("Root", root, pelvis)
 	motor("Waist", pelvis, abdomen)
 	motor("Spine", abdomen, chest)
 	motor("Neck", chest, head)
-	motor("CanopyHinge", head, canopy)
+	motor("HatchHinge", chest, hatch)
+	-- IRON MAN chest doors on vertical hinges at their outer edges
+	for _, side in { "Right", "Left" } do
+		local sx = if side == "Right" then 1 else -1
+		local door = bone(side .. "Door", CFrame.new(hip + Mech2Config.DoorHinge * Vector3.new(sx, 1, 1)))
+		motor(side .. "DoorHinge", chest, door)
+	end
+	-- eye slits: two glow bars under the gold brow V (head mesh ray casts:
+	-- the white chin face is at z ~-0.78 where the brow edge crosses x 0.55);
+	-- dark while powered down, lit when the pilot is in (Mech2Animator)
+	for _, sx in { 1, -1 } do
+		local eye = addPart(folders.Helmet, head, "EyeSlit", Vector3.new(0.5, 0.07, 0.06), CFrame.new(sx * 0.55, 0.5, -0.8) * CFrame.Angles(0, 0, sx * 0.32), "glow")
+		eye:SetAttribute("Mech2Eye", true)
+	end
 
 	for _, side in { "Right", "Left" } do
 		local sx = if side == "Right" then 1 else -1
@@ -296,26 +375,7 @@ function Mech2Builder.buildRig(name: string): Model
 		warn(string.format("[Mech2Builder] %d of the mech2 meshes have no template (ReplicatedStorage.%s): built without them", missing, Mech2Meshes.FolderName))
 	end
 
-	-- head cockpit: the seat sits inside the head shell (the pilot is hidden
-	-- while seated, Mech2Animator); a soft light under the canopy
-	local seat = Instance.new("Seat")
-	seat.Name = "PilotSeat"
-	seat.Size = Vector3.new(1, 0.2, 1)
-	seat.CFrame = head.CFrame * CFrame.new(0, 1.0, 0.3)
-	seat.Transparency = 1
-	seat.CanCollide = false
-	seat.CanTouch = false
-	seat.Massless = true
-	seat.Parent = model
-	weld(head, seat, CFrame.new(0, 1.0, 0.3))
-	local glow = addPart(folders.Helmet, head, "CockpitGlow", Vector3.new(0.9, 0.08, 0.9), CFrame.new(0, 2.05, -0.6), "glow")
-	glow.Transparency = 1 -- just carries the light
-	local light = Instance.new("PointLight")
-	light.Name = "CockpitLight"
-	light.Range = 5
-	light.Brightness = 0.8
-	light.Shadows = false
-	light.Parent = glow
+	buildCockpit(model, folders.Chest, chest)
 
 	buildBattery(folders.Chest, chest)
 
@@ -364,8 +424,8 @@ function Mech2Builder.applySlot(model: Model, slot: string, variantId: string)
 			if typeof(role) == "string" then
 				paint(d, role, palette)
 			end
-		elseif d:IsA("PointLight") then
-			d.Color = palette.glow
+		elseif d:IsA("PointLight") and d.Name ~= "CockpitLight" then
+			d.Color = palette.glow -- (the cockpit keeps a warm white: blue light turned the gold green)
 		end
 	end
 	model:SetAttribute(slot, variantId)

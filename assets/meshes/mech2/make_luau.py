@@ -12,11 +12,22 @@ ids = json.load(open(os.path.join(HERE, "asset_ids.json")))
 legs = json.load(open(os.path.join(HERE, "legs", "meta.json")))
 torso = json.load(open(os.path.join(HERE, "torso", "meta.json")))
 sock = torso["sockets"]
+# the chest cockpit meshes (_import3) are used once their uploads are in asset_ids.json
+USE_IMPORT3 = "hatch_white" in ids
+# IRON MAN chest doors (_import4): door_R/L + the chevron-only hatch_white; hatch_gold retired
+USE_IMPORT4 = "door_R_white" in ids
+SKIP = {"hatch_gold"} if USE_IMPORT4 else set()
 
 def obj_path(name):
-    # _import2 holds the re-exported torso files (tasset split): newer than _import
-    p2 = os.path.join(HERE, "_import2", name + ".obj")
-    return p2 if os.path.exists(p2) else os.path.join(HERE, "_import", name + ".obj")
+    # re-exported torso files, newest first: _import3 (chest cockpit / hatch split),
+    # _import2 (tasset split), then the original upload. A newer file only counts
+    # once asset_ids.json has its new upload (USE_IMPORT3).
+    dirs = (["_import4"] if USE_IMPORT4 else []) + (["_import3"] if USE_IMPORT3 else []) + ["_import2", "_import"]
+    for d in dirs:
+        p = os.path.join(HERE, d, name + ".obj")
+        if os.path.exists(p):
+            return p
+    raise FileNotFoundError(name)
 
 
 def bbox(name):
@@ -32,13 +43,13 @@ def sub(a, b):
 
 rows = []
 for name in sorted(ids):
+    if name in SKIP:
+        continue
     centre, size = bbox(name)
     colour = name.split("_")[-1].lower()
     role = ROLE[colour]
     if name.startswith("Head_"):
         bone, pivot = "Head", [0, 0, 0]
-        if name == "Head_Gold":
-            bone, pivot = "Canopy", [0, 2.3, 0.15]  # crown hinge (Mech2Builder.CanopyHinge)
     elif name.startswith("Leg_"):
         side, seg = name.split("_")[1], name.split("_")[2]
         piv = legs["legs"]["Leg_" + side]["pivots"][{"Thigh": "Hip", "Shin": "Knee", "Foot": "Ankle"}[seg]]
@@ -56,7 +67,13 @@ for name in sorted(ids):
             bone, pivot = n + "Hand", [0.30 * sx, -6.93, 0]
     else:
         seg = name.split("_")[0]
-        if seg == "tasset":
+        if seg == "door":
+            side = name.split("_")[1]
+            bone = ("Right" if side == "R" else "Left") + "Door"
+            pivot = sock["RightDoorHinge" if side == "R" else "LeftDoorHinge"]
+        elif seg == "hatch":
+            bone, pivot = "Hatch", sock["HatchHinge"]  # chest cockpit hatch (bottom hinge)
+        elif seg == "tasset":
             side = name.split("_")[1]
             bone = ("Right" if side == "R" else "Left") + "Tasset"
             pivot = sock["RightTasset" if side == "R" else "LeftTasset"]

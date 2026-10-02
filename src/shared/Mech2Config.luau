@@ -2,7 +2,7 @@
 -- Tuning and data for the PLD-02 "Paladin" (type id "Mech2", the owner's
 -- "mech2"): the white / gold / blue mech built from the imported meshes in
 -- assets/meshes/mech2 (Mech2Meshes). See Mech2Builder (rig, colours,
--- cockpit, battery), Mech2Pose (rest crouch, canopy, leg IK), Mech2Dock
+-- cockpit, battery), Mech2Pose (kneel, chest hatch, leg IK), Mech2Dock
 -- (charging post) and the client Mech2Animator / Mech2Pilot.
 --
 -- Colour variants reuse MechConfig's variant ids (inventory cards, the
@@ -120,29 +120,68 @@ Mech2Config.RootHeight = 8.4603
 Mech2Config.RootSize = Vector3.new(5, 3, 4)
 Mech2Config.CameraOffset = Vector3.new(0, 10, 0)
 
--- Head cockpit: the gold crown is a canopy hinged at its back top edge; it
--- lifts open while parked and shuts over the pilot (Mech2Pose.setCanopy).
-Mech2Config.CanopyHinge = Vector3.new(0, 2.3, 0.15) -- head frame (studs)
-Mech2Config.CanopyOpen = 0.95 -- radians (front lifts)
+-- Chest cockpit: the front chest plates are a hatch (hatch_* meshes) hinged
+-- along their bottom edge (torso meta HatchHinge); it folds down and forward
+-- while parked (Mech2Pose.setHatch). Behind it the core is hollow: a lit
+-- cockpit with a seat; the seated pilot is shown as a scaled stand-in
+-- (Mech2Animator), the real avatar is hidden.
+Mech2Config.HatchHinge = Vector3.new(0, 6.4464, -1.8768) -- torso frame (studs)
+Mech2Config.HatchOpen = -1.45 -- radians (the lower plate drops forward and down)
+Mech2Config.PilotScale = 0.6 -- the stand-in pilot in the chest cockpit
+-- IRON MAN opening: the chest doors (door_R / door_L meshes) swing out on
+-- vertical hinges at their outer edges, the pauldrons lift and roll out.
+-- Each part opens in its own window of the 0..1 opening, so they unfold one
+-- after another (lower plate, doors, pauldrons) and fold back in reverse,
+-- with a little overshoot as each one opens.
+Mech2Config.DoorHinge = Vector3.new(2.3011, 7.9968, -1.428) -- torso frame, right door (left: x negated)
+Mech2Config.DoorOpen = 1.95 -- radians about Y (right door: negative)
+Mech2Config.Unfold = {
+	Hatch = { 0.0, 0.45 },
+	Doors = { 0.18, 0.72 },
+	Pauldrons = { 0.4, 1.0 },
+	PauldronRoll = 0.38, -- out
+	PauldronLift = -0.22, -- tips back
+	Overshoot = 1.2, -- back-out easing strength while opening
+}
+
+-- Parked kneel (Mech2Pose.kneel, the BRZ-01's one-knee pose at this size).
+Mech2Config.Kneel = {
+	KneeClear = 1.62, -- right knee joint above the ground: the shin plate just touches it (EditableMesh check)
+	ThighLean = 0.12, -- right thigh tipped forward (radians)
+	PelvisBack = 0.35,
+	LeftForward = 3.0, -- left ankle ahead of its hip (studs)
+	LeftOut = 0.3,
+	LeftYaw = 0.28,
+	RightYaw = -0.08,
+	RightFootLift = 0.35, -- ankle up a little so the shin lies flatter (its front faces the floor)
+	RightFootPitch = -0.12, -- toe down onto the floor
+	StepLift = 1.3,
+	Lean = 0.12, -- torso pitch forward
+	Neck = -0.3,
+	LeftShoulder = 0.2,
+	LeftElbow = 0.95,
+	RightShoulder = 0.25,
+	RightElbow = 0.3,
+}
 
 -- Get-in / get-out (seconds from PowerTime). Placeholder flow (MechTypes
--- cinematicBoarding = false): E seats the pilot in the head at once, the
--- canopy shuts, the mech rises from its rest crouch and hands over.
+-- cinematicBoarding = false): E seats the pilot in the chest at once, the
+-- hatch swings shut, the mech rises from its kneel and hands over.
 -- Mech2Pilot flies the camera over it.
 Mech2Config.Board = {
-	CanopyCloseStart = 0.3,
-	CanopyCloseEnd = 0.85,
-	PowerUp = 0.8,
-	StandStart = 0.95,
-	StandEnd = 2.05,
-	Online = 2.2,
+	HatchCloseStart = 0.4, -- the chest folds shut around the pilot (pauldrons, doors, lower plate)
+	HatchCloseEnd = 1.15,
+	PowerUp = 1.15, -- eyes light up once it's shut
+	StandStart = 1.3,
+	StandEnd = 2.4,
+	Online = 2.5,
 }
 Mech2Config.Exit = {
-	CrouchEnd = 1.1,
-	CanopyOpenStart = 1.0,
-	CanopyOpenEnd = 1.55,
-	Unseat = 1.6,
-	Off = 1.9,
+	KneelEnd = 1.3,
+	HatchOpenStart = 1.1, -- unfolds: lower plate, doors, pauldrons
+	HatchOpenEnd = 1.9,
+	Unseat = 1.95,
+	Off = 2.2,
 }
 
 -- Gait (Mech2Animator). Speeds are the shared MechConfig ones (22 / 46).
@@ -171,7 +210,7 @@ Mech2Config.Dock = {
 	EmitterHeight = 13.5,
 	Reach = 20, -- battery terminal to emitter distance where the arc breaks
 	PlugRange = 8, -- root within this of home to re-connect
-	ReplugAt = 1.1, -- seconds into PoweringDown (crouched)
+	ReplugAt = 1.3, -- seconds into PoweringDown (knelt)
 	ChargeRate = 14, -- percent per second
 }
 

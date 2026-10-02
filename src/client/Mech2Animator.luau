@@ -4,7 +4,7 @@
 -- "PowerState" / "PowerTime", "Charge", "Plugged"). Modelled on
 -- TitanAnimator:
 --
---   * power states: rest crouch <-> stand, head canopy, cockpit light
+--   * power states: one-knee kneel <-> stand, chest hatch, cockpit light
 --     (Mech2Pose.powerTargets with Mech2Config.Board / Exit timings)
 --   * idle: breathing, weight shift, slow head looks
 --   * walk / sprint: IK-planted feet (LegIK.settle when stopping / turning),
@@ -14,8 +14,9 @@
 --   * footstep / landing sounds, servo hum, power cues
 --   * battery: the four cells on the back show the charge; a blue arc jumps
 --     from the dock post to the terminal while plugged in (Mech2Dock)
---   * head cockpit: whoever sits in the pilot seat is hidden (the avatar is
---     bigger than the head; it is "inside" the cockpit)
+--   * chest cockpit: whoever sits in the pilot seat is hidden (a full-size
+--     avatar doesn't fit) and shown as a local stand-in clone scaled to
+--     Mech2Config.PilotScale, posed seated and welded to the seat
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -43,8 +44,8 @@ type Cue = { at: number, sound: string, volume: number, speed: number, stop: num
 local CUES: { [string]: { Cue } } = {
 	Boarding = {
 		{ at = 0, sound = "Clunk", volume = 0.7, speed = 1.3 },
-		{ at = B.CanopyCloseStart, sound = "Hiss", volume = 0.5, speed = 1.2, stop = 0.5 },
-		{ at = B.CanopyCloseEnd, sound = "Clunk", volume = 1.0, speed = 0.9 },
+		{ at = B.HatchCloseStart, sound = "Hiss", volume = 0.5, speed = 1.2, stop = 0.5 },
+		{ at = B.HatchCloseEnd, sound = "Clunk", volume = 1.0, speed = 0.9 },
 		{ at = B.PowerUp, sound = "PowerUp", volume = 0.8, speed = 1.05 },
 		{ at = B.StandStart, sound = "StandUp", volume = 0.9, speed = 1.0 },
 		{ at = B.StandEnd - 0.05, sound = "Stomp", volume = 0.9, speed = 0.95 },
@@ -52,8 +53,8 @@ local CUES: { [string]: { Cue } } = {
 	PoweringDown = {
 		{ at = 0, sound = "PowerDown", volume = 0.8, speed = 0.9 },
 		{ at = 0.05, sound = "Hydraulic", volume = 0.8, speed = 1.0 },
-		{ at = X.CanopyOpenStart, sound = "Hiss", volume = 0.6, speed = 1.2, stop = 0.6 },
-		{ at = X.CanopyOpenEnd, sound = "Clunk", volume = 0.8, speed = 0.9 },
+		{ at = X.HatchOpenStart, sound = "Hiss", volume = 0.6, speed = 1.2, stop = 0.6 },
+		{ at = X.HatchOpenEnd, sound = "Clunk", volume = 0.8, speed = 0.9 },
 	},
 }
 local CUE_SOUNDS = { "Clunk", "Hiss", "PowerUp", "PowerDown", "Hydraulic", "StandUp", "Stomp" }
@@ -64,9 +65,10 @@ type State = {
 	motors: { [string]: Motor6D },
 	rig: Mech2Pose.Rig,
 	crouch: number,
-	canopy: number,
+	hatch: number,
 	power: number,
 	cockpitLights: { PointLight }?,
+	eyes: { BasePart }?,
 	cells: { BasePart }?,
 	cellKey: string,
 	phase: number,
@@ -97,7 +99,7 @@ type State = {
 local states: { [Model]: State } = {}
 local stepListeners: { (model: Model, side: string, strength: number) -> () } = {}
 local landListeners: { (model: Model, impact: number) -> () } = {}
-local hidden: { [Model]: boolean } = {} -- pilot characters hidden in a head cockpit
+local hidden: { [Model]: Seat } = {} -- pilot characters hidden in a chest cockpit
 Mech2Animator.JumpWindup = Mech2Config.JumpWindup
 local rayParams = RaycastParams.new()
 rayParams.FilterType = Enum.RaycastFilterType.Exclude
@@ -182,9 +184,10 @@ local function setup(model: Model)
 		motors = motors,
 		rig = rig,
 		crouch = crouch,
-		canopy = canopy,
+		hatch = canopy,
 		power = power,
 		cockpitLights = nil,
+		eyes = nil,
 		cells = nil,
 		cellKey = "",
 		phase = 0,
@@ -263,21 +266,32 @@ local function playCues(model: Model, st: State)
 	st.cueT = t
 end
 
--- Cockpit light under the canopy: on while the canopy is open or powered.
+-- Cockpit light: on while the hatch is open or the mech is powered. The eye
+-- slits light up with the power (after the chest has folded shut).
 local function applyCockpit(model: Model, st: State)
 	local lights = st.cockpitLights
 	if not lights then
-		local found = {}
+		local found, eyes = {}, {}
 		for _, d in model:GetDescendants() do
 			if d:IsA("PointLight") and d.Name == "CockpitLight" then
 				table.insert(found, d)
+			elseif d:IsA("BasePart") and d:GetAttribute("Mech2Eye") then
+				table.insert(eyes, d)
 			end
 		end
 		lights = found
 		st.cockpitLights = found
+		st.eyes = eyes
+	end
+	local k = 0.06 + 0.94 * st.power
+	for _, e in st.eyes or {} do
+		local lit = e:GetAttribute("LitColor")
+		if typeof(lit) == "Color3" then
+			e.Color = Color3.new(lit.R * k, lit.G * k, lit.B * k)
+		end
 	end
 	for _, l in lights :: { PointLight } do
-		l.Brightness = 0.9 * math.max(st.canopy, st.power * 0.3)
+		l.Brightness = 0.9 * math.max(st.hatch, st.power * 0.3)
 		l.Enabled = l.Brightness > 0.03
 	end
 end
@@ -591,22 +605,169 @@ local function setHidden(char: Model, on: boolean)
 	end
 end
 
-local function updateHidden()
-	local now: { [Model]: boolean } = {}
-	for model in states do
-		local seat = model:FindFirstChild("PilotSeat")
-		local occ = seat and seat:IsA("Seat") and seat.Occupant
-		local char = occ and occ.Parent
-		if char and char:IsA("Model") then
-			now[char] = true
+-- The stand-in pilot: a local clone of the seated avatar (its look: body,
+-- clothes, accessories, worn gear), scaled down to fit the chest cockpit,
+-- posed seated and welded to the seat. Visual only (no collisions, no mass).
+local dolls: { [Model]: Model } = {} -- character -> stand-in
+local SEATED = {
+	-- R15 joint -> extra C0 rotation for a seated pose
+	LeftHip = CFrame.Angles(math.rad(85), 0, 0),
+	RightHip = CFrame.Angles(math.rad(85), 0, 0),
+	LeftKnee = CFrame.Angles(math.rad(-80), 0, 0),
+	RightKnee = CFrame.Angles(math.rad(-80), 0, 0),
+	LeftShoulder = CFrame.Angles(math.rad(35), 0, 0),
+	RightShoulder = CFrame.Angles(math.rad(35), 0, 0),
+	LeftElbow = CFrame.Angles(math.rad(40), 0, 0),
+	RightElbow = CFrame.Angles(math.rad(40), 0, 0),
+}
+
+local function makeDoll(char: Model, seat: BasePart): Model?
+	local was = char.Archivable
+	char.Archivable = true
+	local ok, doll = pcall(function()
+		return char:Clone()
+	end)
+	char.Archivable = was
+	if not ok or not doll then
+		return nil
+	end
+	local d = doll :: Model
+	d.Name = "PilotStandIn"
+	for _, x in d:GetDescendants() do
+		if x:IsA("Script") or x:IsA("LocalScript") or x:IsA("Sound") or x:IsA("Animator") or x:IsA("ForceField") then
+			x:Destroy()
+		elseif x:IsA("BasePart") then
+			x.Anchored = false
+			x.CanCollide = false
+			x.CanTouch = false
+			x.CanQuery = false
+			x.Massless = true
+			x.LocalTransparencyModifier = 0
+		elseif x:IsA("Beam") or x:IsA("Trail") or x:IsA("ParticleEmitter") then
+			x.Enabled = false
+		elseif x:IsA("Motor6D") and SEATED[x.Name] then
+			x.C0 = x.C0 * SEATED[x.Name]
 		end
 	end
-	for char in now do
+	local hum = d:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.PlatformStand = true
+		hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		hum.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+		hum.EvaluateStateMachine = false
+	end
+	local hrp = d:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not hrp then
+		d:Destroy()
+		return nil
+	end
+	d.PrimaryPart = hrp
+	d:SetAttribute("BaseScale", d:GetScale())
+	d.Parent = workspace
+	return d
+end
+
+-- Where the stand-in sits: hips on the seat pan, at the pilot scale.
+local function seatedCF(doll: Model, seat: BasePart): CFrame
+	local hrp = doll.PrimaryPart :: BasePart
+	local lift = hrp.Size.Y * 0.5 + 0.12 * Mech2Config.PilotScale
+	return seat.CFrame * CFrame.new(0, seat.Size.Y / 2 + lift, 0.12)
+end
+
+local INTRO = 0.6 -- seconds: the pilot steps up into the open chest, shrinking to fit
+
+-- Places a stand-in: during the first INTRO seconds of boarding it steps in
+-- from the boarding spot (anchored, scaling down), then it is welded to the
+-- seat for good.
+local function placeDoll(doll: Model, seat: BasePart, model: Model)
+	if doll:GetAttribute("Welded") then
+		return
+	end
+	local hrp = doll.PrimaryPart :: BasePart
+	local base = doll:GetAttribute("BaseScale") :: number
+	local t = stateTime(model)
+	local boarding = model:GetAttribute("PowerState") == "Boarding"
+	local u = if boarding then math.clamp(t / INTRO, 0, 1) else 1
+	if u < 1 then
+		for _, x in doll:GetDescendants() do
+			if x:IsA("BasePart") then
+				x.Anchored = true
+			end
+		end
+		local e = Mech2Pose.smooth(u)
+		local scale = base * (1 + (Mech2Config.PilotScale - 1) * e)
+		pcall(function()
+			doll:ScaleTo(scale)
+		end)
+		local root = model:FindFirstChild("HumanoidRootPart") :: BasePart?
+		local fromCF = seatedCF(doll, seat)
+		if root then
+			local p = (MechTypes.get(model).Builder :: any).offPoints(root.CFrame)
+			local stand = p.prompt + Vector3.new(0, hrp.Size.Y * 1.5 + 1.4 * scale / base, 0)
+			fromCF = CFrame.lookAt(stand, stand - p.forward)
+		end
+		local toCF = seatedCF(doll, seat)
+		local cf = fromCF:Lerp(toCF, e) + Vector3.new(0, math.sin(math.pi * e) * 1.6, 0) -- a step up
+		doll:PivotTo(cf)
+		return
+	end
+	pcall(function()
+		doll:ScaleTo(base * Mech2Config.PilotScale)
+	end)
+	doll:PivotTo(seatedCF(doll, seat))
+	for _, x in doll:GetDescendants() do
+		if x:IsA("BasePart") then
+			x.Anchored = false
+		end
+	end
+	local w = Instance.new("WeldConstraint")
+	w.Part0 = seat
+	w.Part1 = hrp
+	w.Parent = hrp
+	doll:SetAttribute("Welded", true)
+end
+
+local function updateHidden()
+	local now: { [Model]: Seat } = {}
+	for model in states do
+		local seat = model:FindFirstChild("PilotSeat")
+		if seat and seat:IsA("Seat") then
+			local occ = seat.Occupant
+			local char = occ and occ.Parent
+			if char and char:IsA("Model") then
+				now[char] = seat
+			end
+		end
+	end
+	for char, seat in now do
 		setHidden(char, true)
+		local doll = dolls[char]
+		if doll and (not doll.Parent or (doll:GetAttribute("Seat") ~= seat:GetFullName())) then
+			doll:Destroy()
+			doll = nil
+		end
+		if not doll then
+			local made = makeDoll(char, seat)
+			if made then
+				made:SetAttribute("Seat", seat:GetFullName())
+				dolls[char] = made
+				doll = made
+			end
+		end
+		local mech = seat:FindFirstAncestorOfClass("Model")
+		if doll and mech then
+			placeDoll(doll, seat, mech)
+		end
 	end
 	for char in hidden do
 		if not now[char] and char.Parent then
 			setHidden(char, false)
+		end
+	end
+	for char, doll in dolls do
+		if not now[char] then
+			doll:Destroy()
+			dolls[char] = nil
 		end
 	end
 	hidden = now
@@ -620,11 +781,11 @@ local function step(dt: number)
 		end
 		local crouchT, canopyT, powerT, timed = Mech2Pose.powerTargets(model)
 		if timed then
-			st.crouch, st.canopy, st.power = crouchT, canopyT, powerT
+			st.crouch, st.hatch, st.power = crouchT, canopyT, powerT
 		else
 			local k = math.min(1, dt * 2.5)
 			st.crouch += (crouchT - st.crouch) * k
-			st.canopy += (canopyT - st.canopy) * k
+			st.hatch += (canopyT - st.hatch) * k
 			st.power += (powerT - st.power) * k
 		end
 		playCues(model, st)
@@ -654,7 +815,7 @@ local function step(dt: number)
 			pose = blend(pose, airPose(st, now), st.air)
 		end
 		if st.crouch > 1e-4 then
-			pose = blend(pose, Mech2Pose.crouch(st.rig, st.crouch), math.min(1, st.crouch * 4))
+			pose = blend(pose, Mech2Pose.kneel(st.rig, st.crouch), math.min(1, st.crouch * 4))
 			st.amount *= 1 - math.min(1, st.crouch * 4)
 			st.feet = LegIK.newFeet()
 		elseif st.settled and st.air < 0.2 then
@@ -667,8 +828,11 @@ local function step(dt: number)
 				footfall(st, "Right", strength)
 			end
 		end
+		-- IRON MAN: the pauldrons lift / roll out with the chest open; plates close in reverse
+		local closing = model:GetAttribute("PowerState") == "Boarding"
+		Mech2Pose.addUnfold(pose, st.hatch, closing)
 		Mech2Pose.apply(st.rig, pose)
-		Mech2Pose.setCanopy(st.motors, st.canopy)
+		Mech2Pose.setHatch(st.motors, st.hatch, closing)
 		st.servo.Volume = st.amount * 0.28 + st.sprint * st.amount * 0.18 + st.crouch * (1 - st.crouch) * 1.0
 		st.servo.PlaybackSpeed = 0.95 + st.amount * 0.3
 	end

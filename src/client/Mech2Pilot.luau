@@ -1,11 +1,11 @@
 --!strict
 -- PLD-02 boarding camera, local pilot only. The PLD-02 uses the placeholder
 -- get-in (MechTypes cinematicBoarding = false, see PlaceholderPilot /
--- MechService placeholderEnter): E seats the avatar in the head cockpit at
--- once, the gold canopy shuts and the mech rises from its rest crouch
--- (Mech2Config.Board). This flies the camera over it: in close on the face
--- as the canopy comes down, round the side as it stands, and up behind it
--- into the normal pilot camera when the controls are handed over.
+-- MechService placeholderEnter): E seats the avatar in the chest cockpit at
+-- once, the chest hatch swings shut and the mech rises from its kneel
+-- (Mech2Config.Board). This flies the camera over it: in close on the chest
+-- as the hatch comes up, round the side as it stands, and up behind it into
+-- the normal pilot camera when the controls are handed over.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -29,8 +29,8 @@ end
 -- Camera keys in the mech's root frame (it faces -Z; the root is on the hip line).
 local B = Mech2Config.Board
 local KEYS = {
-	{ t = 0.6, eye = Vector3.new(3.5, 9.5, -9), focus = Vector3.new(0, 8.6, -1) }, -- the face, canopy shutting
-	{ t = B.StandStart + 0.55, eye = Vector3.new(-9, 9, -11), focus = Vector3.new(0, 9.5, 0) }, -- it rises
+	{ t = 0.65, eye = Vector3.new(3, 6.2, -9.5), focus = Vector3.new(0, 5.3, -1) }, -- the chest, hatch swinging shut
+	{ t = B.StandStart + 0.6, eye = Vector3.new(-9, 8, -12), focus = Vector3.new(0, 8, 0) }, -- it rises off its knee
 	{ t = B.Online, eye = Vector3.new(5, 15, 25), focus = Vector3.new(0, 10, 0) }, -- behind: hand over
 }
 

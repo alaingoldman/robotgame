@@ -9,9 +9,9 @@
 --   Mech2Pose.rig(motors)          rest data measured from the motors (cached)
 --   Mech2Pose.apply(rig, pose)     writes a pose to the Transforms
 --   Mech2Pose.legIK(rig, side, ankleTarget, pelvisRel, yaw, footPitch, pose, lateral?)
---   Mech2Pose.crouch(rig, k)       the powered-down rest crouch, 0..1
---   Mech2Pose.setCanopy(motors, c) head canopy 0 shut .. 1 open
---   Mech2Pose.powerTargets(model)  crouch / canopy / power from PowerState
+--   Mech2Pose.kneel(rig, k)        the powered-down one-knee kneel, 0..1
+--   Mech2Pose.setHatch(motors, h)  chest hatch 0 shut .. 1 open
+--   Mech2Pose.powerTargets(model)  kneel / hatch / power from PowerState
 --   applyStatic / applyOff         server mirror and edit-mode preview
 
 local Mech2Config = require(script.Parent.Mech2Config)
@@ -174,49 +174,113 @@ function Mech2Pose.legIK(rig: Rig, side: string, ankle: Vector3, pelvisRel: CFra
 	pose[side .. "Ankle"] = aShin:Inverse() * aFoot
 end
 
--- ===== powered-down rest crouch ==============================================
--- Hips sink back over planted feet, torso leans forward, head bowed (the
--- open canopy faces the pilot walking up), forearms resting on the thighs.
+-- ===== powered-down kneel ===================================================
+-- "Taking a knee", the BRZ-01's parked pose (TitanPose.kneel) at the PLD-02's
+-- size: right knee down with the shin lying back to the flat foot, left foot
+-- planted forward and turned out, torso low and a little forward (the open
+-- chest hatch faces the pilot), head bowed, left forearm across the raised
+-- left knee, right fist by the right knee. Run backwards it stands up.
 
-local CROUCH_DROP = 2.7 -- pelvis drop (studs)
-local CROUCH_BACK = 0.45 -- pelvis back (+Z) so the knees go forward, not the hips
-local CROUCH_LEAN = 0.32 -- torso pitch forward (radians)
-local CROUCH_NECK = -0.3
+local K = Mech2Config.Kneel
 
-function Mech2Pose.crouch(rig: Rig, k: number): { [string]: CFrame }
-	k = math.clamp(k, 0, 1)
-	local pose: { [string]: CFrame } = {}
-	local s = smooth(k)
-	local root = CFrame.new(0, -CROUCH_DROP * s, CROUCH_BACK * s) * CFrame.Angles(-0.12 * s, 0, 0)
-	pose.Root = root
-	for _, side in { "Left", "Right" } do
-		local leg = rig.legs[side]
-		if leg then
-			local out = if side == "Left" then -0.25 else 0.25
-			local yaw = if side == "Left" then 0.14 else -0.14
-			Mech2Pose.legIK(rig, side, leg.ankle + Vector3.new(out * s, 0, 0), root, yaw * s, 0, pose, true)
-		end
+local function kneelDrop(rig: Rig): Vector3
+	local leg = rig.legs.Right
+	if not leg then
+		return Vector3.new(0, -3, 0)
 	end
-	local a = curve(k, 0.2, 1)
-	pose.Waist = CFrame.Angles(-CROUCH_LEAN * 0.6 * a, 0, 0)
-	pose.Spine = CFrame.Angles(-CROUCH_LEAN * 0.4 * a, 0, 0)
-	pose.Neck = CFrame.Angles(CROUCH_NECK * a, 0, 0)
-	-- forearms down onto the thighs
-	for _, side in { "Left", "Right" } do
-		local sx = if side == "Right" then 1 else -1
-		pose[side .. "Shoulder"] = CFrame.Angles(0.42 * a, 0, -sx * 0.1 * a)
-		pose[side .. "Elbow"] = CFrame.Angles(0.75 * a, 0, 0)
-		pose[side .. "Wrist"] = CFrame.Angles(0.15 * a, 0, 0)
-		pose[side .. "PauldronJoint"] = CFrame.Angles(0.12 * a, 0, 0)
-	end
-	return pose
+	local ground = -Mech2Config.RootHeight
+	local hipY = ground + K.KneeClear + leg.l1 * math.cos(K.ThighLean)
+	return Vector3.new(0, hipY - leg.hip.Y, K.PelvisBack)
 end
 
--- Opens the head canopy by c (0 shut .. 1 open).
-function Mech2Pose.setCanopy(motors: { [string]: Motor6D }, c: number)
-	local hinge = motors.CanopyHinge
+function Mech2Pose.kneel(rig: Rig, k: number): { [string]: CFrame }
+	k = math.clamp(k, 0, 1)
+	local pose: { [string]: CFrame } = {}
+	local drop = kneelDrop(rig)
+	local root = CFrame.new(Vector3.new(0, drop.Y * smooth(k), drop.Z * curve(k, 0, 0.7)))
+	pose.Root = root
+	local ground = -Mech2Config.RootHeight
+	-- left foot steps forward first
+	local L = rig.legs.Left
+	if L then
+		local u = curve(k, 0, 0.45)
+		local target = Vector3.new(L.ankle.X - K.LeftOut, ground + L.ankleHeight, L.hip.Z + drop.Z - K.LeftForward)
+		local a = L.ankle:Lerp(target, u) + Vector3.new(0, K.StepLift * math.sin(math.pi * u), 0)
+		Mech2Pose.legIK(rig, "Left", a, root, K.LeftYaw * u, 0, pose)
+	end
+	-- right foot slides back as the knee goes down to the floor
+	local R = rig.legs.Right
+	if R then
+		local u = curve(k, 0.2, 0.85)
+		local kneeY = ground + K.KneeClear
+		local footY = ground + R.ankleHeight + K.RightFootLift
+		local back = math.sqrt(math.max(0, R.l2 * R.l2 - (footY - kneeY) ^ 2))
+		local kneeZ = R.hip.Z + drop.Z - R.l1 * math.sin(K.ThighLean)
+		local target = Vector3.new(R.ankle.X, footY, kneeZ + back * 0.97)
+		local a = R.ankle:Lerp(target, u) + Vector3.new(0, K.StepLift * 0.6 * math.sin(math.pi * u), 0)
+		Mech2Pose.legIK(rig, "Right", a, root, K.RightYaw * u, K.RightFootPitch * u, pose)
+	end
+	local a = curve(k, 0.3, 1)
+	pose.Waist = CFrame.Angles(-K.Lean * curve(k, 0.15, 1), 0, 0)
+	pose.Neck = CFrame.Angles(K.Neck * a, 0.12 * a, 0)
+	-- left forearm across the raised knee, right fist down by the right knee
+	pose.LeftShoulder = CFrame.Angles(K.LeftShoulder * a, 0, 0.08 * a)
+	pose.LeftElbow = CFrame.Angles(K.LeftElbow * a, 0, 0)
+	pose.LeftWrist = CFrame.Angles(0.2 * a, 0, 0)
+	pose.RightShoulder = CFrame.Angles(K.RightShoulder * a, 0, -0.04 * a)
+	pose.RightElbow = CFrame.Angles(K.RightElbow * a, 0, 0)
+	pose.RightWrist = CFrame.Angles(0.25 * a, 0, 0)
+	pose.LeftPauldronJoint = CFrame.Angles(K.LeftShoulder * 0.35 * a, 0, 0)
+	pose.RightPauldronJoint = CFrame.Angles(K.RightShoulder * 0.35 * a, 0, 0)
+	return pose
+end
+Mech2Pose.crouch = Mech2Pose.kneel -- older name
+
+-- ===== IRON MAN unfold ======================================================
+local U = Mech2Config.Unfold
+
+local function backOut(x: number): number
+	x = math.clamp(x, 0, 1)
+	local c1 = U.Overshoot
+	local c3 = c1 + 1
+	return 1 + c3 * (x - 1) ^ 3 + c1 * (x - 1) ^ 2
+end
+
+-- One part's opening (0 shut .. ~1 open) for the whole chest's opening h,
+-- inside its window; opening overshoots a little, closing eases shut.
+function Mech2Pose.part(h: number, window: { number }, closing: boolean?): number
+	local u = math.clamp((h - window[1]) / (window[2] - window[1]), 0, 1)
+	return if closing then smooth(u) else backOut(u)
+end
+
+-- The pauldrons lift and roll out while the chest is open (added on top of
+-- the pose's own pauldron follow; call before apply).
+function Mech2Pose.addUnfold(pose: { [string]: CFrame }, h: number, closing: boolean?)
+	local p = Mech2Pose.part(h, U.Pauldrons, closing)
+	if p <= 1e-4 then
+		return
+	end
+	for _, side in { "Right", "Left" } do
+		local sx = if side == "Right" then 1 else -1
+		local key = side .. "PauldronJoint"
+		pose[key] = (pose[key] or CFrame.identity) * CFrame.Angles(U.PauldronLift * p, 0, sx * U.PauldronRoll * p)
+	end
+end
+
+-- Opens the chest by h (0 shut .. 1 open): the lower plate drops on its
+-- bottom hinge, then the doors swing out on their outer hinges.
+function Mech2Pose.setHatch(motors: { [string]: Motor6D }, h: number, closing: boolean?)
+	local hinge = motors.HatchHinge
 	if hinge then
-		hinge.Transform = CFrame.Angles(Mech2Config.CanopyOpen * smooth(c), 0, 0)
+		hinge.Transform = CFrame.Angles(Mech2Config.HatchOpen * Mech2Pose.part(h, U.Hatch, closing), 0, 0)
+	end
+	local d = Mech2Pose.part(h, U.Doors, closing)
+	local r, l = motors.RightDoorHinge, motors.LeftDoorHinge
+	if r then
+		r.Transform = CFrame.Angles(0, -Mech2Config.DoorOpen * d, 0)
+	end
+	if l then
+		l.Transform = CFrame.Angles(0, Mech2Config.DoorOpen * d, 0)
 	end
 end
 
@@ -225,40 +289,39 @@ function Mech2Pose.stateTime(model: Model): number
 	return if typeof(t0) == "number" then workspace:GetServerTimeNow() - t0 else math.huge
 end
 
--- crouch (0 standing .. 1 crouched), canopy (0 shut .. 1 open), power
--- (light level) for the current power state; last = exact (timed) values.
+-- kneel (0 standing .. 1 knelt), hatch (0 shut .. 1 open), power (light
+-- level) for the current power state; last = exact (timed) values.
 function Mech2Pose.powerTargets(model: Model): (number, number, number, boolean)
 	local state = model:GetAttribute("PowerState")
 	local t = Mech2Pose.stateTime(model)
 	local B, X = Mech2Pose.Board, Mech2Pose.Exit
 	if state == "Boarding" then
-		local crouch = 1 - smooth((t - B.StandStart) / (B.StandEnd - B.StandStart))
-		local canopy = 1 - smooth((t - B.CanopyCloseStart) / (B.CanopyCloseEnd - B.CanopyCloseStart))
-		return crouch, canopy, smooth((t - B.PowerUp) / 0.4), true
+		local kneel = 1 - smooth((t - B.StandStart) / (B.StandEnd - B.StandStart))
+		local hatch = 1 - smooth((t - B.HatchCloseStart) / (B.HatchCloseEnd - B.HatchCloseStart))
+		return kneel, hatch, smooth((t - B.PowerUp) / 0.4), true
 	elseif state == "PoweringDown" then
-		local canopy = smooth((t - X.CanopyOpenStart) / (X.CanopyOpenEnd - X.CanopyOpenStart))
-		return smooth(t / X.CrouchEnd), canopy, 1 - smooth(t / 0.6), true
+		local hatch = smooth((t - X.HatchOpenStart) / (X.HatchOpenEnd - X.HatchOpenStart))
+		return smooth(t / X.KneelEnd), hatch, 1 - smooth(t / 0.6), true
 	elseif state == "Off" then
 		return 1, 1, 0, false
 	end
 	return 0, 0, 1, false
 end
 
-function Mech2Pose.applyStatic(motors: { [string]: Motor6D }, crouch: number, canopy: number)
+function Mech2Pose.applyStatic(motors: { [string]: Motor6D }, kneel: number, hatch: number)
 	local rig = Mech2Pose.rig(motors)
 	if not rig then
 		return
 	end
-	if crouch <= 1e-4 then
-		for name, j in rig.joints do
-			if name ~= "CanopyHinge" then
-				j.motor.Transform = CFrame.identity
-			end
+	local pose = if kneel <= 1e-4 then {} else Mech2Pose.kneel(rig, kneel)
+	Mech2Pose.addUnfold(pose, hatch)
+	for name, j in rig.joints do
+		if not pose[name] and not string.find(name, "Hinge$") then
+			j.motor.Transform = CFrame.identity
 		end
-	else
-		Mech2Pose.apply(rig, Mech2Pose.crouch(rig, crouch))
 	end
-	Mech2Pose.setCanopy(motors, canopy)
+	Mech2Pose.apply(rig, pose)
+	Mech2Pose.setHatch(motors, hatch)
 end
 
 function Mech2Pose.applyOff(motors: { [string]: Motor6D })
