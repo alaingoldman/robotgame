@@ -102,7 +102,7 @@ The owner imported the GLB as asset **110252059423481**. The game code lives in:
 
 It is registered in `MechTypes` and its lineup spot is at (-218, -150), next to the CRM-01, with its charging post behind it on the right.
 
-## v2: metal texture, pads and wings on the shoulders (`Mech3_v2.glb`, about 12 MB)
+## v2: metal texture, pads and wings on the shoulders (`Mech3_v2.glb`, about 13 MB)
 
 The owner reported that up close the v1 texture looked like paper. The bake had copied the drawing's ink outlines, its speckle dots and its flat cel fills. v2 keeps the **same vertices, UVs and triangles** but changes the material and moves two pieces.
 

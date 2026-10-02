@@ -9,7 +9,7 @@
   "wing_shift_back": 0.6,
   "parts": {
     "Head": {
-      "tris": 6130,
+      "tris": 6127,
       "core_tris": 5780,
       "overlap_tris": 350,
       "cap_tris": 0,
@@ -25,7 +25,7 @@
       ]
     },
     "Torso": {
-      "tris": 17440,
+      "tris": 17829,
       "core_tris": 15869,
       "overlap_tris": 1530,
       "cap_tris": 41,
@@ -36,12 +36,12 @@
       ],
       "bbox_max": [
         2.764,
-        19.194,
+        18.496,
         2.405
       ]
     },
     "Pelvis": {
-      "tris": 5916,
+      "tris": 6371,
       "core_tris": 4705,
       "overlap_tris": 1180,
       "cap_tris": 31,
@@ -89,7 +89,7 @@
       ]
     },
     "ShoulderPad_L": {
-      "tris": 2454,
+      "tris": 2453,
       "core_tris": 1903,
       "overlap_tris": 551,
       "cap_tris": 0,
@@ -100,12 +100,12 @@
       ],
       "bbox_max": [
         -1.836,
-        17.947,
+        17.77,
         1.438
       ]
     },
     "ShoulderPad_R": {
-      "tris": 2278,
+      "tris": 2277,
       "core_tris": 1770,
       "overlap_tris": 508,
       "cap_tris": 0,
@@ -121,7 +121,7 @@
       ]
     },
     "UpperArm_L": {
-      "tris": 4002,
+      "tris": 4067,
       "core_tris": 3249,
       "overlap_tris": 725,
       "cap_tris": 28,
@@ -137,7 +137,7 @@
       ]
     },
     "UpperArm_R": {
-      "tris": 3619,
+      "tris": 3745,
       "core_tris": 2998,
       "overlap_tris": 593,
       "cap_tris": 28,
@@ -153,7 +153,7 @@
       ]
     },
     "Forearm_L": {
-      "tris": 4107,
+      "tris": 4504,
       "core_tris": 3587,
       "overlap_tris": 479,
       "cap_tris": 41,
@@ -169,7 +169,7 @@
       ]
     },
     "Forearm_R": {
-      "tris": 3969,
+      "tris": 4361,
       "core_tris": 3419,
       "overlap_tris": 506,
       "cap_tris": 44,
@@ -185,7 +185,7 @@
       ]
     },
     "Hand_L": {
-      "tris": 2754,
+      "tris": 2904,
       "core_tris": 2493,
       "overlap_tris": 242,
       "cap_tris": 19,
@@ -201,7 +201,7 @@
       ]
     },
     "Hand_R": {
-      "tris": 2744,
+      "tris": 2897,
       "core_tris": 2496,
       "overlap_tris": 232,
       "cap_tris": 16,
@@ -217,7 +217,7 @@
       ]
     },
     "Thigh_L": {
-      "tris": 6125,
+      "tris": 6564,
       "core_tris": 5357,
       "overlap_tris": 726,
       "cap_tris": 42,
@@ -233,7 +233,7 @@
       ]
     },
     "Thigh_R": {
-      "tris": 5940,
+      "tris": 6321,
       "core_tris": 5203,
       "overlap_tris": 694,
       "cap_tris": 43,
@@ -249,7 +249,7 @@
       ]
     },
     "Shin_L": {
-      "tris": 8326,
+      "tris": 9106,
       "core_tris": 7561,
       "overlap_tris": 699,
       "cap_tris": 66,
@@ -265,7 +265,7 @@
       ]
     },
     "Shin_R": {
-      "tris": 8149,
+      "tris": 8904,
       "core_tris": 7472,
       "overlap_tris": 616,
       "cap_tris": 61,
@@ -281,7 +281,7 @@
       ]
     },
     "Foot_L": {
-      "tris": 4164,
+      "tris": 4607,
       "core_tris": 3807,
       "overlap_tris": 326,
       "cap_tris": 31,
@@ -297,7 +297,7 @@
       ]
     },
     "Foot_R": {
-      "tris": 4034,
+      "tris": 4421,
       "core_tris": 3693,
       "overlap_tris": 313,
       "cap_tris": 28,
