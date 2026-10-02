@@ -15,6 +15,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechBuilder = require(Shared:WaitForChild("MechBuilder"))
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechPose = require(Shared:WaitForChild("MechPose"))
+local MechTypes = require(Shared:WaitForChild("MechTypes"))
 
 local MechAnimator = {}
 
@@ -32,6 +33,20 @@ local BOB_SPRINT = 0.75 * S
 local BREATHE = 0.04 * S
 local SPRINT_LEAN = 0.4 -- upper body tips forward into the run
 local SPRINT_TWIST = 0.22 -- torso swings with the stride when sprinting
+local SWING_DROOP = 0.5 -- toes hang down while a foot swings (radians at peak)
+local SWING_DROOP_SPRINT = 0.75
+
+-- Ankle pitch for a swinging foot, u = 0 at lift-off .. 1 at heel strike.
+-- Negative = toes down. Returns 0 while the foot is planted.
+local function swingFoot(u: number, swinging: boolean): number
+	if not swinging then
+		return 0
+	end
+	u = math.clamp(u, 0, 1)
+	local droop = -math.sin(math.pi * math.min(1, u / 0.7)) * (1 - 0.3 * u)
+	local reach = 0.35 * math.sin(math.pi * math.clamp((u - 0.7) / 0.3, 0, 1))
+	return droop + reach
+end
 
 -- jumping: airborne tuck, and damped springs for the landing recoil
 local REST_GAP = MechBuilder.RootHeight -- root center above the ground when standing
@@ -135,7 +150,8 @@ function MechAnimator.powerTargets(model: Model): (number, number, number, numbe
 end
 
 local function setup(model: Model)
-	if states[model] then
+	-- HWM-04B rig only; other types have their own animator (e.g. Type99Animator)
+	if states[model] or not MechTypes.get(model).hwmAnimator then
 		return
 	end
 	local root = model:WaitForChild("HumanoidRootPart", 10) :: BasePart?
@@ -517,8 +533,13 @@ local function step(dt: number)
 		set(m, "RightHip", CFrame.Angles(hipR, 0, 0))
 		set(m, "LeftKnee", CFrame.Angles(-kneeL, 0, 0))
 		set(m, "RightKnee", CFrame.Angles(-kneeR, 0, 0))
-		set(m, "LeftAnkle", CFrame.Angles(kneeL - hipL, 0, 0))
-		set(m, "RightAnkle", CFrame.Angles(kneeR - hipR, 0, 0))
+		-- swinging foot hangs loose: toes droop after lift-off, then level out and
+		-- tip up just before the heel strikes (flat again while planted)
+		local droopAmp = lerp(SWING_DROOP, SWING_DROOP_SPRINT, st.sprint) * a * (1 - air)
+		local ankleL = swingFoot((s + 1) / 2, c > 0) * droopAmp
+		local ankleR = swingFoot((1 - s) / 2, c < 0) * droopAmp
+		set(m, "LeftAnkle", CFrame.Angles(kneeL - hipL + ankleL, 0, 0))
+		set(m, "RightAnkle", CFrame.Angles(kneeR - hipR + ankleR, 0, 0))
 
 		-- body: heavy drop at each footfall, sway and roll over the planted foot
 		local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a

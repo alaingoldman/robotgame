@@ -15,6 +15,11 @@
 --                (replicated) velocity: idle, walking, sprinting, plus a
 --                chunk per jump. At 0 the pilot's client limps the mech (no
 --                sprint / jump, half speed).
+--
+-- WTK-99s ("Type99") use their wall charger instead of the floor cord
+-- (Type99Charger): "Plugged" goes false once the hull's cable port is out of
+-- the hoses' reach and back true after an exit near home; it charges at
+-- MechConfig.Type99Charger.ChargeRate.
 
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -24,11 +29,14 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechCord = require(Shared:WaitForChild("MechCord"))
 local MechPose = require(Shared:WaitForChild("MechPose"))
+local MechTypes = require(Shared:WaitForChild("MechTypes"))
+local Type99Charger = require(Shared:WaitForChild("Type99Charger"))
 
 local MechBattery = {}
 
 local BAT = MechConfig.Battery
 local CORD = MechConfig.Cord
+local T99C = MechConfig.Type99Charger
 local SEND_INTERVAL = 0.1 -- seconds between Charge attribute updates
 local SPRINT_SPEED = (MechConfig.WalkSpeed + MechConfig.SprintSpeed) / 2
 local JUMP_VY = 25 -- upward speed that counts as a takeoff
@@ -71,6 +79,31 @@ local function updatePlug(model: Model, root: BasePart)
 	end
 end
 
+-- WTK-99 wall charger: the same rules against the hull's cable port and the
+-- charger's glands (Type99Charger.reach); re-plugs once the walker has sat
+-- down after an exit (ReplugAt) near its home spot.
+local function updateCharger(model: Model, root: BasePart)
+	local home = model:GetAttribute("Home")
+	local port = Type99Charger.portCFrame(model)
+	local over = true
+	if typeof(home) == "CFrame" and port then
+		over = (port.Position - Type99Charger.glandCenter(home)).Magnitude > Type99Charger.reach()
+	end
+	local plugged = model:GetAttribute("Plugged") == true
+	local state = model:GetAttribute("PowerState")
+	if plugged then
+		if over then
+			model:SetAttribute("Plugged", false)
+		end
+	elseif not over and typeof(home) == "CFrame" then
+		local d = root.Position - home.Position
+		local near = Vector3.new(d.X, 0, d.Z).Magnitude <= T99C.PlugRange
+		if near and (state == "Off" or (state == "PoweringDown" and MechPose.stateTime(model) >= T99C.ReplugAt)) then
+			model:SetAttribute("Plugged", true)
+		end
+	end
+end
+
 local function step(dt: number)
 	local now = os.clock()
 	for _, inst in CollectionService:GetTagged("Mech") do
@@ -92,7 +125,16 @@ local function step(dt: number)
 				states[model] = nil
 			end)
 		end
-		updatePlug(model, root)
+		-- HWM-04B: floor outlet cord; WTK-99: wall charger
+		local charger = Type99Charger.applies(model)
+		local def = MechTypes.get(model)
+		if def.hasCord then
+			updatePlug(model, root)
+		elseif charger then
+			updateCharger(model, root)
+		elseif def.updatePlug then
+			def.updatePlug(model, root) -- own charger (BRZ-01 dock pylon, TitanDock)
+		end
 		-- another server script (or a test) set the charge directly: adopt it
 		local attr = model:GetAttribute("Charge")
 		if typeof(attr) == "number" and attr ~= st.sent then
@@ -102,7 +144,7 @@ local function step(dt: number)
 		local state = model:GetAttribute("PowerState")
 		local before = st.charge
 		if model:GetAttribute("Plugged") == true then
-			st.charge += BAT.ChargeRate * dt
+			st.charge += (if charger then T99C.ChargeRate else def.chargeRate or BAT.ChargeRate) * dt
 		elseif state == "Online" and not root.Anchored then
 			local v = root.AssemblyLinearVelocity
 			local speed = Vector3.new(v.X, 0, v.Z).Magnitude

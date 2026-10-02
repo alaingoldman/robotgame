@@ -14,6 +14,9 @@ local RunService = game:GetService("RunService")
 
 local MechPattern = {}
 
+-- MechType id -> function(model) run at the end of every apply (see TitanPattern)
+MechPattern.postApply = {} :: { [string]: (Model) -> () }
+
 type PatternDef = { largeImage: string, largeTile: number, smallImage: string, smallTile: number }
 
 -- Color maps of the "Weld 4x4" / "Weld 2x2" crosshatch MaterialVariants,
@@ -145,6 +148,12 @@ function MechPattern.apply(model: Model, pattern: string?)
 				addTextures(d, def)
 			end
 		end
+	end
+	-- per-type follow-up (BRZ-01 Titan: TitanPattern re-phases the textures so
+	-- the lattice runs continuously across its faceted armour)
+	local post = MechPattern.postApply[model:GetAttribute("MechType") or ""]
+	if post then
+		post(model)
 	end
 end
 return MechPattern

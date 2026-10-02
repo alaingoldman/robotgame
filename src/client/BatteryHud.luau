@@ -16,6 +16,7 @@ local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local MechConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechConfig"))
+local MechTypes = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechTypes"))
 
 local BatteryHud = {}
 
@@ -39,6 +40,7 @@ local percent: TextLabel
 local percentScale: UIScale
 local status: TextLabel
 local bolt: TextLabel
+local title: TextLabel
 local sounds: { [string]: Sound } = {}
 
 local mech: Model? = nil
@@ -141,7 +143,7 @@ local function build()
 	cardScale = Instance.new("UIScale")
 	cardScale.Parent = card
 
-	local title = label(card, "HWM-04B", Enum.Font.GothamBlack, UDim2.fromOffset(16, 8), UDim2.fromOffset(120, 16))
+	title = label(card, "HWM-04B",Enum.Font.GothamBlack, UDim2.fromOffset(16, 8), UDim2.fromOffset(120, 16))
 	title.TextSize = 13
 	title.TextColor3 = Color3.fromRGB(176, 182, 200)
 
@@ -370,6 +372,7 @@ local function track(model: Model?)
 	end
 	mech = model
 	if model then
+		title.Text = MechTypes.get(model).displayName
 		-- the cord re-plugging (on exit at the pad) jolts the gauge too
 		plugConn = model:GetAttributeChangedSignal("Plugged"):Connect(function()
 			if shown and model:GetAttribute("Plugged") == true then

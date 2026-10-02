@@ -1,0 +1,170 @@
+{
+  "pieces": {
+    "Titan_HeadMain": {
+      "bone": "Head",
+      "model": "MechHead",
+      "folder": "HelmetArmor",
+      "role": "main",
+      "offset": [
+        0.0,
+        0.7222,
+        -0.2596
+      ],
+      "size": [
+        2.5786,
+        3.6312,
+        3.4628
+      ],
+      "tris": 688,
+      "open_edges": 0,
+      "uv_islands": 91,
+      "max_uv_stretch": 1.189
+    },
+    "Titan_HeadTrim": {
+      "bone": "Head",
+      "model": "MechHead",
+      "folder": "HelmetArmor",
+      "role": "hi",
+      "offset": [
+        0.0,
+        0.1102,
+        -0.5467
+      ],
+      "size": [
+        2.9539,
+        2.5541,
+        2.8723
+      ],
+      "tris": 324,
+      "open_edges": 0,
+      "uv_islands": 52,
+      "max_uv_stretch": 1.151
+    },
+    "Titan_HeadCrest": {
+      "bone": "Head",
+      "model": "MechHead",
+      "folder": "HelmetArmor",
+      "role": "trim",
+      "offset": [
+        0.0,
+        2.2114,
+        -1.6238
+      ],
+      "size": [
+        0.6202,
+        2.6602,
+        0.7181
+      ],
+      "tris": 32,
+      "open_edges": 0,
+      "uv_islands": 8,
+      "max_uv_stretch": 1.093
+    },
+    "Titan_HeadVisor": {
+      "bone": "Head",
+      "model": "MechHead",
+      "folder": "HelmetArmor",
+      "role": "glow",
+      "offset": [
+        0.0,
+        0.5467,
+        -1.325
+      ],
+      "size": [
+        1.6157,
+        0.4896,
+        0.7119
+      ],
+      "tris": 20,
+      "open_edges": 0,
+      "uv_islands": 10,
+      "max_uv_stretch": 1.0
+    },
+    "Titan_HeadRecess": {
+      "bone": "Head",
+      "model": "MechHead",
+      "folder": "HelmetArmor",
+      "role": "recess",
+      "offset": [
+        0.0,
+        0.9792,
+        -0.083
+      ],
+      "size": [
+        2.5214,
+        1.4688,
+        3.1469
+      ],
+      "tris": 192,
+      "open_edges": 0,
+      "uv_islands": 36,
+      "max_uv_stretch": 1.19
+    },
+    "Titan_Gorget": {
+      "bone": "Collar",
+      "model": "MechHead",
+      "folder": "CollarArmor",
+      "role": "main",
+      "offset": [
+        0.0,
+        0.8609,
+        0.6528
+      ],
+      "size": [
+        4.4717,
+        2.9458,
+        4.2432
+      ],
+      "tris": 384,
+      "open_edges": 0,
+      "uv_islands": 43,
+      "max_uv_stretch": 1.152
+    },
+    "Titan_GorgetRecess": {
+      "bone": "Collar",
+      "model": "MechHead",
+      "folder": "CollarArmor",
+      "role": "recess",
+      "offset": [
+        0.0,
+        1.0608,
+        0.6528
+      ],
+      "size": [
+        3.8189,
+        2.6112,
+        3.5904
+      ],
+      "tris": 252,
+      "open_edges": 0,
+      "uv_islands": 32,
+      "max_uv_stretch": 1.139
+    },
+    "Titan_ThroatFold": {
+      "bone": "Chest",
+      "model": "MechChest",
+      "folder": "TorsoArmor",
+      "role": "main",
+      "offset": [
+        0.0,
+        6.3811,
+        -1.7952
+      ],
+      "size": [
+        2.1542,
+        1.2403,
+        1.1424
+      ],
+      "tris": 20,
+      "open_edges": 0,
+      "uv_islands": 6,
+      "max_uv_stretch": 1.065
+    }
+  },
+  "iou": {
+    "front": 0.9729,
+    "side": 0.9634,
+    "back": 0.9616
+  },
+  "studs_per_cell": 0.816
+}

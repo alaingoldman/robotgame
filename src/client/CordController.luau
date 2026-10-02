@@ -23,6 +23,7 @@ local TweenService = game:GetService("TweenService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechCord = require(Shared:WaitForChild("MechCord"))
+local MechTypes = require(Shared:WaitForChild("MechTypes"))
 
 local CordController = {}
 
@@ -387,7 +388,8 @@ local function cleanup(model: Model)
 end
 
 local function setup(model: Model)
-	if entries[model] then
+	-- types without the floor cord (WTK-99) have no socket
+	if entries[model] or not MechTypes.get(model).hasCord then
 		return
 	end
 	local home = model:GetAttribute("Home")

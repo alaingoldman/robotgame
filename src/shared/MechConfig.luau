@@ -219,10 +219,99 @@ MechConfig.Battery = {
 	Low = 20, -- red + beeping below this
 }
 
+-- WTK-99 ("Type99", see Type99Builder / Type99Pose / Climb). The pilot gets
+-- in over the nose: the mech sits nose-down with the canopy open, so the
+-- sloped nose deck runs up to the cockpit sill like a ramp.
+-- Boarding times count from the end of the approach walk to the spot in
+-- front of the nose tip (the "BoardWalk" attribute, ApproachMin..ApproachMax
+-- seconds by distance at ApproachSpeed). Every client animates the avatar
+-- from these (Climb); the server seats it at Sit and hands over at Online.
+MechConfig.Type99Boarding = {
+	ApproachMin = 0.3,
+	ApproachMax = 0.8,
+	ApproachSpeed = 26, -- walk speed cap for the approach
+	Mantle = 0.85, -- reach, grab the nose handles, pull up, knee onto the nose, stand
+	DeckWalk = 0.6, -- up the sloped nose deck and over the sill into the cockpit
+	Turn = 0.35, -- turns round to face forward, in front of the seat
+	SitDown = 0.4, -- lowers into the seat
+	Sit = 2.2, -- server seats the pilot (Mantle + DeckWalk + Turn + SitDown)
+	CanopyCloseStart = 2.25, -- the canopy swings shut over the seated pilot
+	CanopyCloseEnd = 2.75,
+	Sealed = 2.8, -- pilot enclosed: the camera starts following the mech
+	PowerUp = 2.75, -- lights come on
+	StandStart = 2.85, -- legs extend, hull levels
+	StandEnd = 3.75,
+	Online = 3.85, -- controls handed over (~4.3 s after pressing E)
+}
+
+-- WTK-99 exit, seconds from the start of PoweringDown.
+MechConfig.Type99Exit = {
+	FoldEnd = 0.9, -- sits down, canopy still shut
+	CanopyOpenStart = 0.8, -- opens on the seated pilot
+	CanopyOpenEnd = 1.3,
+	Unseat = 1.3, -- server unseats; every client animates the way out (Climb)
+	StandUp = 0.35, -- (from Unseat) up out of the seat
+	DeckDown = 0.75, -- over the sill and down the nose deck to the tip
+	Hop = 0.35, -- off the nose tip to the ground
+	Land = 0.3, -- landing squash
+	Off = 3.1, -- controls returned (Unseat + the four above, rounded up)
+}
+
+-- WTK-99 movement and gait (see Type99Animator). Heavier and slower than the
+-- HWM-04B. SprintSpeed stays above MechBattery's sprint-drain threshold
+-- ((WalkSpeed + SprintSpeed) / 2 of the HWM-04B, ~34).
+MechConfig.Type99Anim = {
+	WalkSpeed = 18,
+	SprintSpeed = 38,
+	JumpPower = 58, -- takeoff speed, studs/s
+	JumpWindup = 0.2, -- deep squat before the legs fire (pilot only)
+	-- foot placement: studs the body travels over a planted foot, and the
+	-- fraction of a two-step cycle each foot is down (stride = stance / duty)
+	WalkStance = 10, -- short quick waddling steps
+	SprintStance = 15, -- long running strides
+	WalkDuty = 0.64,
+	SprintDuty = 0.5,
+	WalkLift = 2.4, -- swing foot height (studs)
+	SprintLift = 3.6,
+	SprintCrouch = 1.2, -- hips drop while sprinting (studs), for reach
+	Sounds = {
+		Step = MechConfig.Sounds.Footstep, -- played low and slow
+		StepThud = MechConfig.Sounds.Stomp, -- layered under each plant
+		Lift = MechConfig.Sounds.Hiss, -- faint hydraulic hiss as a foot lifts
+		Servo = MechConfig.Sounds.Servo,
+	},
+}
+
 -- Camera zoom limits while piloting; boarding hands over at FinalZoom.
 MechConfig.PilotZoomMin = 14 * MechConfig.Scale
 MechConfig.PilotZoomMax = 90 * MechConfig.Scale
 MechConfig.BoardFinalZoom = 48
 MechConfig.ExitZoom = 17 -- reveal shot distance, kept when following the pilot out
+
+-- WTK-99 wall charger (see Type99Charger / Type99CableController / MechBattery).
+-- A boxy charger stands at the back edge of the pad, behind the walker; two
+-- thick hoses run from its socket panel to a connector latched into the
+-- hull's rear CablePort. The winch keeps the hoses at a sag that suits the distance;
+-- past Reach the latch blows, the connector ejects and the winch reels it
+-- back into its cradle. It re-latches once the walker has sat back down
+-- after an exit (ReplugAt, seconds into PoweringDown) near its home spot.
+MechConfig.Type99Charger = {
+	Offset = Vector3.new(0, 0, 23), -- charger center from the home spot (mech space: +Z back); it faces the mech
+	Reach = 30, -- port to socket distance (studs) where the connector ejects
+	PlugRange = 10, -- root within this of its home spot to re-plug
+	ReplugAt = MechConfig.Type99Exit.FoldEnd, -- the sit-down is done
+	ChargeRate = 12, -- percent per second while plugged in
+	Diameter = 0.62, -- each hose
+	Segments = 22, -- per hose
+	Sounds = {
+		Release = "rbxassetid://9114887944", -- pneumatic latch release hiss
+		Clamp = "rbxassetid://9116545245", -- heavy latch clunk (eject and seat)
+		Steam = "rbxassetid://9116496050", -- steam / air burst out of the port
+		Pop = "rbxassetid://9113057586", -- short metallic air-burst clunk as it pops out
+		Winch = "rbxassetid://9116908667", -- winch gears reeling the hoses
+		Dock = "rbxassetid://9116545603", -- connector drops into the cradle
+		ChargeUp = "rbxassetid://9125926363", -- inertia-starter wind-up on re-latch
+	},
+}
 
 return MechConfig

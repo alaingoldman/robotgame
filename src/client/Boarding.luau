@@ -22,10 +22,14 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechBuilder = require(Shared:WaitForChild("MechBuilder"))
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechPose = require(Shared:WaitForChild("MechPose"))
+local MechTypes = require(Shared:WaitForChild("MechTypes"))
+local Type99Builder = require(Shared:WaitForChild("Type99Builder"))
 
 local Boarding = {}
 
 local B, X = MechConfig.Boarding, MechConfig.Exit
+local TB, TX = MechConfig.Type99Boarding, MechConfig.Type99Exit
+local T99_EYE = 3.4 -- WTK-99: camera focus above the seat top (along the seat's up)
 local FINAL_ZOOM = MechConfig.BoardFinalZoom
 local EXIT_ZOOM = MechConfig.ExitZoom
 local PILOT_EYE = 2.9 -- camera focus above the seat top: the seated pilot's face
@@ -45,6 +49,7 @@ type Seq = {
 	camStart: Shot?, -- where the camera was when the cinematic took over
 	followFrame: number?, -- frame the default camera started running underneath
 	camDone: boolean,
+	lastShot: Shot?, -- WTK-99: the last scripted boarding shot before the handoff
 }
 -- blends the scripted shot `from()` into the default camera's output
 type Blend = { t0: number, dur: number, from: () -> CFrame?, done: () -> () }
@@ -392,6 +397,127 @@ local function updateExit(s: Seq, t: number)
 	end
 end
 
+-- ============================================================ WTK-99
+-- The pilot climbs in over the nose (Climb animates the avatar on every
+-- client); this runs the approach walk and the camera.
+
+local function isT99(model: Model): boolean
+	return MechTypes.idOf(model) == "Type99"
+end
+
+-- The seated pilot's face in the WTK-99's (sat down) cockpit.
+local function t99PilotFocus(model: Model): Vector3
+	local root = rootOf(model) :: BasePart
+	return (Type99Builder.offPoints(root.CFrame).seat * CFrame.new(0, T99_EYE, 0)).Position
+end
+
+-- Front three-quarter shots from the missile pod side (the railgun is on the right).
+local function t99CloseShot(model: Model): Shot
+	return { yaw = -28, pitch = 14, dist = 15, focus = t99PilotFocus(model) }
+end
+
+local function t99RevealShot(model: Model): Shot
+	return { yaw = -24, pitch = 12, dist = EXIT_ZOOM, focus = t99PilotFocus(model) }
+end
+
+-- Where to walk to the climb spot in front of the nose: from beside or
+-- behind the nose line, first out front around the splayed feet.
+local function t99Path(model: Model, from: Vector3): { Vector3 }
+	local root = rootOf(model) :: BasePart
+	local p = Type99Builder.offPoints(root.CFrame)
+	local rel = from - p.climb
+	local side = rel:Dot(root.CFrame.RightVector)
+	if rel:Dot(p.forward) < 3 and math.abs(side) > 2 then
+		local s = if side > 0 then 1 else -1
+		return { p.climb + p.forward * 4 + root.CFrame.RightVector * s * math.max(math.abs(side), 9.5), p.climb + p.forward * 1.5, p.climb }
+	end
+	return { p.climb }
+end
+
+local function updateBoardT99(s: Seq, t: number)
+	local model = s.model
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	local hrp = char and char:FindFirstChild("HumanoidRootPart") :: BasePart?
+	-- (a) walk to the climb spot (Climb takes over at t = 0)
+	if hum and hrp and not s.walking and t < 0 then
+		walkPath(s, hum, hrp, t99Path(model, hrp.Position), -t, TB.ApproachSpeed, function()
+			return MechPose.stateTime(model) - MechPose.boardWalk(model) >= 0
+		end)
+	end
+	if t < 0 then
+		return
+	end
+	local camera = workspace.CurrentCamera
+	local close = t99CloseShot(model)
+	-- (b) while he climbs in and sits: orbit from wherever the camera was
+	-- onto the cockpit, the focus drifting from the climbing pilot to the
+	-- seat, easing in as he sits and the canopy closes on him
+	if t < TB.Sealed then
+		scriptable()
+		local head = if hrp then hrp.Position + Vector3.new(0, 1.5, 0) else close.focus
+		if not s.camStart then
+			s.camStart = shotFrom(model, camera.CFrame, head)
+		end
+		local k = smooth(t / TB.Sit)
+		local climbShot: Shot = { yaw = close.yaw, pitch = close.pitch, dist = 21, focus = head:Lerp(close.focus, k) }
+		local shot = orbit(s.camStart :: Shot, climbShot, smooth(t / (TB.Mantle + TB.DeckWalk)))
+		shot.dist += (close.dist - 21) * smooth((t - TB.Mantle) / (TB.CanopyCloseEnd - TB.Mantle))
+		camera.CFrame = shotCFrame(model, shot)
+		s.lastShot = shot
+		return
+	end
+	-- canopy shut: the default camera takes the mech underneath this shot
+	local mechHum = model:FindFirstChildOfClass("Humanoid")
+	if not s.followFrame and mechHum then
+		s.followFrame = frame
+		follow(mechHum, FINAL_ZOOM)
+	end
+	-- pull back and swing round behind the mech the short way, starting and
+	-- ending at rest
+	local from = s.lastShot or close
+	local u = (t - TB.Sealed) / (TB.Online - TB.Sealed)
+	local fin = finalShot(model, s)
+	while fin.yaw - from.yaw > 180 do
+		fin.yaw -= 360
+	end
+	while fin.yaw - from.yaw < -180 do
+		fin.yaw += 360
+	end
+	camera.CFrame = shotCFrame(model, lerpShot(from, fin, smooth(u), smooth(u)))
+end
+
+local function updateExitT99(s: Seq, t: number)
+	local model = s.model
+	local camera = workspace.CurrentCamera
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	-- reveal shot on the cockpit while the mech sits down and the canopy opens
+	if not s.camDone then
+		scriptable()
+		local reveal = t99RevealShot(model)
+		if not s.camStart then
+			s.camStart = shotFrom(model, camera.CFrame, reveal.focus)
+		end
+		-- a long, gently started swing: it has half the mech to go round
+		local u = math.clamp(t / TX.CanopyOpenEnd, 0, 1)
+		camera.CFrame = shotCFrame(model, orbit(s.camStart :: Shot, reveal, u * u * u * (u * (6 * u - 15) + 10)))
+		if t >= TX.Unseat and hum and not hum.Sit then
+			-- follow the pilot out with the default camera
+			s.camDone = true
+			follow(hum, EXIT_ZOOM)
+			blend = {
+				t0 = os.clock(),
+				dur = EXIT_BLEND,
+				from = function(): CFrame?
+					return if rootOf(model) then shotCFrame(model, reveal) else nil
+				end,
+				done = Boarding.restoreOnFootZoom,
+			}
+		end
+	end
+end
+
 local function update()
 	frame += 1
 	local s = seq
@@ -399,15 +525,29 @@ local function update()
 		local model = s.model
 		local state = model:GetAttribute("PowerState")
 		local alive = model:IsDescendantOf(workspace) and rootOf(model) ~= nil
+		local t99 = alive and isT99(model)
 		if alive and s.kind == "board" and state == "Online" then
 			-- hold the final shot until PilotChanged hands over (Boarding.stop)
-			updateBoard(s, B.Online)
+			if t99 then
+				updateBoardT99(s, TB.Online)
+			else
+				updateBoard(s, B.Online)
+			end
 		elseif not alive or tostring(model:GetAttribute("PowerTime")) ~= s.key then
 			Boarding.stop()
 		elseif s.kind == "board" and state == "Boarding" then
-			updateBoard(s, MechPose.stateTime(model) - MechPose.boardWalk(model))
+			local t = MechPose.stateTime(model) - MechPose.boardWalk(model)
+			if t99 then
+				updateBoardT99(s, t)
+			else
+				updateBoard(s, t)
+			end
 		elseif s.kind == "exit" and state == "PoweringDown" then
-			updateExit(s, MechPose.stateTime(model))
+			if t99 then
+				updateExitT99(s, MechPose.stateTime(model))
+			else
+				updateExit(s, MechPose.stateTime(model))
+			end
 		end
 	end
 	stepBlend()
@@ -425,6 +565,7 @@ local function begin(model: Model, kind: string)
 		camStart = nil,
 		followFrame = nil,
 		camDone = false,
+		lastShot = nil,
 	}
 end
 

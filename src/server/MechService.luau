@@ -24,6 +24,12 @@ local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechCord = require(Shared:WaitForChild("MechCord"))
 local MechPattern = require(Shared:WaitForChild("MechPattern"))
 local MechPose = require(Shared:WaitForChild("MechPose"))
+local MechTypes = require(Shared:WaitForChild("MechTypes"))
+local Type99Builder = require(Shared:WaitForChild("Type99Builder"))
+local Type99Charger = require(Shared:WaitForChild("Type99Charger"))
+local KnightBuilder = require(Shared:WaitForChild("KnightBuilder"))
+local GunnerBuilder = require(Shared:WaitForChild("GunnerBuilder"))
+local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
 
 local MechService = {}
 
@@ -34,9 +40,20 @@ local BACK_ROW_Z = -92
 local PAD_SIZE = 28
 local RESPAWN_DELAY = 3
 local ENTER_DISTANCE = 24 -- from the foot of the ramp
-local ROOT_HEIGHT = MechBuilder.RootHeight -- root center above ground
+-- the WTK-99 lineup: a block to the right of the HWM-04B one
+local T99_X = 110
+local T99_SPACING = 36
+-- the VK-01 lineup: mirrors the WTK-99 block on the left (x -110 .. -218)
+local KNIGHT_X = -110
+local KNIGHT_SPACING = 36
+-- the GR-07 lineup: a block behind the HWM-04B one (the long cannons run
+-- front to back, so the rows are spaced like the HWM-04B ones)
+local GUNNER_Z = -150
+local GUNNER_BACK_Z = -196
+local GUNNER_X = { -54, -18, 18, 54 }
 
 local B, X = MechConfig.Boarding, MechConfig.Exit
+local T99B, T99X = MechConfig.Type99Boarding, MechConfig.Type99Exit
 
 local remotes: Folder
 local pilotChanged: RemoteEvent
@@ -61,6 +78,7 @@ type SpawnSpec = {
 	home: CFrame, -- on the ground, facing the way the mech should face
 	pattern: string?, -- MechPattern name, nil for plain armor
 	offPose: string?, -- powered-down pose style (MechBuilder.OffStyles), nil = "Kneel"
+	mechType: string, -- MechTypes id
 }
 
 -- Ground-level CFrame at x, z facing the spawn point (+Z).
@@ -82,6 +100,7 @@ local function buildSpecs(): { SpawnSpec }
 			variantId = id,
 			home = facingSpawn(x, LINEUP_Z),
 			offPose = offPoses[id],
+			mechType = "HWM04B",
 		})
 		table.insert(specs, {
 			key = id .. "_Hatch",
@@ -89,7 +108,49 @@ local function buildSpecs(): { SpawnSpec }
 			home = facingSpawn(x, BACK_ROW_Z),
 			pattern = "Crosshatch",
 			offPose = offPoses[id],
+			mechType = "HWM04B",
 		})
+	end
+	-- WTK-99 walkers: same four colors, plain in front, crosshatch behind
+	for i, id in { "Desert", "Olive", "Arctic", "Navy" } do
+		local x = T99_X + (i - 1) * T99_SPACING
+		table.insert(specs, { key = "T99_" .. id, variantId = id, home = facingSpawn(x, LINEUP_Z), mechType = "Type99" })
+		table.insert(specs, {
+			key = "T99_" .. id .. "_Hatch",
+			variantId = id,
+			home = facingSpawn(x, BACK_ROW_Z),
+			pattern = "Crosshatch",
+			mechType = "Type99",
+		})
+	end
+	-- VK-01 knights: same four colors, plain in front, crosshatch behind
+	for i, id in { "Desert", "Olive", "Arctic", "Navy" } do
+		local x = KNIGHT_X - (i - 1) * KNIGHT_SPACING
+		table.insert(specs, { key = "VK01_" .. id, variantId = id, home = facingSpawn(x, LINEUP_Z), mechType = KnightBuilder.TypeId })
+		table.insert(specs, {
+			key = "VK01_" .. id .. "_Hatch",
+			variantId = id,
+			home = facingSpawn(x, BACK_ROW_Z),
+			pattern = "Crosshatch",
+			mechType = KnightBuilder.TypeId,
+		})
+	end
+	-- GR-07 gunners: same four colors, plain in front, crosshatch behind
+	for i, id in { "Desert", "Olive", "Arctic", "Navy" } do
+		local x = GUNNER_X[i]
+		table.insert(specs, { key = "GR07_" .. id, variantId = id, home = facingSpawn(x, GUNNER_Z), mechType = GunnerBuilder.TypeId })
+		table.insert(specs, {
+			key = "GR07_" .. id .. "_Hatch",
+			variantId = id,
+			home = facingSpawn(x, GUNNER_BACK_Z),
+			pattern = "Crosshatch",
+			mechType = GunnerBuilder.TypeId,
+		})
+	end
+	-- BRZ-01 Titans (TitanConfig.Lineup): behind the WTK-99 block. Last, so a
+	-- failing build of the (still evolving) assembled mech can't stop the rest.
+	for _, t in TitanConfig.Lineup do
+		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), pattern = t.pattern, mechType = TitanConfig.TypeId })
 	end
 	return specs
 end
@@ -119,8 +180,14 @@ local function buildPad(spec: SpawnSpec)
 		stripe.Material = Enum.Material.SmoothPlastic
 		stripe.Parent = pad
 	end
-	-- the charging box the mech's power cord runs to
-	MechCord.buildOutlet(base, pad)
+	-- the charging box the mech's power cord runs to; the WTK-99's wall charger
+	if MechTypes.get(spec.mechType).hasCord then
+		MechCord.buildOutlet(base, pad)
+	elseif Type99Charger.applies(spec.mechType) then
+		Type99Charger.buildCharger(base, pad)
+	elseif MechTypes.get(spec.mechType).buildDock then
+		(MechTypes.get(spec.mechType).buildDock :: any)(base, pad) -- BRZ-01 charging pylon
+	end
 end
 
 local function setIdleVisuals(model: Model, idle: boolean)
@@ -281,7 +348,7 @@ local function park(model: Model)
 	-- stand upright on the ground where it stopped
 	local _, yaw, _ = root.CFrame:ToOrientation()
 	local pos = root.Position
-	local y = groundY(model, pos) + ROOT_HEIGHT
+	local y = groundY(model, pos) + MechTypes.get(model).rootHeight
 	root.AssemblyLinearVelocity = Vector3.zero
 	root.AssemblyAngularVelocity = Vector3.zero
 	root.Anchored = true
@@ -323,10 +390,15 @@ local function waitUntil(model: Model, t: number)
 	end
 end
 
--- Seconds a pilot at `from` gets to walk up the ramp to the seat. Clients
--- speed the walk up to fit (or glide the rest of a long route).
+-- Seconds a pilot at `from` gets to walk up the ramp to the seat (WTK-99:
+-- to the spot in front of the nose). Clients speed the walk up to fit (or
+-- glide the rest of a long route).
 local function walkTime(model: Model, from: Vector3): number
 	local root = model:FindFirstChild("HumanoidRootPart") :: BasePart
+	if MechTypes.idOf(model) == "Type99" then
+		local d = ((Type99Builder.offPoints(root.CFrame).climb - from) * Vector3.new(1, 0, 1)).Magnitude
+		return math.clamp(d / T99B.ApproachSpeed, T99B.ApproachMin, T99B.ApproachMax)
+	end
 	local style = MechPose.style(model)
 	local len = MechBuilder.pathLength(from, MechBuilder.boardPath(root.CFrame, from, style))
 	if style == "OneKnee" then
@@ -337,17 +409,18 @@ local function walkTime(model: Model, from: Vector3): number
 	return math.clamp(len / MechConfig.BoardWalkSpeed, MechConfig.BoardWalkMin, MechConfig.BoardWalkMax)
 end
 
--- Boarding: the pilot walks up the ramp, turns and sits; the doors close
--- around them and the mech stands up, then the pilot gets the controls.
-local function boardSequence(player: Player, p: Pilot, token: {})
+-- Boarding: the pilot walks (and climbs) in, turns and sits; the doors or
+-- canopy close around them and the mech stands up, then the pilot gets the
+-- controls. The clients animate the way in; the server seats the avatar at
+-- `sitAt` and hands over at `onlineAt` (seconds after the approach walk).
+local function boardSequence(player: Player, p: Pilot, token: {}, sitAt: number, onlineAt: number)
 	local model = p.model
 	local function valid(): boolean
 		return sequences[model] == token and pilots[player] == p and model.Parent ~= nil
 	end
 
-	-- the client walks the character up the ramp and turns it round
 	local walk = MechPose.boardWalk(model)
-	waitUntil(model, walk + B.Sit)
+	waitUntil(model, walk + sitAt)
 	if not valid() then
 		return
 	end
@@ -361,7 +434,7 @@ local function boardSequence(player: Player, p: Pilot, token: {})
 	end
 	strap(p)
 
-	waitUntil(model, walk + B.Online)
+	waitUntil(model, walk + onlineAt)
 	if not valid() then
 		return
 	end
@@ -375,6 +448,86 @@ local function boardSequence(player: Player, p: Pilot, token: {})
 	setPower(model, "Online")
 	pilotChanged:FireClient(player, model, "Online")
 end
+
+-- ============================================== placeholder get-in / get-out
+-- For types with cinematicBoarding = false (VK-01 Knight, GR-07 Gunner) until
+-- their cockpits are signed off (no cinematic). E seats the avatar at once
+-- (client phase "Seated"), the hatch shuts and the mech stands (its Pose's
+-- Board timings), then the pilot gets the controls. E again: "Unseating"
+-- while it powers down and opens the hatch (Pose.Exit), then the server
+-- unseats the avatar and the pilot's client puts it down in front of the
+-- mech ("Exiting", PlaceholderPilot).
+local function placeholderEnter(player: Player, model: Model, char: Model, hum: Humanoid, def: MechTypes.TypeDef)
+	local board = def.Pose.Board
+	local p: Pilot = { model = model, char = char, hum = hum, massless = {}, conns = {} }
+	pilots[player] = p
+	local function lost()
+		dropPilot(player, true)
+	end
+	table.insert(p.conns, hum.Died:Connect(lost))
+	table.insert(p.conns, player.CharacterRemoving:Connect(lost))
+	model:SetAttribute("PilotId", player.UserId)
+	setIdleVisuals(model, false)
+	setPower(model, "Boarding")
+	local token = {}
+	sequences[model] = token
+	pilotChanged:FireClient(player, model, "Seated")
+	local seat = seatOf(model)
+	if seat then
+		seat:Sit(hum)
+	end
+	if not (seat and (seat.Occupant == hum or seat:FindFirstChild("SeatWeld"))) then
+		dropPilot(player, true)
+		return
+	end
+	if def.fitPilot then
+		def.fitPilot(model, hum)
+	end
+	strap(p)
+	task.spawn(function()
+		waitUntil(model, board.Online)
+		if sequences[model] ~= token or pilots[player] ~= p or not model.Parent then
+			return
+		end
+		local root = model:FindFirstChild("HumanoidRootPart") :: BasePart
+		local humanoid = model:FindFirstChildOfClass("Humanoid") :: Humanoid
+		sequences[model] = nil
+		root.Anchored = false
+		humanoid:ChangeState(Enum.HumanoidStateType.Running)
+		root:SetNetworkOwner(player)
+		setPower(model, "Online")
+		pilotChanged:FireClient(player, model, "Online")
+	end)
+end
+
+local function placeholderExit(player: Player, p: Pilot, def: MechTypes.TypeDef)
+	local model = p.model
+	local x = def.Pose.Exit
+	local token = {}
+	sequences[model] = token
+	park(model)
+	setPower(model, "PoweringDown")
+	pilotChanged:FireClient(player, model, "Unseating")
+	waitUntil(model, x.Unseat)
+	if sequences[model] ~= token or pilots[player] ~= p then
+		return
+	end
+	pilots[player] = nil
+	for _, c in p.conns do
+		c:Disconnect()
+	end
+	unseat(model, p.hum)
+	unstrap(p)
+	pilotChanged:FireClient(player, model, "Exiting")
+	waitUntil(model, x.Off)
+	if sequences[model] == token then
+		resetToOff(model)
+	end
+	if player.Parent and pilots[player] == nil then
+		pilotChanged:FireClient(player, nil)
+	end
+end
+-- ============================================== end placeholder
 
 local function enter(player: Player, model: Model)
 	if pilots[player] or model:GetAttribute("PilotId") or model:GetAttribute("PowerState") ~= "Off" then
@@ -391,12 +544,17 @@ local function enter(player: Player, model: Model)
 		return
 	end
 	local root = model:FindFirstChild("HumanoidRootPart") :: BasePart
-	local foot = MechBuilder.offPoints(root.CFrame, MechPose.style(model)).foot
+	local def = MechTypes.get(model)
+	local foot = def.promptPoint(root.CFrame, MechPose.style(model))
 	if ((charRoot.Position - foot) * Vector3.new(1, 0, 1)).Magnitude > ENTER_DISTANCE then
 		return
 	end
+	if def.cinematicBoarding == false then
+		placeholderEnter(player, model, char, hum, def) -- see above
+		return
+	end
 
-	local p: Pilot = { model = model, char = char, hum = hum, massless = {}, conns = {} }
+	local p: Pilot ={ model = model, char = char, hum = hum, massless = {}, conns = {} }
 	pilots[player] = p
 	-- losing the avatar (death, reset, respawn) parks the mech again
 	local function lost()
@@ -411,14 +569,23 @@ local function enter(player: Player, model: Model)
 	local token = {}
 	sequences[model] = token
 	pilotChanged:FireClient(player, model, "Boarding")
-	task.spawn(boardSequence, player, p, token)
+	if def.id == "Type99" then
+		task.spawn(boardSequence, player, p, token, T99B.Sit, T99B.Online)
+	else
+		task.spawn(boardSequence, player, p, token, B.Sit, B.Online)
+	end
 end
 
--- Exit: the mech kneels with the doors shut, the doors and ramp open on the
--- seated pilot, who unbuckles and walks out.
+-- Exit: the mech kneels (sits down) with the doors (canopy) shut, they open
+-- on the seated pilot, who unbuckles and walks (climbs) out.
 local function exit(player: Player)
 	local p = pilots[player]
 	if not p or p.model:GetAttribute("PowerState") ~= "Online" then
+		return
+	end
+	local def = MechTypes.get(p.model)
+	if def.cinematicBoarding == false then
+		placeholderExit(player, p, def) -- see placeholderEnter
 		return
 	end
 	local model = p.model
@@ -427,9 +594,12 @@ local function exit(player: Player)
 	park(model)
 	setPower(model, "PoweringDown")
 	pilotChanged:FireClient(player, model, "PoweringDown")
+	local t99 = MechTypes.idOf(model) == "Type99"
+	local unseatAt = if t99 then T99X.Unseat else X.Reveal + X.Stand
+	local offAt = if t99 then T99X.Off else X.Reveal + X.Off
 
-	-- kneel, doors open (see MechPose.powerTargets), then stand up
-	waitUntil(model, X.Reveal + X.Stand)
+	-- kneel / sit down, doors / canopy open (see MechPose / Type99Pose.powerTargets)
+	waitUntil(model, unseatAt)
 	if sequences[model] ~= token or pilots[player] ~= p then
 		return
 	end
@@ -439,10 +609,10 @@ local function exit(player: Player)
 	end
 	unseat(model, p.hum)
 	unstrap(p)
-	-- the client walks the character down the ramp
+	-- the client walks the character down the ramp (Climb animates the WTK-99 climb-out)
 	pilotChanged:FireClient(player, model, "Exiting")
 
-	waitUntil(model, X.Reveal + X.Off)
+	waitUntil(model, offAt)
 	if sequences[model] == token then
 		resetToOff(model)
 	end
@@ -468,7 +638,7 @@ local function equip(player: Player, slot: unknown, variantId: unknown)
 		return
 	end
 	-- the pilot seat lives outside the armor folders, so the pilot stays put
-	MechBuilder.applySlot(model, slot, variantId)
+	MechTypes.get(model).Builder.applySlot(model, slot, variantId)
 	-- the rebuilt slot comes back plain
 	local pattern = model:GetAttribute("Pattern")
 	MechPattern.apply(model, if typeof(pattern) == "string" then pattern else nil)
@@ -476,32 +646,38 @@ end
 
 function spawnMech(specIndex: number)
 	local spec = specs[specIndex]
+	local def = MechTypes.get(spec.mechType)
 	local variant = MechConfig.getVariant(spec.variantId)
 	local suffix = if spec.pattern then " (Hatch)" else ""
-	local model = MechBuilder.buildMech("HWM-04B " .. variant.displayName .. suffix, {
+	local variantName = if def.variantName then def.variantName(variant.id) else variant.displayName
+	local model = def.Builder.buildMech(def.displayName .. " " .. variantName .. suffix, {
 		Helmet = variant.id,
 		Chest = variant.id,
 		Legs = variant.id,
 	})
+	model:SetAttribute(MechTypes.Attribute, def.id)
 	MechPattern.apply(model, spec.pattern)
-	MechCord.buildSocket(model)
+	if def.hasCord then
+		MechCord.buildSocket(model)
+	end
 	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	model:SetAttribute("HomeIndex", specIndex)
 	model:SetAttribute("OffPose", spec.offPose)
-	-- battery + power cord (see MechBattery): spawns full and plugged in at home
+	-- battery + power cord (see MechBattery): spawns full and plugged in at
+	-- home (the WTK-99 into its wall charger, Type99CableController).
 	model:SetAttribute("Home", spec.home)
 	model:SetAttribute("Charge", 100)
-	model:SetAttribute("Plugged", true)
+	model:SetAttribute("Plugged", def.hasCord or Type99Charger.applies(def.id) or def.buildDock ~= nil)
 	setPower(model, "Off")
 	local root = model:FindFirstChild("HumanoidRootPart") :: BasePart
 	root.Anchored = true
-	model:PivotTo(spec.home * CFrame.new(0, ROOT_HEIGHT, 0))
+	model:PivotTo(spec.home * CFrame.new(0, def.rootHeight, 0))
 
-	-- the prompt sits at the foot of the ramp, where the pilot walks in
+	-- the prompt sits where the pilot gets in (HWM-04B: the foot of the ramp)
 	local boardPoint = Instance.new("Attachment")
 	boardPoint.Name = "BoardPoint"
 	boardPoint.Parent = root
-	boardPoint.WorldPosition = MechBuilder.offPoints(root.CFrame, spec.offPose).foot + Vector3.new(0, 3, 0)
+	boardPoint.WorldPosition = def.promptPoint(root.CFrame, spec.offPose) + Vector3.new(0, 3, 0)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Pilot"
 	prompt.ObjectText = model.Name
@@ -524,7 +700,7 @@ function spawnMech(specIndex: number)
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.fromScale(1, 1)
 	label.BackgroundTransparency = 1
-	label.Text = "HWM-04B  //  " .. string.upper(variant.displayName) .. (if spec.pattern then "  //  CROSSHATCH" else "")
+	label.Text = def.displayName .. "  //  " .. string.upper(variantName) .. (if spec.pattern then "  //  CROSSHATCH" else "")
 	label.TextColor3 = Color3.new(1, 1, 1)
 	label.TextStrokeTransparency = 0.4
 	label.Font = Enum.Font.GothamBold
@@ -618,26 +794,35 @@ function MechService.buildPreview(): Folder
 	folder.Name = "MechsPreview"
 	mechFolder = folder
 	local cords: { { model: Model, home: CFrame, key: string } } = {}
+	local chargers: { { model: Model, home: CFrame } } = {}
 	for _, spec in buildSpecs() do
 		buildPad(spec)
+		local def = MechTypes.get(spec.mechType)
 		local variant = MechConfig.getVariant(spec.variantId)
-		local model = MechBuilder.buildMech("Preview " .. spec.key, {
+		local model = def.Builder.buildMech("Preview " .. spec.key, {
 			Helmet = variant.id,
 			Chest = variant.id,
 			Legs = variant.id,
 		})
+		model:SetAttribute(MechTypes.Attribute, def.id)
 		MechPattern.apply(model, spec.pattern)
-		MechCord.buildSocket(model)
+		if def.hasCord then
+			MechCord.buildSocket(model)
+		end
 		model:SetAttribute("OffPose", spec.offPose)
 		local humanoid = model:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			humanoid:Destroy()
 		end
-		model:PivotTo(spec.home * CFrame.new(0, ROOT_HEIGHT, 0))
-		MechPose.applyOff(MechPose.motors(model), spec.offPose)
+		model:PivotTo(spec.home * CFrame.new(0, def.rootHeight, 0))
+		def.applyOff(MechPose.motors(model), spec.offPose)
 		bakePose(model)
 		model.Parent = folder
-		table.insert(cords, { model = model, home = spec.home, key = spec.key })
+		if def.hasCord then
+			table.insert(cords, { model = model, home = spec.home, key = spec.key })
+		elseif Type99Charger.applies(def.id) then
+			table.insert(chargers, { model = model, home = spec.home })
+		end
 	end
 	folder.Parent = workspace
 	-- plugged-in cords in their hanging pose (anchored, no physics)
@@ -646,6 +831,9 @@ function MechService.buildPreview(): Folder
 	params.RespectCanCollide = true
 	local exclude: { Instance } = {}
 	for _, c in cords do
+		table.insert(exclude, c.model)
+	end
+	for _, c in chargers do
 		table.insert(exclude, c.model)
 	end
 	params.FilterDescendantsInstances = exclude
@@ -673,6 +861,36 @@ function MechService.buildPreview(): Folder
 				if light then
 					light.Brightness = 1.1
 				end
+			end
+		end
+	end
+	-- WTK-99s: connector latched into the cable port, hoses sagging to the charger
+	for _, c in chargers do
+		local port = Type99Charger.portCFrame(c.model)
+		if port then
+			local chargerCF = Type99Charger.chargerCFrame(c.home)
+			local conn = Type99Charger.buildConnector("ChargerConnector", c.model)
+			conn.led.Color = Type99Charger.GlowOn
+			local hoses = { Type99Charger.buildHose("ChargerHose1", c.model), Type99Charger.buildHose("ChargerHose2", c.model) }
+			Type99Charger.placeConnector(conn, port, 0)
+			local len = Type99Charger.hoseLength(Type99Charger.spanOf(chargerCF, port))
+			local mid = (port.Position + Type99Charger.glandCenter(c.home)) / 2
+			Type99Charger.layHoses(hoses, chargerCF, port, len, floorAt(mid))
+		end
+	end
+	-- chargers show "charging"
+	for _, d in folder:GetDescendants() do
+		if d:IsA("Model") and d.Name == "Type99Charger" then
+			for _, name in { "StripL", "StripR", "GlandLight" } do
+				local p = d:FindFirstChild(name)
+				if p and p:IsA("BasePart") then
+					p.Color = Type99Charger.GlowOn
+				end
+			end
+			local gl = d:FindFirstChild("GlandLight")
+			local light = gl and gl:FindFirstChild("Glow")
+			if light and light:IsA("PointLight") then
+				light.Brightness = 0.9
 			end
 		end
 	end
@@ -741,8 +959,7 @@ function MechService.start()
 					motorCache[model] = nil
 				end)
 			end
-			local crouch, doors, ramp = MechPose.powerTargets(model)
-			MechPose.applyStatic(motors, crouch, doors, ramp, MechPose.style(model))
+			MechTypes.get(model).applyPowerPose(model, motors)
 		end
 	end)
 

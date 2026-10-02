@@ -678,6 +678,7 @@ local SLOT_BUILDERS = {
 function MechBuilder.buildRig(name: string): Model
 	local model = Instance.new("Model")
 	model.Name = name
+	model:SetAttribute("MechType", "HWM04B") -- see MechTypes
 
 	local root = Instance.new("Part")
 	root.Name = "HumanoidRootPart"

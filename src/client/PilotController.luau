@@ -22,7 +22,10 @@ local RunService = game:GetService("RunService")
 
 local Boarding = require(script.Parent.Boarding)
 local MechAnimator = require(script.Parent.MechAnimator)
+local Type99Animator = require(script.Parent.Type99Animator)
+local TitanAnimator = require(script.Parent.TitanAnimator) -- BRZ-01 jump windup / airborne / landing
 local MechConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechConfig"))
+local MechTypes = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechTypes"))
 
 local PilotController = {}
 
@@ -93,6 +96,40 @@ local function onExitAction(_: string, state: Enum.UserInputState)
 	return Enum.ContextActionResult.Sink
 end
 
+-- Per-type movement: the WTK-99 has its own speeds, jump and animator.
+local function isType99(model: Model?): boolean
+	return model ~= nil and MechTypes.idOf(model) == "Type99"
+end
+
+local function speedsOf(model: Model?): (number, number)
+	if isType99(model) then
+		return MechConfig.Type99Anim.WalkSpeed, MechConfig.Type99Anim.SprintSpeed
+	end
+	return MechConfig.WalkSpeed, MechConfig.SprintSpeed
+end
+
+local function isTitan(model: Model?): boolean
+	return model ~= nil and MechTypes.idOf(model) == "Titan"
+end
+
+local function jumpOf(model: Model?): (number, number)
+	if isType99(model) then
+		return MechConfig.Type99Anim.JumpPower, MechConfig.Type99Anim.JumpWindup
+	end
+	if isTitan(model) then
+		return MechConfig.JumpPower, TitanAnimator.JumpWindup -- deeper crouch before the legs fire
+	end
+	return MechConfig.JumpPower, MechConfig.JumpWindup
+end
+
+-- Airborne state from whichever animator drives this mech type.
+local function isAirborne(model: Model): boolean
+	if isTitan(model) then
+		return TitanAnimator.isAirborne(model)
+	end
+	return if isType99(model) then Type99Animator.isAirborne(model) else MechAnimator.isAirborne(model)
+end
+
 -- Battery flat (Charge 0, see MechBattery): no sprint, no jump, half speed.
 local function batteryEmpty(): boolean
 	local c = current and current:GetAttribute("Charge")
@@ -100,10 +137,11 @@ local function batteryEmpty(): boolean
 end
 
 local function targetSpeed(): number
+	local walk, sprint = speedsOf(current)
 	if batteryEmpty() then
-		return MechConfig.WalkSpeed * MechConfig.Battery.EmptySpeedFactor
+		return walk * MechConfig.Battery.EmptySpeedFactor
 	end
-	return if sprinting then MechConfig.SprintSpeed else MechConfig.WalkSpeed
+	return if sprinting then sprint else walk
 end
 
 local function setSprinting(on: boolean)
@@ -132,7 +170,7 @@ local function canJump(): boolean
 		return false
 	end
 	local state = humanoid:GetState()
-	if MechAnimator.isAirborne(current :: Model) or state == Enum.HumanoidStateType.Jumping or state == Enum.HumanoidStateType.Freefall then
+	if isAirborne(current :: Model) or state == Enum.HumanoidStateType.Jumping or state == Enum.HumanoidStateType.Freefall then
 		return false
 	end
 	return os.clock() - lastLanded >= MechConfig.JumpCooldown
@@ -144,12 +182,19 @@ local function onJumpAction(_: string, state: Enum.UserInputState)
 	if state == Enum.UserInputState.Begin and canJump() then
 		local model = current :: Model
 		jumpPending = true
-		MechAnimator.windup(model)
-		task.delay(MechConfig.JumpWindup, function()
+		local power, windup = jumpOf(model)
+		if isType99(model) then
+			Type99Animator.windup(model)
+		elseif isTitan(model) then
+			TitanAnimator.windup(model)
+		else
+			MechAnimator.windup(model)
+		end
+		task.delay(windup, function()
 			jumpPending = false
 			local humanoid = pilotHumanoid
 			if driving and humanoid and current == model then
-				humanoid.JumpPower = MechConfig.JumpPower
+				humanoid.JumpPower = power
 				humanoid.Jump = true
 			end
 		end)
@@ -218,7 +263,7 @@ local function setPiloting(model: Model?)
 		pilotHumanoid = humanoid
 		sprinting = false
 		if humanoid then
-			humanoid.WalkSpeed = MechConfig.WalkSpeed
+			humanoid.WalkSpeed = (speedsOf(model))
 			if camera.CameraSubject ~= humanoid then
 				camera.CameraSubject = humanoid
 			end
@@ -227,10 +272,14 @@ local function setPiloting(model: Model?)
 			humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 			humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false)
 			humanoid:ChangeState(Enum.HumanoidStateType.Running)
-			humanoid.JumpPower = MechConfig.JumpPower
+			humanoid.JumpPower = (jumpOf(model))
 		end
 		ProximityPromptService.Enabled = false
 		driving = true
+		local label = hud:FindFirstChild("Label", true)
+		if label and label:IsA("TextLabel") then
+			label.Text = MechTypes.get(model).displayName .. " ONLINE   ·   [SHIFT] SPRINT   ·   [SPACE] JUMP   ·   [E] EXIT   ·   [I] INVENTORY"
+		end
 		lockAvatar(true)
 		-- the controls stay on for the move vector: jump goes to the mech, never the seated avatar
 		ContextActionService:BindActionAtPriority(JUMP_ACTION, onJumpAction, true, SPRINT_PRIORITY, Enum.KeyCode.Space, Enum.KeyCode.ButtonA)
@@ -279,6 +328,12 @@ local function onPilotChanged(model: Model?, phase: string?)
 		releaseControls()
 		Boarding.lockControls(true)
 		Boarding.beginExit(model)
+	elseif model and (phase == "Seated" or phase == "Unseating") then
+		-- placeholder get-in / get-out (VK-01, GR-07; no cinematic, see PlaceholderPilot)
+		releaseControls()
+		ProximityPromptService.Enabled = false
+		lockAvatar(true)
+		Boarding.lockControls(true)
 	elseif model and phase == "Exiting" then
 		-- unseated in the open cockpit; the exit sequence walks it out
 		if current then
@@ -316,7 +371,7 @@ function PilotController.start()
 			return
 		end
 		local v = root.AssemblyLinearVelocity
-		if v.Y < 8 and MechAnimator.isAirborne(model) then
+		if v.Y < 8 and isAirborne(model) then
 			root.AssemblyLinearVelocity = v - Vector3.new(0, workspace.Gravity * MechConfig.JumpFallGravity * dt, 0)
 		end
 	end)
@@ -334,6 +389,26 @@ function PilotController.start()
 		end
 	end)
 
+	-- the BRZ-01's animator (it adds its own landing thump)
+	TitanAnimator.onLand(function(model, _impact)
+		if model == current then
+			lastLanded = os.clock()
+		end
+	end)
+
+	-- the WTK-99's animator: heavier stomps, scaled per step
+	Type99Animator.onLand(function(model, impact)
+		if model == current then
+			lastLanded = os.clock()
+			shake = math.max(shake, 0.7 + impact / 30)
+		end
+	end)
+	Type99Animator.onFootstep(function(model, _side, strength)
+		if model == current then
+			shake = math.max(shake, strength)
+		end
+	end)
+
 	RunService:BindToRenderStep("MechCameraShake", Enum.RenderPriority.Camera.Value + 1, function(dt)
 		local camera = workspace.CurrentCamera
 		-- widen the view while actually running fast, not just holding Shift
@@ -345,7 +420,8 @@ function PilotController.start()
 			if sprinting and root then
 				local v = root.AssemblyLinearVelocity
 				local speed = Vector3.new(v.X, 0, v.Z).Magnitude
-				target = math.clamp((speed - MechConfig.WalkSpeed) / (MechConfig.SprintSpeed - MechConfig.WalkSpeed), 0, 1)
+				local walk, sprint = speedsOf(current)
+				target = math.clamp((speed - walk) / (sprint - walk), 0, 1)
 			end
 			fovBoost += (target - fovBoost) * math.min(1, dt * 5)
 			camera.FieldOfView = fov + fovBoost * SPRINT_FOV_BOOST

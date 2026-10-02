@@ -10,6 +10,8 @@ local UserInputService = game:GetService("UserInputService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechBuilder = require(Shared:WaitForChild("MechBuilder"))
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
+local MechTypes = require(Shared:WaitForChild("MechTypes"))
+local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
 local PilotController = require(script.Parent.PilotController)
 
 local Inventory = {}
@@ -37,8 +39,16 @@ local VIEW_DIR = Vector3.new(0.6, 0.3, -1).Unit -- mech faces -Z; look at its fr
 local gui: ScreenGui
 local panel: Frame
 local status: TextLabel
-local cards: { [string]: { [string]: { frame: Frame, stroke: UIStroke } } } = {}
+local cards: { [string]: { [string]: { frame: Frame, stroke: UIStroke, name: TextLabel, swatch: Frame } } } = {}
 local previewsBuilt = false
+-- BRZ-01 Titan: while piloting one, the cards show its variant names
+-- (TitanConfig: Bronze, Gunmetal, ...) and Titan pieces instead
+local previewMode = "HWM" -- what the previews were built for
+local TITAN_VIEW = { -- studs, Titan model space (faces -Z)
+	Helmet = { focus = Vector3.new(0, 27.6, -1.6), dist = 10 },
+	Chest = { focus = Vector3.new(0, 21.5, -1.0), dist = 34 },
+	Legs = { focus = Vector3.new(0, 8.5, -0.5), dist = 33 },
+}
 local attrConn: RBXScriptConnection? = nil
 
 local function corner(parent: Instance, r: number)
@@ -58,7 +68,61 @@ local function text(parent: Instance, str: string, size: number, color: Color3, 
 	return t
 end
 
+-- Card previews show HWM-04B pieces only (for now); equipping works on any
+-- mech type: the server rebuilds the slot with the piloted type's builder.
+local function cardMode(): string
+	local mech = PilotController.getMech()
+	return if mech and MechTypes.idOf(mech) == TitanConfig.TypeId then "Titan" else "HWM"
+end
+
+local function clearPreview(viewport: ViewportFrame)
+	for _, c in viewport:GetChildren() do
+		if not c:IsA("UICorner") then
+			c:Destroy()
+		end
+	end
+end
+
+local function setCamera(viewport: ViewportFrame, focus: Vector3, dist: number)
+	local camera = Instance.new("Camera")
+	camera.FieldOfView = 40
+	camera.CFrame = CFrame.lookAt(focus + VIEW_DIR * dist, focus)
+	camera.Parent = viewport
+	viewport.CurrentCamera = camera
+end
+
+-- Titan cards: one Titan built per colour (once), its slot folder cloned
+-- into the card (the pieces sit where the build left them, no physics).
+local titanSources: { [string]: Model } = {}
+local function buildTitanPreview(viewport: ViewportFrame, slot: string, variantId: string)
+	local src = titanSources[variantId]
+	if not src then
+		local TitanBuilder = require(Shared:WaitForChild("TitanBuilder")) :: any
+		local ok, built = pcall(TitanBuilder.buildMech, "TitanPreview", { Helmet = variantId, Chest = variantId, Legs = variantId })
+		if not ok then
+			warn("[Inventory] Titan preview failed: " .. tostring(built))
+			return
+		end
+		src = built :: Model
+		titanSources[variantId] = src
+	end
+	local folder = src:FindFirstChild("Armor_" .. slot)
+	if folder then
+		local holder = Instance.new("Model")
+		holder.Name = "Preview"
+		folder:Clone().Parent = holder
+		holder.Parent = viewport
+	end
+	local view = TITAN_VIEW[slot]
+	setCamera(viewport, view.focus, view.dist)
+end
+
 local function buildPreview(viewport: ViewportFrame, slot: string, variantId: string)
+	clearPreview(viewport)
+	if previewMode == "Titan" then
+		buildTitanPreview(viewport, slot, variantId)
+		return
+	end
 	local rig = MechBuilder.buildRig("Preview")
 	MechBuilder.applySlot(rig, slot, variantId)
 	local humanoid = rig:FindFirstChildOfClass("Humanoid")
@@ -76,7 +140,41 @@ local function buildPreview(viewport: ViewportFrame, slot: string, variantId: st
 	viewport.CurrentCamera = camera
 end
 
+-- Card names / swatches for the current mode (Titan variant names while
+-- piloting a Titan); previews are rebuilt if the panel already built them.
+local function refreshCards()
+	local mode = cardMode()
+	for _, row in cards do
+		for variantId, card in row do
+			if mode == "Titan" then
+				local v = TitanConfig.getVariant(variantId)
+				card.name.Text = string.upper(v.displayName)
+				card.swatch.BackgroundColor3 = v.palette.main
+			else
+				local v = MechConfig.getVariant(variantId)
+				card.name.Text = string.upper(v.displayName)
+				card.swatch.BackgroundColor3 = v.palette.main
+			end
+		end
+	end
+	if mode ~= previewMode then
+		previewMode = mode
+		if previewsBuilt then
+			for slot, row in cards do
+				for variantId, card in row do
+					buildPreview(card.frame:FindFirstChild("Preview") :: ViewportFrame, slot, variantId)
+				end
+			end
+			for _, m in titanSources do
+				m:Destroy()
+			end
+			table.clear(titanSources)
+		end
+	end
+end
+
 local function refreshSelection()
+	refreshCards()
 	local mech = PilotController.getMech()
 	for slot, row in cards do
 		local equipped = mech and mech:GetAttribute(slot)
@@ -155,7 +253,7 @@ local function buildCard(row: Frame, slot: string, variant: MechConfig.Variant, 
 	end)
 
 	cards[slot] = cards[slot] or {}
-	cards[slot][variant.id] = { frame = card :: any, stroke = stroke }
+	cards[slot][variant.id] = { frame = card :: any, stroke = stroke, name = name, swatch = swatch }
 end
 
 local function buildGui()
@@ -260,11 +358,16 @@ local function buildGui()
 		panel.Visible = open
 		if open and not previewsBuilt then
 			previewsBuilt = true
+			previewMode = cardMode()
 			for slot, row in cards do
 				for variantId, card in row do
 					buildPreview(card.frame:FindFirstChild("Preview") :: ViewportFrame, slot, variantId)
 				end
 			end
+			for _, m in titanSources do
+				m:Destroy()
+			end
+			table.clear(titanSources)
 		end
 		if open then
 			-- shrink the panel on small screens
