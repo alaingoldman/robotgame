@@ -1,6 +1,6 @@
 --!strict
 -- Mech type registry. Every mech model carries a "MechType" attribute
--- ("HWM04B", "Type99", "Knight", "Gunner", "Titan", "Mech2" or "Crimson"; missing = "HWM04B"); shared code looks up the
+-- ("HWM04B", "Type99", "Knight", "Gunner", "Titan", "Mech2", "Crimson" or "Mech3"; missing = "HWM04B"); shared code looks up the
 -- builder, pose module and per-type behavior here instead of assuming the
 -- HWM-04B.
 --
@@ -38,6 +38,11 @@ local CrimsonBuilder = require(script.Parent.CrimsonBuilder)
 local CrimsonPose = require(script.Parent.CrimsonPose)
 local CrimsonDock = require(script.Parent.CrimsonDock)
 local CrimsonConfig = require(script.Parent.CrimsonConfig)
+-- SRF-03 "Seraph" (mech3, owner's winged textured meshes): Mech3Builder / Mech3Pose / Mech3Dock / Mech3Config
+local Mech3Builder = require(script.Parent.Mech3Builder)
+local Mech3Pose = require(script.Parent.Mech3Pose)
+local Mech3Dock = require(script.Parent.Mech3Dock)
+local Mech3Config = require(script.Parent.Mech3Config)
 
 local MechTypes = {}
 
@@ -242,6 +247,35 @@ MechTypes.Types = {
 		chargeRate = CrimsonDock.ChargeRate,
 		variantName = function(variantId: string): string
 			return CrimsonConfig.getVariant(variantId).displayName
+		end,
+	},
+	-- SRF-03 "Seraph" (Mech3Builder / Mech3Pose / Mech3Animator / Mech3Pilot)
+	Mech3 = {
+		id = Mech3Builder.TypeId,
+		displayName = Mech3Builder.DisplayName,
+		Builder = Mech3Builder,
+		Pose = Mech3Pose,
+		rootHeight = Mech3Builder.RootHeight,
+		hasCord = false, -- charges from its dock post (Mech3Dock)
+		hwmAnimator = false, -- Mech3Animator
+		cinematicBoarding = false, -- instant seat-in (helmet cockpit) + Mech3Pilot camera move
+		promptPoint = function(rootCF: CFrame, _style: string?): Vector3
+			return Mech3Builder.offPoints(rootCF).prompt
+		end,
+		applyPowerPose = function(model: Model, motors: { [string]: Motor6D })
+			local kneel, helmet = Mech3Pose.powerTargets(model)
+			Mech3Pose.applyStatic(motors, kneel, helmet)
+		end,
+		applyOff = function(motors: { [string]: Motor6D }, _style: string?)
+			Mech3Pose.applyOff(motors)
+		end,
+		buildDock = function(home: CFrame, parent: Instance)
+			Mech3Dock.buildDock(home, parent)
+		end,
+		updatePlug = Mech3Dock.updatePlug,
+		chargeRate = Mech3Dock.ChargeRate,
+		variantName = function(variantId: string): string
+			return Mech3Config.getVariant(variantId).displayName
 		end,
 	},
 } :: { [string]: TypeDef }

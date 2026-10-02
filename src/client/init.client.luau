@@ -31,6 +31,9 @@ require(script.Mech2Pilot).start()
 -- CRM-01 Crimson (owner's textured meshes): animation / lights / battery cells / dock arc / pod pilot, boarding camera
 require(script.CrimsonAnimator).start()
 require(script.CrimsonPilot).start()
+-- SRF-03 Seraph (mech3, owner's winged textured meshes): animation / wings / lights / battery cells / dock arc / helmet cockpit pilot, boarding camera
+require(script.Mech3Animator).start()
+require(script.Mech3Pilot).start()
 CordController.Snapped:Connect(BatteryHud.cordSnapped)
 Type99CableController.Ejected:Connect(BatteryHud.cordSnapped)
 -- EXO-1 exoskeleton: light pulse, pistons, hoisted frame walk, debug key

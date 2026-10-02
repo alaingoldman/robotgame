@@ -32,6 +32,7 @@ local GunnerBuilder = require(Shared:WaitForChild("GunnerBuilder"))
 local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
 local Mech2Config = require(Shared:WaitForChild("Mech2Config"))
 local CrimsonConfig = require(Shared:WaitForChild("CrimsonConfig"))
+local Mech3Config = require(Shared:WaitForChild("Mech3Config"))
 
 local MechService = {}
 
@@ -163,6 +164,11 @@ local function buildSpecs(): { SpawnSpec }
 	-- meshes loaded on demand, so last as well
 	for _, t in CrimsonConfig.Lineup do
 		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), mechType = CrimsonConfig.TypeId })
+	end
+	-- SRF-03 Seraph (Mech3Config.Lineup): left of the CRM-01; textured meshes
+	-- loaded on demand, so last as well
+	for _, t in Mech3Config.Lineup do
+		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), mechType = Mech3Config.TypeId })
 	end
 	return specs
 end

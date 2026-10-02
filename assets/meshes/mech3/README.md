@@ -92,3 +92,12 @@ How the joints rotate:
 - Some shin and calf stripes on the back are smeared in the bake (see the back view in `renders/Mech3_vs_sheet.png`).
 - The arm/torso and pad cuts are vertical and are not capped, as on the Crimson. They are hidden in normal poses. A thin light-blue sliver of the upper-arm cut shows at a deep elbow bend.
 - The helmet has a pointed beak, but it is shorter than the sheet's long side-view spike.
+
+## In game: SRF-03 "Seraph" (type id `Mech3`)
+
+The owner imported the GLB as asset **110252059423481**. The game code lives in:
+
+- `src/shared/Mech3Meshes.luau`, `Mech3Config.luau`, `Mech3Builder.luau`, `Mech3Pose.luau` and `Mech3Dock.luau`;
+- `src/client/Mech3Animator.luau` and `Mech3Pilot.luau`.
+
+It is registered in `MechTypes` and its lineup spot is at (-218, -150), next to the CRM-01, with its charging post behind it on the right.
