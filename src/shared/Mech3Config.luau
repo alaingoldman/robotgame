@@ -61,7 +61,7 @@ Mech3Config.Lineup = {
 -- (SurfaceAppearance), pad flaps pulled onto the arms, wings 0.2 studs in
 -- (meta_v2.json). Set AssetV2 to the owner's v2 import and the rig follows.
 Mech3Config.AssetV1 = 110252059423481
-Mech3Config.AssetV2 = nil :: number?
+Mech3Config.AssetV2 = 99986620366860 :: number?
 local WING_X = if Mech3Config.AssetV2 then 2.815 else 3.015
 
 -- Pivots (studs, model space; assets/meshes/mech3/meta.json / meta_v2.json "pivots").
