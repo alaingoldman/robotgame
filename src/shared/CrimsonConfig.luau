@@ -79,7 +79,17 @@ CrimsonConfig.Pivots = {
 CrimsonConfig.HipLine = 12.2
 CrimsonConfig.RootHeight = 12.2
 CrimsonConfig.RootSize = Vector3.new(6, 3, 5)
-CrimsonConfig.CameraOffset = Vector3.new(0, 12, 0)
+-- Pilot camera: over the right shoulder, a little above the shoulder pads
+-- (the default camera focuses root + 1.5 up + CameraOffset, in root axes),
+-- closer than the shared pilot zoom (MechConfig.PilotZoomMin 23.8 put it high
+-- and far behind this 20-stud brawler). CrimsonPilot hands over at Distance
+-- and lowers the min zoom to MinZoom while piloting.
+CrimsonConfig.CameraOffset = Vector3.new(2.4, 3.2, 0)
+CrimsonConfig.PilotCamera = {
+	Distance = 19,
+	Pitch = math.rad(17), -- looking down at the mech
+	MinZoom = 14,
+}
 
 -- The cleaver in the right fist (meta.json blade: grip at the GLB origin,
 -- blade along +Y, spine +X, edge -X). Held forward and down with the edge

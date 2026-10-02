@@ -36,8 +36,17 @@ local KEYS = {
 	{ t = B.HatchCloseEnd, eye = Vector3.new(-4.5, 1.5, 11), focus = Vector3.new(0, -2.5, 3) }, -- in on the hatch as it slams
 	{ t = B.PowerUp + 0.35, eye = Vector3.new(3.5, -1.5, -12), focus = Vector3.new(0, 0.5, -1) }, -- round the front, low: the eyes light
 	{ t = B.StandEnd, eye = Vector3.new(-9, 4, -17), focus = Vector3.new(0, 5, 0) }, -- it rises off its knee
-	{ t = B.Online, eye = Vector3.new(5, 17, 27), focus = Vector3.new(0, 10, 0) }, -- behind: hand over
+	{ t = B.Online, eye = Vector3.zero, focus = Vector3.zero }, -- behind, over the shoulder: hand over (set below)
 }
+-- The hand-over key matches the default camera at the pilot distance, so
+-- control passes without a jump: focus = root + 1.5 up + CameraOffset.
+do
+	local PC = CrimsonConfig.PilotCamera
+	local focus = Vector3.new(0, 1.5, 0) + CrimsonConfig.CameraOffset
+	local last = KEYS[#KEYS]
+	last.focus = focus
+	last.eye = focus + Vector3.new(0, PC.Distance * math.sin(PC.Pitch), PC.Distance * math.cos(PC.Pitch))
+end
 
 local function stop()
 	running = nil
@@ -91,6 +100,20 @@ function CrimsonPilot.start()
 	local pilotChanged = ReplicatedStorage:WaitForChild("MechRemotes"):WaitForChild("PilotChanged") :: RemoteEvent
 	pilotChanged.OnClientEvent:Connect(function(model: Model?, phase: string?)
 		local mine = model ~= nil and MechTypes.idOf(model) == CrimsonConfig.TypeId
+		if mine and phase == "Online" then
+			-- closer than the shared pilot zoom (after PlaceholderPilot sets it;
+			-- Boarding restores the on-foot zoom when the pilot gets out)
+			-- the default camera keeps its current zoom, so pin it to the pilot
+			-- distance for a frame (max = Distance), then free the range again
+			task.defer(function()
+				local maxZoom = player.CameraMaxZoomDistance
+				player.CameraMinZoomDistance = CrimsonConfig.PilotCamera.MinZoom
+				player.CameraMaxZoomDistance = CrimsonConfig.PilotCamera.Distance
+				RunService.RenderStepped:Wait()
+				RunService.RenderStepped:Wait()
+				player.CameraMaxZoomDistance = maxZoom
+			end)
+		end
 		if mine and phase == "Seated" then
 			play(model :: Model)
 		elseif running and (phase == "Online" or not mine) then
