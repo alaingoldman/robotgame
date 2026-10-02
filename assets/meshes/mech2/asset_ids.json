@@ -1,0 +1,230 @@
+{
+ "Head_Blue": {
+  "model": 118434798781329,
+  "mesh": 96947889144036
+ },
+ "Head_Gold": {
+  "model": 132406168465428,
+  "mesh": 73918839131336
+ },
+ "Head_Neck": {
+  "model": 110234671375484,
+  "mesh": 108455566447762
+ },
+ "Head_White": {
+  "model": 88687933154679,
+  "mesh": 128336515480602
+ },
+ "Leg_L_Foot_Gold": {
+  "model": 135403974468497,
+  "mesh": 113347973785237
+ },
+ "Leg_L_Foot_White": {
+  "model": 132204885557180,
+  "mesh": 114941312552144
+ },
+ "Leg_L_Shin_Blue": {
+  "model": 110677367853688,
+  "mesh": 91764979234305
+ },
+ "Leg_L_Shin_Joint": {
+  "model": 74382975002365,
+  "mesh": 129472877915648
+ },
+ "Leg_L_Shin_White": {
+  "model": 90726796310252,
+  "mesh": 71677136520884
+ },
+ "Leg_L_Thigh_Blue": {
+  "model": 125095286926062,
+  "mesh": 100251851915643
+ },
+ "Leg_L_Thigh_Gold": {
+  "model": 118729518072416,
+  "mesh": 81652409429998
+ },
+ "Leg_L_Thigh_Joint": {
+  "model": 88259829497679,
+  "mesh": 130242871663912
+ },
+ "Leg_L_Thigh_White": {
+  "model": 82492260981201,
+  "mesh": 97879991729433
+ },
+ "Leg_R_Foot_Gold": {
+  "model": 97592901274435,
+  "mesh": 138524802954721
+ },
+ "Leg_R_Foot_White": {
+  "model": 118668565847455,
+  "mesh": 88360987699680
+ },
+ "Leg_R_Shin_Blue": {
+  "model": 71077977211644,
+  "mesh": 108340965337052
+ },
+ "Leg_R_Shin_Joint": {
+  "model": 91613759648624,
+  "mesh": 84413877441799
+ },
+ "Leg_R_Shin_White": {
+  "model": 83821114069955,
+  "mesh": 96613838233438
+ },
+ "Leg_R_Thigh_Blue": {
+  "model": 99599630300543,
+  "mesh": 102733551388638
+ },
+ "Leg_R_Thigh_Gold": {
+  "model": 85741550533790,
+  "mesh": 128215315350202
+ },
+ "Leg_R_Thigh_Joint": {
+  "model": 137812590033260,
+  "mesh": 123637801079132
+ },
+ "Leg_R_Thigh_White": {
+  "model": 116162204110753,
+  "mesh": 77856737712584
+ },
+ "Mech2Arm_L_HandMerged_DarkGrey": {
+  "model": 83769757272420,
+  "mesh": 116075598371338
+ },
+ "Mech2Arm_L_HandMerged_Grey": {
+  "model": 135697942237167,
+  "mesh": 116701838747977
+ },
+ "Mech2Arm_L_HandMerged_White": {
+  "model": 104973790874113,
+  "mesh": 126777751453864
+ },
+ "Mech2Arm_L_Lower_DarkGrey": {
+  "model": 105405953824209,
+  "mesh": 71828409476811
+ },
+ "Mech2Arm_L_Lower_Gold": {
+  "model": 79088945850881,
+  "mesh": 106748102586145
+ },
+ "Mech2Arm_L_Lower_Grey": {
+  "model": 104485291711440,
+  "mesh": 106076015497981
+ },
+ "Mech2Arm_L_Lower_White": {
+  "model": 94246503222000,
+  "mesh": 83142243123876
+ },
+ "Mech2Arm_L_Upper_Grey": {
+  "model": 101696924420984,
+  "mesh": 87295341046781
+ },
+ "Mech2Arm_L_Upper_White": {
+  "model": 77867872130503,
+  "mesh": 90247672918332
+ },
+ "Mech2Arm_R_HandMerged_DarkGrey": {
+  "model": 119816524780478,
+  "mesh": 128902239845574
+ },
+ "Mech2Arm_R_HandMerged_Grey": {
+  "model": 115649898323007,
+  "mesh": 138101250557536
+ },
+ "Mech2Arm_R_HandMerged_White": {
+  "model": 90132224034248,
+  "mesh": 80543535861560
+ },
+ "Mech2Arm_R_Lower_DarkGrey": {
+  "model": 99010279203006,
+  "mesh": 79087885975012
+ },
+ "Mech2Arm_R_Lower_Gold": {
+  "model": 114354033256442,
+  "mesh": 95601807972335
+ },
+ "Mech2Arm_R_Lower_Grey": {
+  "model": 134763140165614,
+  "mesh": 96290608049302
+ },
+ "Mech2Arm_R_Lower_White": {
+  "model": 116843782451029,
+  "mesh": 81872098597531
+ },
+ "Mech2Arm_R_Upper_Grey": {
+  "model": 91128127159512,
+  "mesh": 110607093931097
+ },
+ "Mech2Arm_R_Upper_White": {
+  "model": 131930112388626,
+  "mesh": 111415785777287
+ },
+ "abdomen_darkgrey": {
+  "model": 114599729805180,
+  "mesh": 104769449162577
+ },
+ "abdomen_grey": {
+  "model": 114008556500893,
+  "mesh": 120715926549187
+ },
+ "chest_blue": {
+  "model": 81937086615654,
+  "mesh": 99946283269169
+ },
+ "chest_darkgrey": {
+  "model": 94077912547637,
+  "mesh": 119593854197587
+ },
+ "chest_gold": {
+  "model": 77437241780794,
+  "mesh": 112085478718440
+ },
+ "chest_grey": {
+  "model": 82967865220301,
+  "mesh": 100222453512004
+ },
+ "chest_white": {
+  "model": 131235371322993,
+  "mesh": 126091163384873
+ },
+ "pauldron_L_gold": {
+  "model": 124443663066761,
+  "mesh": 77129760736062
+ },
+ "pauldron_L_grey": {
+  "model": 136630973483305,
+  "mesh": 136270568247954
+ },
+ "pauldron_L_white": {
+  "model": 94520769864855,
+  "mesh": 83239990562197
+ },
+ "pauldron_R_gold": {
+  "model": 82437263740743,
+  "mesh": 131248346792349
+ },
+ "pauldron_R_grey": {
+  "model": 137442102930956,
+  "mesh": 130675231701504
+ },
+ "pauldron_R_white": {
+  "model": 85894791427882,
+  "mesh": 106525742806917
+ },
+ "pelvis_blue": {
+  "model": 81219464135417,
+  "mesh": 72617847335673
+ },
+ "pelvis_darkgrey": {
+  "model": 76922233987085,
+  "mesh": 115492014022779
+ },
+ "pelvis_grey": {
+  "model": 100279770333634,
+  "mesh": 106060776486193
+ },
+ "pelvis_white": {
+  "model": 95604665727659,
+  "mesh": 114160490901794
+ }
+}
