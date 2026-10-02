@@ -104,6 +104,19 @@
         "tasset_L_blue.obj",
         "tasset_L_white.obj"
       ]
+    },
+    "hatch": {
+      "pivot": [
+        0.0,
+        6.4464,
+        -1.8768
+      ],
+      "parent": "chest",
+      "files": [
+        "hatch_blue.obj",
+        "hatch_gold.obj",
+        "hatch_white.obj"
+      ]
     }
   },
   "sockets": {
@@ -146,6 +159,11 @@
       1.9511,
       4.5696,
       0.0
+    ],
+    "HatchHinge": [
+      0.0,
+      6.4464,
+      -1.8768
     ],
     "LeftTasset": [
       -1.9511,
@@ -193,6 +211,11 @@
       2.3910539215686275,
       5.6,
       0.0
+    ],
+    "HatchHinge": [
+      0.0,
+      7.9,
+      -2.3
     ],
     "LeftTasset": [
       -2.3910539215686275,
@@ -254,12 +277,12 @@
       "segment": "chest",
       "colour": "blue",
       "hex": "#2F6FBF",
-      "tris": 240,
+      "tris": 184,
       "open_edges": 0,
-      "max_uv_stretch": 1.068,
+      "max_uv_stretch": 1.028,
       "bbox_min": [
         -2.7907,
-        6.2832,
+        6.4056,
         -1.6728
       ],
       "bbox_max": [
@@ -269,7 +292,7 @@
       ],
       "bbox_centre": [
         0.0,
-        8.2212,
+        8.2824,
         0.102
       ]
     },
@@ -278,7 +301,7 @@
       "segment": "chest",
       "colour": "darkgrey",
       "hex": "#5A5A5A",
-      "tris": 28,
+      "tris": 84,
       "open_edges": 0,
       "max_uv_stretch": 1.0,
       "bbox_min": [
@@ -302,13 +325,13 @@
       "segment": "chest",
       "colour": "gold",
       "hex": "#D4A93A",
-      "tris": 496,
+      "tris": 408,
       "open_edges": 0,
-      "max_uv_stretch": 1.124,
+      "max_uv_stretch": 1.114,
       "bbox_min": [
         -3.0192,
         6.8136,
-        -2.3612
+        -2.1624
       ],
       "bbox_max": [
         3.0192,
@@ -318,7 +341,7 @@
       "bbox_centre": [
         0.0,
         9.4887,
-        0.5738
+        0.6732
       ]
     },
     {
@@ -350,13 +373,13 @@
       "segment": "chest",
       "colour": "white",
       "hex": "#F2F2F2",
-      "tris": 296,
+      "tris": 112,
       "open_edges": 0,
-      "max_uv_stretch": 1.076,
+      "max_uv_stretch": 1.0,
       "bbox_min": [
         -2.6446,
-        6.4056,
-        -2.7744
+        7.7112,
+        1.5569
       ],
       "bbox_max": [
         2.6446,
@@ -365,8 +388,80 @@
       ],
       "bbox_centre": [
         0.0,
-        8.2457,
-        0.0653
+        8.8985,
+        2.2309
+      ]
+    },
+    {
+      "file": "hatch_blue.obj",
+      "segment": "hatch",
+      "colour": "blue",
+      "hex": "#2F6FBF",
+      "tris": 56,
+      "open_edges": 0,
+      "max_uv_stretch": 1.068,
+      "bbox_min": [
+        -2.1216,
+        6.2832,
+        -1.6001
+      ],
+      "bbox_max": [
+        2.1216,
+        7.2216,
+        -0.6433
+      ],
+      "bbox_centre": [
+        0.0,
+        6.7524,
+        -1.1217
+      ]
+    },
+    {
+      "file": "hatch_gold.obj",
+      "segment": "hatch",
+      "colour": "gold",
+      "hex": "#D4A93A",
+      "tris": 88,
+      "open_edges": 0,
+      "max_uv_stretch": 1.124,
+      "bbox_min": [
+        -2.7439,
+        6.8232,
+        -2.3612
+      ],
+      "bbox_max": [
+        2.7439,
+        8.16,
+        -0.4827
+      ],
+      "bbox_centre": [
+        0.0,
+        7.4916,
+        -1.4219
+      ]
+    },
+    {
+      "file": "hatch_white.obj",
+      "segment": "hatch",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 184,
+      "open_edges": 0,
+      "max_uv_stretch": 1.076,
+      "bbox_min": [
+        -2.3011,
+        6.4056,
+        -2.7744
+      ],
+      "bbox_max": [
+        2.3011,
+        8.9923,
+        -0.4533
+      ],
+      "bbox_centre": [
+        0.0,
+        7.699,
+        -1.6138
       ]
     },
     {
@@ -706,5 +801,5 @@
       ]
     }
   ],
-  "total_tris": 3364
+  "total_tris": 3420
 }

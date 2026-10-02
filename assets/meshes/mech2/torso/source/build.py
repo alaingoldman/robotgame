@@ -176,7 +176,11 @@ def add_sides(col, m):
 def build_chest():
     seg = "chest"
     # --- dark core (hidden mostly): |X|<=2.95, H 8.7..12.45 (back sheet: grey frame x 210..382, y 140..262)
-    add(seg, "darkgrey", box(-2.95, 2.95, 8.65, 12.45, -1.1, 1.5, 0.2))
+    # COCKPIT: the core is hollowed in front for the chest cockpit (the front plates are the
+    # "hatch" segment): back block, plus full-depth top (under the collar) and floor slabs
+    add(seg, "darkgrey", box(-2.95, 2.95, 8.65, 12.45, 0.3, 1.5, 0.2))
+    add(seg, "darkgrey", box(-2.95, 2.95, 10.95, 12.45, -1.1, 0.35, 0.2))
+    add(seg, "darkgrey", box(-2.95, 2.95, 8.65, 8.98, -1.1, 0.35, 0.1))
     # --- grey neck collar ring around the neck socket (259: grey neck x 262..309, y 150..170)
     rings = [oct_ring(0, 12.2, 0.95, -0.75, 0.95, 0.35), oct_ring(0, 12.75, 0.95, -0.75, 0.95, 0.35),
              oct_ring(0, 12.95, 0.8, -0.6, 0.8, 0.3)]
@@ -241,14 +245,17 @@ def build_chest():
     lo = [(0, 8.75), (1.05, 9.0), (2.82, 9.45), (2.82, 9.8), (0, 9.8)]
     z_up = lambda u, v: -3.4 + 0.42 * u + 0.5 * (v - 9.8)  # noqa: E731
     z_lo = lambda u, v: -3.4 + 0.42 * u + 0.42 * (9.8 - v)  # noqa: E731
-    add(seg, "white", sym(plate(up, z_up, 2.1, 0.13, 0.05, fold_h(9.8))))
-    add(seg, "white", sym(plate(lo, z_lo, 2.1, 0.13, 0.05, fold_h(9.8))))
+    # COCKPIT: the prow plates, pecs, chevron and under-chest accents form the hatch
+    # (segment "hatch", hinged at its bottom); thinner (1.1 cells, still a thick door) so
+    # the cockpit behind it has depth
+    add("hatch", "white", sym(plate(up, z_up, 1.1, 0.13, 0.05, fold_h(9.8))))
+    add("hatch", "white", sym(plate(lo, z_lo, 1.1, 0.13, 0.05, fold_h(9.8))))
     # gold lower pectoral chevrons, stacked 0.3 in front of the white plate
     #   (259: (190,232) (252,240) (255,267) (235,270) (210,280) (195,275))
     pec = [(FX(190), HY(232)), (FX(252), HY(240)), (FX(255), HY(267)), (FX(235), HY(270)),
            (FX(210), HY(280)), (FX(195), HY(275))]
     z_pec = lambda u, v: -3.55 + 0.42 * u + 0.36 * (9.8 - v) + 0.1 * (u - 1.1)  # noqa: E731
-    add(seg, "gold", sym(plate(pec, z_pec, 1.9, 0.16, 0.06)))
+    add("hatch", "gold", sym(plate(pec, z_pec, 1.0, 0.16, 0.06)))  # COCKPIT: on the hatch
     # gold outer pec side wrap (259: gold x 190..205 at y 240..280)
     wrap = [(-0.6, 8.35), (0.6, 8.6), (0.5, 10.0), (-0.9, 10.0)]
     for s in (1, -1):
@@ -256,10 +263,10 @@ def build_chest():
                                frame=(lambda s: (lambda u, v, w: (s * w, v, -1.75 + u)))(s)))
     # lower white chevron under the chest (259: (230,268) .. V tip (285,295) .. (340,268) -> H 8.77..7.85)
     chev = [(0, 7.85), (1.95, 8.6), (1.95, 8.95), (0, 8.4)]
-    add(seg, "white", sym(plate(chev, lambda u, v: -2.8 + 0.25 * u + 0.25 * (v - 7.85), 1.5, 0.1, 0.04, fold_x)))
+    add("hatch", "white", sym(plate(chev, lambda u, v: -2.8 + 0.25 * u + 0.25 * (v - 7.85), 1.0, 0.1, 0.04, fold_x)))
     # blue under-chest accents (259: x 215..240 -> |X| 2.48..1.6, y 270..300 -> H 8.7..7.68)
     buc = [(1.55, 8.55), (2.55, 8.85), (2.6, 8.4), (2.0, 7.7)]
-    add(seg, "blue", sym(plate(buc, lambda u, v: -2.3 + 0.2 * u, 1.3, 0.1, 0.04)))
+    add("hatch", "blue", sym(plate(buc, lambda u, v: -2.3 + 0.2 * u, 1.0, 0.1, 0.04)))
 
 
 def build_abdomen():
@@ -397,6 +404,8 @@ SOCKETS = {  # cells
     # TASSETS: hinge of each side's skirt plates (front / back / outer side): over the hip
     # ball, at the top of the outer side plate (H 5.6), so the plates swing with the thigh
     "RightTasset": (1.9511 / 0.816, 5.6, 0.0),
+    # COCKPIT: the chest hatch hinge, along the bottom of the chevron (centre of its thickness)
+    "HatchHinge": (0.0, 7.9, -2.3),
     "LeftTasset": (-1.9511 / 0.816, 5.6, 0.0),
 }
 PIVOTS = {
@@ -407,9 +416,10 @@ PIVOTS = {
     "pauldron_L": SOCKETS["LeftShoulder"],
     "tasset_R": SOCKETS["RightTasset"],
     "tasset_L": SOCKETS["LeftTasset"],
+    "hatch": SOCKETS["HatchHinge"],
 }
 PARENT = {"pelvis": None, "abdomen": "pelvis", "chest": "abdomen", "pauldron_R": "chest", "pauldron_L": "chest",
-          "tasset_R": "pelvis", "tasset_L": "pelvis"}
+          "tasset_R": "pelvis", "tasset_L": "pelvis", "hatch": "chest"}
 
 
 def main():
