@@ -15,16 +15,13 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechBuilder = require(Shared:WaitForChild("MechBuilder"))
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechPose = require(Shared:WaitForChild("MechPose"))
+local LegIK = require(Shared:WaitForChild("LegIK"))
 local MechTypes = require(Shared:WaitForChild("MechTypes"))
 
 local MechAnimator = {}
 
 local S = MechBuilder.Scale
 local TAU = math.pi * 2
-local HIP_SWING = MechConfig.WalkHipSwing
-local HIP_SWING_SPRINT = MechConfig.SprintHipSwing
-local KNEE_BEND = 0.95
-local KNEE_BEND_SPRINT = 1.45
 local ARM_SWING = 0.28
 local ARM_SWING_SPRINT_L = 0.6
 local ARM_SWING_SPRINT_R = 0.35 -- gatling arm
@@ -33,20 +30,16 @@ local BOB_SPRINT = 0.75 * S
 local BREATHE = 0.04 * S
 local SPRINT_LEAN = 0.4 -- upper body tips forward into the run
 local SPRINT_TWIST = 0.22 -- torso swings with the stride when sprinting
-local SWING_DROOP = 0.5 -- toes hang down while a foot swings (radians at peak)
-local SWING_DROOP_SPRINT = 0.75
-
--- Ankle pitch for a swinging foot, u = 0 at lift-off .. 1 at heel strike.
--- Negative = toes down. Returns 0 while the foot is planted.
-local function swingFoot(u: number, swinging: boolean): number
-	if not swinging then
-		return 0
-	end
-	u = math.clamp(u, 0, 1)
-	local droop = -math.sin(math.pi * math.min(1, u / 0.7)) * (1 - 0.3 * u)
-	local reach = 0.35 * math.sin(math.pi * math.clamp((u - 0.7) / 0.3, 0, 1))
-	return droop + reach
-end
+-- planted-foot gait (LegIK): stance length (front foot to back foot, studs),
+-- share of the cycle a foot is down, swing clearance. Cadence follows speed.
+local GAIT: LegIK.Params = {
+	stance = 12,
+	stanceSprint = 16,
+	duty = 0.6,
+	dutySprint = 0.48,
+	lift = 2.6,
+	liftSprint = 4.2,
+}
 
 -- jumping: airborne tuck, and damped springs for the landing recoil
 local REST_GAP = MechBuilder.RootHeight -- root center above the ground when standing
@@ -97,10 +90,11 @@ local CUES: { [string]: { Cue } } = {
 type State = {
 	root: BasePart,
 	motors: { [string]: Motor6D },
-	phase: number,
 	amount: number,
 	sprint: number,
-	lastCos: number,
+	ik: LegIK.Rig?,
+	walk: LegIK.Walk,
+	legsIK: boolean, -- the IK owned the legs last frame (warm start valid)
 	stepSounds: { [string]: Sound },
 	servo: Sound,
 	cueSounds: { [string]: Sound },
@@ -199,10 +193,11 @@ local function setup(model: Model)
 	local st: State = {
 		root = root,
 		motors = motors,
-		phase = 0,
+		ik = LegIK.new(motors),
+		walk = LegIK.newWalk(),
+		legsIK = false,
 		amount = 0,
 		sprint = 0,
-		lastCos = 1,
 		idleT = 0,
 		look = 0,
 		idleArmT = 0,
@@ -502,14 +497,14 @@ local function step(dt: number)
 		st.amount += (walkTarget - st.amount) * math.min(1, dt * 6)
 		st.sprint += (sprintTarget - st.sprint) * math.min(1, dt * 4)
 
-		-- stride grows with the sprint blend so cadence rises naturally
-		local stride = lerp(MechConfig.StrideLength, MechConfig.SprintStrideLength, st.sprint)
-		st.phase = (st.phase + dt * speed / stride * TAU) % TAU
-
+		-- planted-foot cycle (LegIK): advances with the distance travelled
+		local ik = st.ik
+		local strike = if ik then LegIK.advance(ik, st.walk, GAIT, dt, speed, st.amount * (1 - 0.85 * air), st.sprint) else nil
+		local w = st.walk
 		local a = st.amount * (1 - 0.85 * air) -- legs stop striding in the air
 		local r = st.sprint * a -- never sprint-pose while standing still
-		local s, c = math.sin(st.phase), math.cos(st.phase)
-		local s2 = math.sin(st.phase * 2) -- twice per cycle: once per footfall
+		local s = math.sin(w.phase)
+		local s2 = math.sin(w.phase * 2) -- twice per cycle: once per footfall
 		local idle = 1 - a
 
 		-- squat: IK keeps the feet flat and planted while the body drops. One-knee
@@ -522,29 +517,36 @@ local function step(dt: number)
 		local crTorso = MechPose.torsoCrouch(crK)
 		local breathe = math.sin(now * 1.7) * idle * (1 - cr)
 
-		-- legs: hip swings, knee bends while the leg swings forward, ankle keeps foot flat
-		local hipAmp = lerp(HIP_SWING, HIP_SWING_SPRINT, st.sprint) * a
-		local kneeAmp = lerp(KNEE_BEND, KNEE_BEND_SPRINT, st.sprint) * a
-		local hipL, hipR = s * hipAmp + crHip + 0.45 * tuck, -s * hipAmp + crHip + 0.45 * tuck
-		local kneeL = math.max(0, c) * kneeAmp - crKnee + 0.9 * tuck
-		local kneeR = math.max(0, -c) * kneeAmp - crKnee + 0.9 * tuck
+		-- body: heavy drop at each footfall, sway and roll over the planted foot;
+		-- sinks into the stride so the planted feet stay in reach
 		local m = st.motors
-		set(m, "LeftHip", CFrame.Angles(hipL, 0, 0))
-		set(m, "RightHip", CFrame.Angles(hipR, 0, 0))
-		set(m, "LeftKnee", CFrame.Angles(-kneeL, 0, 0))
-		set(m, "RightKnee", CFrame.Angles(-kneeR, 0, 0))
-		-- swinging foot hangs loose: toes droop after lift-off, then level out and
-		-- tip up just before the heel strikes (flat again while planted)
-		local droopAmp = lerp(SWING_DROOP, SWING_DROOP_SPRINT, st.sprint) * a * (1 - air)
-		local ankleL = swingFoot((s + 1) / 2, c > 0) * droopAmp
-		local ankleR = swingFoot((1 - s) / 2, c < 0) * droopAmp
-		set(m, "LeftAnkle", CFrame.Angles(kneeL - hipL + ankleL, 0, 0))
-		set(m, "RightAnkle", CFrame.Angles(kneeR - hipR + ankleR, 0, 0))
-
-		-- body: heavy drop at each footfall, sway and roll over the planted foot
 		local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
 		local roll = s * (0.035 * a + 0.05 * r)
-		set(m, "Root", CFrame.new(drop.X, drop.Y - s * s * bob + breathe * BREATHE * 0.5, drop.Z) * CFrame.Angles(0, 0, roll))
+		local walkDrop = w.drop * w.weight
+		-- idle: a slow weight shift from foot to foot (the feet stay planted)
+		local shift = math.sin(now * 0.5) * 0.3 * S * idle * (1 - math.min(1, cr * 4))
+		local rootT = CFrame.new(drop.X + s * 0.1 * S * a + shift, drop.Y - s * s * bob + breathe * BREATHE * 0.5 - walkDrop, drop.Z)
+			* CFrame.Angles(0, 0, roll - shift * 0.015)
+		set(m, "Root", rootT)
+		if ik and (cr < 1e-4 or w.weight > 0.01 or tuck > 0.01) and not (oneKnee and cr > 1e-4) then
+			-- walking / airborne: legs solved to planted feet (LegIK); the
+			-- squat drop is in rootT, so the IK keeps the feet down
+			if not st.legsIK then
+				LegIK.adopt(ik)
+				st.legsIK = true
+			end
+			LegIK.place(ik, w, rootT, tuck)
+		else
+			-- standing / squatting: MechPose's crouch IK (exact powered-down pose)
+			st.legsIK = false
+			set(m, "LeftHip", CFrame.Angles(crHip, 0, 0))
+			set(m, "RightHip", CFrame.Angles(crHip, 0, 0))
+			set(m, "LeftKnee", CFrame.Angles(crKnee, 0, 0))
+			set(m, "RightKnee", CFrame.Angles(crKnee, 0, 0))
+			set(m, "LeftAnkle", CFrame.Angles(-crKnee - crHip, 0, 0))
+			set(m, "RightAnkle", CFrame.Angles(-crKnee - crHip, 0, 0))
+		end
+
 		-- torso: lean into the walk (hunch forward when sprinting), counter-twist against the hips
 		local lean = -0.07 * a - SPRINT_LEAN * r + s2 * 0.03 * r + CROUCH_LEAN * crTorso - 0.1 * air - 0.45 * comp
 		set(m, "Waist", CFrame.Angles(lean + breathe * 0.04, s * (0.11 * a + SPRINT_TWIST * r), -s * (0.02 * a + 0.05 * r)))
@@ -593,15 +595,10 @@ local function step(dt: number)
 		-- cockpit doors and ramp
 		MechPose.setCockpit(m, st.doors, st.ramp, if oneKnee then "OneKnee" else nil)
 
-		-- footfall happens at full stride (cos crosses zero)
-		if a > 0.25 then
-			if st.lastCos > 0 and c <= 0 then
-				MechAnimator._footstep(model, st, "Left")
-			elseif st.lastCos < 0 and c >= 0 then
-				MechAnimator._footstep(model, st, "Right")
-			end
+		-- footfall: a foot just planted (LegIK heel strike)
+		if strike and a > 0.25 then
+			MechAnimator._footstep(model, st, strike)
 		end
-		st.lastCos = c
 
 		-- continuous servo whine while moving, louder and higher when sprinting
 		st.servo.Volume = a * 0.35 + r * 0.25 + math.min(0.5, math.abs(st.compV) * 0.05)

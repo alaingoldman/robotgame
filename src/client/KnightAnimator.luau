@@ -16,25 +16,24 @@ local RunService = game:GetService("RunService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local KnightBuilder = require(Shared:WaitForChild("KnightBuilder"))
 local KnightPose = require(Shared:WaitForChild("KnightPose"))
+local LegIK = require(Shared:WaitForChild("LegIK"))
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechTypes = require(Shared:WaitForChild("MechTypes"))
 
 local KnightAnimator = {}
 
 local S = KnightBuilder.Scale
-local TAU = math.pi * 2
 local LIGHT_DIM = 0.12
 local ARMOR_FOLDERS = { "Armor_Helmet", "Armor_Chest", "Armor_Legs" }
-local HIP_SWING, HIP_SWING_SPRINT = 0.5, 0.68
-local KNEE_BEND, KNEE_BEND_SPRINT = 0.9, 1.4
 local ARM_SWING, ARM_SWING_SPRINT = 0.3, 0.65
 local BOB, BOB_SPRINT = 0.3 * S, 0.6 * S
 local SPRINT_LEAN = 0.3
-
-local function strideFor(amp: number): number
-	return 4 * KnightBuilder.LegLength * 0.935 * math.sin(amp)
-end
-local STRIDE, STRIDE_SPRINT = strideFor(HIP_SWING), strideFor(HIP_SWING_SPRINT)
+-- planted-foot gait (LegIK): stance length front foot -> back foot (studs),
+-- share of the cycle a foot is down, foot lift. Cadence follows from speed.
+local STANCE, STANCE_SPRINT = 11, 15
+local DUTY, DUTY_SPRINT = 0.62, 0.5
+local LIFT, LIFT_SPRINT = 2.2, 3.6
+local MAX_COMP = 2.6 -- deepest landing squat (studs)
 
 local B, X = KnightPose.Board, KnightPose.Exit
 type Cue = { at: number, sound: string, volume: number, speed: number, stop: number? }
@@ -64,19 +63,24 @@ type State = {
 	power: number,
 	appliedPower: number,
 	lights: { BasePart }?,
-	phase: number,
 	amount: number,
 	sprint: number,
-	lastCos: number,
 	stepSounds: { [string]: Sound },
 	servo: Sound,
 	cueSounds: { [string]: Sound },
 	cueKey: string,
 	cueT: number,
+	ik: LegIK.Rig?,
+	walk: LegIK.Walk,
+	legsFree: boolean, -- the walk owned the legs last frame (IK warm start valid)
+	jump: LegIK.Air,
+	idleT: number,
+	look: number,
 }
 
 local states: { [Model]: State } = {}
 local stepListeners: { (model: Model, side: string) -> () } = {}
+local landListeners: { (model: Model, impact: number) -> () } = {}
 
 local function lerp(a: number, b: number, t: number): number
 	return a + (b - a) * t
@@ -135,15 +139,19 @@ local function setup(model: Model)
 		power = power,
 		appliedPower = -1,
 		lights = nil,
-		phase = 0,
 		amount = 0,
 		sprint = 0,
-		lastCos = 1,
 		stepSounds = stepSounds,
 		servo = servo,
 		cueSounds = cueSounds,
 		cueKey = "",
 		cueT = 0,
+		ik = LegIK.new(motors),
+		walk = LegIK.newWalk(),
+		legsFree = false,
+		jump = LegIK.newAir(),
+		idleT = 0,
+		look = 0,
 	}
 	states[model] = st
 	-- armor swaps rebuild the light parts
@@ -224,6 +232,15 @@ local function applyLights(model: Model, st: State)
 	end
 end
 
+local GAIT: LegIK.Params = {
+	stance = STANCE,
+	stanceSprint = STANCE_SPRINT,
+	duty = DUTY,
+	dutySprint = DUTY_SPRINT,
+	lift = LIFT,
+	liftSprint = LIFT_SPRINT,
+}
+
 local function set(m: { [string]: Motor6D }, name: string, cf: CFrame)
 	local motor = m[name]
 	if motor then
@@ -259,60 +276,86 @@ local function step(dt: number)
 		st.amount += (math.clamp(speed / MechConfig.WalkSpeed, 0, 1) - st.amount) * math.min(1, dt * 6)
 		local sprintT = math.clamp((speed - MechConfig.WalkSpeed) / (MechConfig.SprintSpeed - MechConfig.WalkSpeed), 0, 1)
 		st.sprint += (sprintT - st.sprint) * math.min(1, dt * 4)
-		st.phase = (st.phase + dt * speed / lerp(STRIDE, STRIDE_SPRINT, st.sprint) * TAU) % TAU
+		local landed = LegIK.updateAir(st.jump, model, st.root, KnightBuilder.RootHeight, MAX_COMP, dt)
+		if landed and landed > 15 then
+			local sound = st.cueSounds.Stomp
+			sound.Volume = math.min(1.4, 0.6 + landed / 60)
+			sound.PlaybackSpeed = 0.9
+			sound.TimePosition = 0
+			sound:Play()
+			for _, fn in landListeners do
+				task.spawn(fn, model, landed)
+			end
+		end
+		local air, comp = st.jump.air, st.jump.comp
 
-		if st.kneel > 1e-4 then
+		local ik = st.ik
+		if st.kneel > 1e-4 or not ik then
 			-- powered down / getting up: the kneel pose owns the body
 			for name, cf in KnightPose.kneel(st.kneel) do
 				set(m, name, cf)
 			end
 			st.amount = 0
+			st.legsFree = false
 		else
-			local a, r = st.amount, st.sprint * st.amount
-			local s, c = math.sin(st.phase), math.cos(st.phase)
-			local breathe = math.sin(now * 1.6) * (1 - a)
-			local hipAmp = lerp(HIP_SWING, HIP_SWING_SPRINT, st.sprint) * a
-			local kneeAmp = lerp(KNEE_BEND, KNEE_BEND_SPRINT, st.sprint) * a
-			local hipL, hipR = s * hipAmp, -s * hipAmp
-			local kneeL, kneeR = math.max(0, c) * kneeAmp, math.max(0, -c) * kneeAmp
-			set(m, "LeftHip", CFrame.Angles(hipL, 0, 0))
-			set(m, "RightHip", CFrame.Angles(hipR, 0, 0))
-			set(m, "LeftKnee", CFrame.Angles(-kneeL, 0, 0))
-			set(m, "RightKnee", CFrame.Angles(-kneeR, 0, 0))
-			set(m, "LeftAnkle", CFrame.Angles(kneeL - hipL, 0, 0))
-			set(m, "RightAnkle", CFrame.Angles(kneeR - hipR, 0, 0))
-			local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
-			set(m, "Root", CFrame.new(0, -s * s * bob + breathe * 0.03 * S, 0) * CFrame.Angles(0, 0, s * (0.03 * a + 0.04 * r)))
-			set(m, "Waist", CFrame.Angles(-0.05 * a - SPRINT_LEAN * r + breathe * 0.02, s * (0.1 * a + 0.15 * r), 0))
-			set(m, "Neck", CFrame.Angles(0.04 * a + 0.25 * r - breathe * 0.02, -s * 0.08 * a, 0))
-			local arm = lerp(ARM_SWING, ARM_SWING_SPRINT, st.sprint) * a
-			set(m, "LeftShoulder", CFrame.Angles(-s * arm, 0, -0.04 - breathe * 0.015))
-			set(m, "RightShoulder", CFrame.Angles(s * arm, 0, 0.04 + breathe * 0.015))
-			set(m, "LeftElbow", CFrame.Angles(0.12 + math.max(0, -s) * 0.3 * a + 0.5 * r, 0, 0))
-			set(m, "RightElbow", CFrame.Angles(0.12 + math.max(0, s) * 0.3 * a + 0.5 * r, 0, 0))
-			set(m, "LeftWrist", CFrame.identity)
-			-- wings sweep back a little at speed
-			local w = 0.12 * r
-			set(m, "WingLeftMount", CFrame.Angles(w, 0, 0))
-			set(m, "WingRightMount", CFrame.Angles(w, 0, 0))
+			if not st.legsFree then
+				LegIK.adopt(ik)
+				st.legsFree = true
+			end
+			local strike = LegIK.advance(ik, st.walk, GAIT, dt, speed, st.amount * (1 - air), st.sprint)
+			local w = st.walk
+			local a = st.amount * w.weight
+			local r = st.sprint * a
+			local s = math.sin(w.phase)
+			local s2 = math.sin(w.phase * 2)
+			local idle = (1 - a) * (1 - air)
+			local breathe = math.sin(now * 1.6) * idle
+			-- idle: slow weight shift from foot to foot, a look around now and then
+			if model:GetAttribute("PowerState") == "Online" and speed < 1 and not airborne then
+				st.idleT += dt
+			else
+				st.idleT = 0
+			end
+			local shift = math.sin(now * 0.55) * 0.35 * S * idle
+			local lookT = if st.idleT > 2 then math.sin(st.idleT * 0.45) * 0.45 + math.sin(st.idleT * 1.3) * 0.06 else 0
+			st.look += (lookT - st.look) * math.min(1, dt * 3)
 
-			-- footfall at full stride (cos crosses zero)
-			if a > 0.25 then
-				local side = if st.lastCos > 0 and c <= 0 then "Left" elseif st.lastCos < 0 and c >= 0 then "Right" else nil
-				if side then
-					local sound = st.stepSounds[side]
-					if sound then
-						sound.Volume = 0.8 + r * 0.35
-						sound.PlaybackSpeed = 0.95 + math.random() * 0.2 + r * 0.1
-						sound.TimePosition = 0
-						sound:Play()
-					end
-					for _, fn in stepListeners do
-						task.spawn(fn, model, side)
-					end
+			-- body: sinks into the stride, drops at each footfall, rolls over the
+			-- planted foot; lands into a squat
+			local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
+			local land = math.max(0, comp)
+			local rootT = CFrame.new(shift + s * 0.12 * S * a, -w.drop * w.weight - s * s * bob + breathe * 0.05 * S - land, 0)
+				* CFrame.Angles(0, 0, s * (0.03 * a + 0.04 * r) - shift * 0.02)
+			set(m, "Root", rootT)
+			LegIK.place(ik, w, rootT, air * 0.9)
+			local lean = -0.06 * a - SPRINT_LEAN * r + s2 * 0.03 * r - 0.06 * air - 0.05 * land
+			set(m, "Waist", CFrame.Angles(lean + breathe * 0.025, s * (0.1 * a + 0.15 * r) + st.look * 0.3, -shift * 0.015))
+			set(m, "Neck", CFrame.Angles(0.04 * a + 0.25 * r - s2 * 0.02 * r - breathe * 0.03 + 0.05 * air, -s * 0.08 * a + st.look * 0.7, 0))
+			local arm = lerp(ARM_SWING, ARM_SWING_SPRINT, st.sprint) * a
+			local sway = math.sin(now * 0.8) * 0.04 * idle
+			local airArm = 0.35 * air + 0.25 * math.min(1, land)
+			set(m, "LeftShoulder", CFrame.Angles(-s * arm + sway + airArm * 0.5, 0, -0.04 - breathe * 0.02 - airArm * 0.6))
+			set(m, "RightShoulder", CFrame.Angles(s * arm - sway + airArm * 0.5, 0, 0.04 + breathe * 0.02 + airArm * 0.6))
+			set(m, "LeftElbow", CFrame.Angles(0.12 + math.max(0, -s) * 0.3 * a + 0.5 * r + 0.04 * idle + 0.3 * air, 0, 0))
+			set(m, "RightElbow", CFrame.Angles(0.12 + math.max(0, s) * 0.3 * a + 0.5 * r + 0.04 * idle + 0.3 * air, 0, 0))
+			set(m, "LeftWrist", CFrame.identity)
+			-- wings sweep back at speed and flare in the air
+			local wing = 0.12 * r - 0.2 * air + breathe * 0.015
+			set(m, "WingLeftMount", CFrame.Angles(wing, 0, 0))
+			set(m, "WingRightMount", CFrame.Angles(wing, 0, 0))
+
+			if strike then
+				local sound = st.stepSounds[strike]
+				if sound then
+					sound.Volume = 0.8 + r * 0.35
+					sound.PlaybackSpeed = 0.95 + math.random() * 0.2 + r * 0.1
+					sound.TimePosition = 0
+					sound:Play()
+				end
+				for _, fn in stepListeners do
+					task.spawn(fn, model, strike)
 				end
 			end
-			st.lastCos = c
 		end
 		KnightPose.setHatch(m, st.hatch)
 		st.servo.Volume = st.amount * 0.3 + st.sprint * st.amount * 0.2
@@ -323,6 +366,17 @@ end
 -- Subscribe to footfalls (camera shake for the local pilot).
 function KnightAnimator.onFootstep(fn: (model: Model, side: string) -> ())
 	table.insert(stepListeners, fn)
+end
+
+-- Subscribe to landings (impact = fall speed, studs/s).
+function KnightAnimator.onLand(fn: (model: Model, impact: number) -> ())
+	table.insert(landListeners, fn)
+end
+
+-- Whether a knight is off the ground (ground ray, see LegIK.updateAir).
+function KnightAnimator.isAirborne(model: Model): boolean
+	local st = states[model]
+	return st ~= nil and st.jump.airborne
 end
 
 function KnightAnimator.start()

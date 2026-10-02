@@ -21,25 +21,28 @@ local RunService = game:GetService("RunService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local GunnerBuilder = require(Shared:WaitForChild("GunnerBuilder"))
 local GunnerPose = require(Shared:WaitForChild("GunnerPose"))
+local LegIK = require(Shared:WaitForChild("LegIK"))
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
 local MechTypes = require(Shared:WaitForChild("MechTypes"))
 
 local GunnerAnimator = {}
 
 local S = GunnerBuilder.Scale
-local TAU = math.pi * 2
 local LIGHT_DIM = 0.12
 local ARMOR_FOLDERS = { "Armor_Helmet", "Armor_Chest", "Armor_Legs" }
-local HIP_SWING, HIP_SWING_SPRINT = 0.42, 0.6
-local KNEE_BEND, KNEE_BEND_SPRINT = 0.8, 1.25
 local ARM_SWING, ARM_SWING_SPRINT = 0.22, 0.45
 local BOB, BOB_SPRINT = 0.35 * S, 0.65 * S
 local SPRINT_LEAN = 0.25
-
-local function strideFor(amp: number): number
-	return 4 * GunnerBuilder.LegLength * 0.935 * math.sin(amp)
-end
-local STRIDE, STRIDE_SPRINT = strideFor(HIP_SWING), strideFor(HIP_SWING_SPRINT)
+-- planted-foot gait (LegIK): a heavy, short-stepping walk; cadence follows speed
+local GAIT: LegIK.Params = {
+	stance = 10,
+	stanceSprint = 13.5,
+	duty = 0.64,
+	dutySprint = 0.52,
+	lift = 1.8,
+	liftSprint = 3,
+}
+local MAX_COMP = 2.2 -- deepest landing squat (studs)
 
 local B, X = GunnerPose.Board, GunnerPose.Exit
 type Cue = { at: number, sound: string, volume: number, speed: number, stop: number? }
@@ -69,10 +72,14 @@ type State = {
 	power: number,
 	appliedPower: number,
 	lights: { BasePart }?,
-	phase: number,
 	amount: number,
 	sprint: number,
-	lastCos: number,
+	ik: LegIK.Rig?,
+	walk: LegIK.Walk,
+	legsFree: boolean,
+	jump: LegIK.Air,
+	idleT: number,
+	look: number,
 	stepSounds: { [string]: Sound },
 	servo: Sound,
 	cueSounds: { [string]: Sound },
@@ -82,6 +89,7 @@ type State = {
 
 local states: { [Model]: State } = {}
 local stepListeners: { (model: Model, side: string) -> () } = {}
+local landListeners: { (model: Model, impact: number) -> () } = {}
 
 local function lerp(a: number, b: number, t: number): number
 	return a + (b - a) * t
@@ -140,10 +148,14 @@ local function setup(model: Model)
 		power = power,
 		appliedPower = -1,
 		lights = nil,
-		phase = 0,
 		amount = 0,
 		sprint = 0,
-		lastCos = 1,
+		ik = LegIK.new(motors),
+		walk = LegIK.newWalk(),
+		legsFree = false,
+		jump = LegIK.newAir(),
+		idleT = 0,
+		look = 0,
 		stepSounds = stepSounds,
 		servo = servo,
 		cueSounds = cueSounds,
@@ -279,61 +291,82 @@ local function step(dt: number)
 		st.amount += (math.clamp(speed / MechConfig.WalkSpeed, 0, 1) - st.amount) * math.min(1, dt * 6)
 		local sprintT = math.clamp((speed - MechConfig.WalkSpeed) / (MechConfig.SprintSpeed - MechConfig.WalkSpeed), 0, 1)
 		st.sprint += (sprintT - st.sprint) * math.min(1, dt * 4)
-		st.phase = (st.phase + dt * speed / lerp(STRIDE, STRIDE_SPRINT, st.sprint) * TAU) % TAU
+		local landed = LegIK.updateAir(st.jump, model, st.root, GunnerBuilder.RootHeight, MAX_COMP, dt)
+		if landed and landed > 15 then
+			local sound = st.cueSounds.Stomp
+			sound.Volume = math.min(1.5, 0.7 + landed / 55)
+			sound.PlaybackSpeed = 0.8
+			sound.TimePosition = 0
+			sound:Play()
+			for _, fn in landListeners do
+				task.spawn(fn, model, landed)
+			end
+		end
+		local air, comp = st.jump.air, st.jump.comp
 
-		if st.off > 1e-4 then
+		local ik = st.ik
+		if st.off > 1e-4 or not ik then
 			-- powered down / getting up: the off pose owns the body
 			for name, cf in GunnerPose.offPose(st.off) do
 				set(m, name, cf)
 			end
 			set(m, "PeriscopeTurret", CFrame.identity)
 			st.amount = 0
+			st.legsFree = false
 		else
-			local a, r = st.amount, st.sprint * st.amount
-			local s, c = math.sin(st.phase), math.cos(st.phase)
-			local breathe = math.sin(now * 1.6) * (1 - a)
-			local hipAmp = lerp(HIP_SWING, HIP_SWING_SPRINT, st.sprint) * a
-			local kneeAmp = lerp(KNEE_BEND, KNEE_BEND_SPRINT, st.sprint) * a
-			local hipL, hipR = s * hipAmp, -s * hipAmp
-			local kneeL, kneeR = math.max(0, c) * kneeAmp, math.max(0, -c) * kneeAmp
-			set(m, "LeftHip", CFrame.Angles(hipL, 0, 0))
-			set(m, "RightHip", CFrame.Angles(hipR, 0, 0))
-			set(m, "LeftKnee", CFrame.Angles(-kneeL, 0, 0))
-			set(m, "RightKnee", CFrame.Angles(-kneeR, 0, 0))
-			set(m, "LeftAnkle", CFrame.Angles(kneeL - hipL, 0, 0))
-			set(m, "RightAnkle", CFrame.Angles(kneeR - hipR, 0, 0))
+			if not st.legsFree then
+				LegIK.adopt(ik)
+				st.legsFree = true
+			end
+			local strike = LegIK.advance(ik, st.walk, GAIT, dt, speed, st.amount * (1 - air), st.sprint)
+			local w = st.walk
+			local a = st.amount * w.weight
+			local r = st.sprint * a
+			local s = math.sin(w.phase)
+			local c = math.cos(w.phase)
+			local idle = (1 - a) * (1 - air)
+			local breathe = math.sin(now * 1.4) * idle
+			if model:GetAttribute("PowerState") == "Online" and speed < 1 and not st.jump.airborne then
+				st.idleT += dt
+			else
+				st.idleT = 0
+			end
+			-- idle: the heavy frame settles from foot to foot, the head checks around
+			local shift = math.sin(now * 0.45) * 0.3 * S * idle
+			local lookT = if st.idleT > 2.5 then math.sin(st.idleT * 0.4) * 0.35 else 0
+			st.look += (lookT - st.look) * math.min(1, dt * 2.5)
 			local bob = lerp(BOB, BOB_SPRINT, st.sprint) * a
-			set(m, "Root", CFrame.new(0, -s * s * bob + breathe * 0.03 * S, 0) * CFrame.Angles(0, 0, s * (0.03 * a + 0.04 * r)))
-			set(m, "Waist", CFrame.Angles(-0.05 * a - SPRINT_LEAN * r + breathe * 0.02, s * (0.1 * a + 0.15 * r), 0))
-			set(m, "Neck", CFrame.Angles(0.04 * a + 0.25 * r - breathe * 0.02, -s * 0.08 * a, 0))
+			local land = math.max(0, comp)
+			local rootT = CFrame.new(shift + s * 0.15 * S * a, -w.drop * w.weight - s * s * bob + breathe * 0.05 * S - land, 0)
+				* CFrame.Angles(0, 0, s * (0.03 * a + 0.04 * r) - shift * 0.02)
+			set(m, "Root", rootT)
+			LegIK.place(ik, w, rootT, air * 0.85)
+			set(m, "Waist", CFrame.Angles(-0.05 * a - SPRINT_LEAN * r + breathe * 0.02 - 0.06 * land, s * (0.1 * a + 0.15 * r) + st.look * 0.25, -shift * 0.012))
+			set(m, "Neck", CFrame.Angles(0.04 * a + 0.25 * r - breathe * 0.02 + 0.06 * air, -s * 0.08 * a + st.look * 0.6, 0))
 			local arm = lerp(ARM_SWING, ARM_SWING_SPRINT, st.sprint) * a
+			local airArm = 0.3 * air + 0.2 * math.min(1, land)
 			-- the shield arm barely swings
-			set(m, "LeftShoulder", CFrame.Angles(-s * arm * 0.3, 0, -breathe * 0.01))
-			set(m, "RightShoulder", CFrame.Angles(s * arm, 0, breathe * 0.015))
+			set(m, "LeftShoulder", CFrame.Angles(-s * arm * 0.3 + airArm * 0.3, 0, -breathe * 0.01 - airArm * 0.3))
+			set(m, "RightShoulder", CFrame.Angles(s * arm + airArm * 0.4, 0, breathe * 0.015 + airArm * 0.5))
 			set(m, "LeftElbow", CFrame.Angles(0.05 * a + 0.2 * r, 0, 0))
-			set(m, "RightElbow", CFrame.Angles(math.max(0, s) * 0.25 * a + 0.45 * r, 0, 0))
-			-- the cannon dips a touch on each footfall; the periscope sweeps at idle
-			set(m, "CannonPitch", CFrame.Angles(-0.03 * a * math.abs(c) + 0.05 * r + breathe * 0.01, 0, 0))
-			set(m, "PeriscopeTurret", CFrame.Angles(0, math.sin(now * 0.35) * 0.5 * (1 - a), 0))
+			set(m, "RightElbow", CFrame.Angles(math.max(0, s) * 0.25 * a + 0.45 * r + 0.03 * idle + 0.3 * air, 0, 0))
+			-- the cannon dips a touch on each footfall and kicks on landing; the periscope sweeps at idle
+			set(m, "CannonPitch", CFrame.Angles(-0.03 * a * math.abs(c) + 0.05 * r + breathe * 0.01 - 0.04 * land + 0.05 * air, 0, 0))
+			set(m, "PeriscopeTurret", CFrame.Angles(0, math.sin(now * 0.35) * 0.5 * idle, 0))
 			set(m, "ShieldMount", CFrame.identity)
 
-			-- footfall at full stride (cos crosses zero)
-			if a > 0.25 then
-				local side = if st.lastCos > 0 and c <= 0 then "Left" elseif st.lastCos < 0 and c >= 0 then "Right" else nil
-				if side then
-					local sound = st.stepSounds[side]
-					if sound then
-						sound.Volume = 0.8 + r * 0.35
-						sound.PlaybackSpeed = 0.95 + math.random() * 0.2 + r * 0.1
-						sound.TimePosition = 0
-						sound:Play()
-					end
-					for _, fn in stepListeners do
-						task.spawn(fn, model, side)
-					end
+			if strike then
+				local sound = st.stepSounds[strike]
+				if sound then
+					sound.Volume = 0.8 + r * 0.35
+					sound.PlaybackSpeed = 0.95 + math.random() * 0.2 + r * 0.1
+					sound.TimePosition = 0
+					sound:Play()
+				end
+				for _, fn in stepListeners do
+					task.spawn(fn, model, strike)
 				end
 			end
-			st.lastCos = c
 		end
 		GunnerPose.setPetals(m, st.petals)
 		straightenPilot(model)
@@ -345,6 +378,17 @@ end
 -- Subscribe to footfalls (camera shake for the local pilot).
 function GunnerAnimator.onFootstep(fn: (model: Model, side: string) -> ())
 	table.insert(stepListeners, fn)
+end
+
+-- Subscribe to landings (impact = fall speed, studs/s).
+function GunnerAnimator.onLand(fn: (model: Model, impact: number) -> ())
+	table.insert(landListeners, fn)
+end
+
+-- Whether a gunner is off the ground (ground ray, see LegIK.updateAir).
+function GunnerAnimator.isAirborne(model: Model): boolean
+	local st = states[model]
+	return st ~= nil and st.jump.airborne
 end
 
 function GunnerAnimator.start()
