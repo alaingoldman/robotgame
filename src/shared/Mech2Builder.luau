@@ -177,7 +177,7 @@ end
 -- reference palette. Needs the mesh templates (loaded on demand where
 -- InsertService works: server / edit mode).
 function Mech2Builder.buildRig(name: string): Model
-	if not Mech2Meshes.available() and RunService:IsServer() then
+	if not Mech2Meshes.available() and (RunService:IsServer() or not RunService:IsRunning()) then -- server, or edit mode (plugin)
 		local ok, err = pcall(Mech2Meshes.ensure)
 		if not ok then
 			warn("[Mech2Builder] loading mesh templates failed: " .. tostring(err))

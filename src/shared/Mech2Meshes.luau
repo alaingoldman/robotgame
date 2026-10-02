@@ -1,8 +1,10 @@
 --!strict
--- PLD-02 (Mech2) mesh table + templates. The 57 meshes in
+-- PLD-02 (Mech2) mesh table + templates. The 61 meshes in
 -- assets/meshes/mech2 (legs / head / arms / torso, one MeshPart per colour
 -- per rigid segment; the finger segments are not used, the HandMerged hands
--- are) were uploaded by the owner (asset_ids.json). Templates live in
+-- are; the torso skirt plates are split into tasset_R / tasset_L, hinged
+-- over each hip so they swing with the thigh) were uploaded by the owner
+-- (asset_ids.json). Templates live in
 -- ReplicatedStorage.Mech2Meshes (one MeshPart per name): Mech2Meshes.ensure()
 -- loads any missing ones with InsertService:LoadAsset (edit mode via the
 -- plugin, or the server at start-up), so the mech builds even when the
@@ -82,20 +84,38 @@ Mech2Meshes.Meshes = {
 	pauldron_R_gold = { bone = "RightPauldron", role = "hi", offset = Vector3.new(1.4994, -0.3159, -0.1632), size = Vector3.new(4.0513, 1.3368, 2.1321), model = 82437263740743, mesh = 131248346792349 },
 	pauldron_R_grey = { bone = "RightPauldron", role = "joint", offset = Vector3.new(-0.0116, 0.6736, -0.1632), size = Vector3.new(1.5096, 0.5712, 1.3872), model = 137442102930956, mesh = 130675231701504 },
 	pauldron_R_white = { bone = "RightPauldron", role = "main", offset = Vector3.new(0.9966, 0.7563, -0.1632), size = Vector3.new(3.5054, 1.7545, 2.5860), model = 85894791427882, mesh = 106525742806917 },
-	pelvis_blue = { bone = "Pelvis", role = "accent", offset = Vector3.new(0.0000, 2.5174, 0.0000), size = Vector3.new(7.2310, 3.3211, 2.8511), model = 81219464135417, mesh = 72617847335673 },
+	pelvis_blue = { bone = "Pelvis", role = "accent", offset = Vector3.new(0.0000, 3.4802, 0.0000), size = Vector3.new(1.6320, 1.3954, 2.8511), model = 134010301629930, mesh = 100413995030765 },
 	pelvis_darkgrey = { bone = "Pelvis", role = "dark", offset = Vector3.new(0.0000, 3.7740, 0.0000), size = Vector3.new(3.7536, 3.1416, 2.2032), model = 76922233987085, mesh = 115492014022779 },
 	pelvis_grey = { bone = "Pelvis", role = "joint", offset = Vector3.new(0.0000, 2.7948, 0.0000), size = Vector3.new(5.2894, 4.3656, 2.6112), model = 100279770333634, mesh = 106060776486193 },
-	pelvis_white = { bone = "Pelvis", role = "main", offset = Vector3.new(0.0000, 2.8356, 0.0441), size = Vector3.new(7.5287, 5.1000, 4.4053), model = 95604665727659, mesh = 114160490901794 },
+	pelvis_white = { bone = "Pelvis", role = "main", offset = Vector3.new(0.0000, 3.7087, 0.0000), size = Vector3.new(4.4880, 3.3538, 3.0192), model = 121908111503170, mesh = 131644409494088 },
+	tasset_L_blue = { bone = "LeftTasset", role = "accent", offset = Vector3.new(-1.4016, -3.1416, 0.9384), size = Vector3.new(0.5256, 1.1424, 0.8160), model = 92216836190890, mesh = 92390392871000 },
+	tasset_L_white = { bone = "LeftTasset", role = "main", offset = Vector3.new(-0.2371, -2.0808, 0.0441), size = Vector3.new(3.1524, 4.4064, 4.4053), model = 115438943596941, mesh = 92050912618135 },
+	tasset_R_blue = { bone = "RightTasset", role = "accent", offset = Vector3.new(1.4016, -3.1416, 0.9384), size = Vector3.new(0.5256, 1.1424, 0.8160), model = 99508363244216, mesh = 72894632898627 },
+	tasset_R_white = { bone = "RightTasset", role = "main", offset = Vector3.new(0.2371, -2.0808, 0.0441), size = Vector3.new(3.1524, 4.4064, 4.4053), model = 92395982261644, mesh = 74824186391478 },
 } :: { [string]: Entry }
 
 local function folder(): Instance?
 	return ReplicatedStorage:FindFirstChild(Mech2Meshes.FolderName)
 end
 
+-- A template only counts while it holds this entry's mesh: re-imported
+-- meshes (pelvis_* after the tasset split) get new ids, and the old template
+-- of the same name must be replaced, not kept.
+local function meshIdOf(e: Entry): string
+	return string.format("%.0f", e.mesh)
+end
+
 function Mech2Meshes.template(name: string): MeshPart?
 	local f = folder()
 	local t = f and f:FindFirstChild(name)
-	return if t and t:IsA("MeshPart") then t else nil
+	local e = Mech2Meshes.Meshes[name]
+	if not (t and t:IsA("MeshPart")) then
+		return nil
+	end
+	if e and not string.find(t.MeshId, meshIdOf(e), 1, true) then
+		return nil -- stale (an older upload of this mesh)
+	end
+	return t
 end
 
 -- Names without a template.
@@ -172,6 +192,12 @@ function Mech2Meshes.ensure(): { string }
 			if ok and res then
 				local mp = res:FindFirstChildWhichIsA("MeshPart", true)
 				if mp then
+					-- drop stale templates of this name first
+					for _, old in f:GetChildren() do
+						if old.Name == name then
+							old:Destroy()
+						end
+					end
 					mp.Name = name
 					mp.Anchored = true
 					mp.CanCollide = false

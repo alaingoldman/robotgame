@@ -13,8 +13,14 @@ legs = json.load(open(os.path.join(HERE, "legs", "meta.json")))
 torso = json.load(open(os.path.join(HERE, "torso", "meta.json")))
 sock = torso["sockets"]
 
+def obj_path(name):
+    # _import2 holds the re-exported torso files (tasset split): newer than _import
+    p2 = os.path.join(HERE, "_import2", name + ".obj")
+    return p2 if os.path.exists(p2) else os.path.join(HERE, "_import", name + ".obj")
+
+
 def bbox(name):
-    vs = [list(map(float, l.split()[1:4])) for l in open(os.path.join(HERE, "_import", name + ".obj")) if l.startswith("v ")]
+    vs = [list(map(float, l.split()[1:4])) for l in open(obj_path(name)) if l.startswith("v ")]
     lo = [min(v[i] for v in vs) for i in range(3)]
     hi = [max(v[i] for v in vs) for i in range(3)]
     return [(lo[i] + hi[i]) / 2 for i in range(3)], [hi[i] - lo[i] for i in range(3)]
@@ -50,7 +56,11 @@ for name in sorted(ids):
             bone, pivot = n + "Hand", [0.30 * sx, -6.93, 0]
     else:
         seg = name.split("_")[0]
-        if seg == "pauldron":
+        if seg == "tasset":
+            side = name.split("_")[1]
+            bone = ("Right" if side == "R" else "Left") + "Tasset"
+            pivot = sock["RightTasset" if side == "R" else "LeftTasset"]
+        elif seg == "pauldron":
             side = name.split("_")[1]
             bone = ("Right" if side == "R" else "Left") + "Pauldron"
             pivot = sock["RightShoulder" if side == "R" else "LeftShoulder"]
