@@ -133,7 +133,14 @@ local EXHAUST = {
 	from = { ox = 1.7, h = 27.3, z = 2.0 },
 	to = { ox = 3.2, h = 25.3, z = 3.45 },
 	d = 1.3, rimD = 1.45, rimLen = 0.35, boreD = 0.85,
+	-- owner's hand edit in Studio (2026-10-02, saved here): the tubes slid DOWN /
+	-- OUT along their own axis so their inner ends clear the cockpit; the two
+	-- sides were moved 1.53 / 1.71 studs, averaged to one symmetric 1.62 studs
+	-- (= 1.987 cells). The rim and bore stay where they were (the rim now reads
+	-- as a band round the tube).
+	slide = 1.987,
 }
+ChestBuilder.ExhaustSlide = EXHAUST.slide -- cells; TitanBuilder places the back battery from the un-slid tubes
 
 -- shoulder pads: rows of { h, inner ox, outer ox, half-depth } (bottom up)
 local PAD_ROWS: { { number } } = {
@@ -446,7 +453,8 @@ function ChestBuilder.build(scale: number?, opts: BuildOptions?): Model
 		local a = Vector3.new(s * e.from.ox, e.from.h, e.from.z) * u
 		local b = Vector3.new(s * e.to.ox, e.to.h, e.to.z) * u
 		local dir = (b - a).Unit
-		G.rod(ctx, torso, "Exhaust", a - dir * 0.6 * u, b, e.d, colors.main)
+		local slide = dir * e.slide * u
+		G.rod(ctx, torso, "Exhaust", a - dir * 0.6 * u + slide, b + slide, e.d, colors.main)
 		G.rod(ctx, torso, "ExhaustRim", b - dir * e.rimLen * u, b + dir * 0.06 * u, e.rimD, colors.joint)
 		G.rod(ctx, torso, "ExhaustBore", b - dir * 0.2 * u, b + dir * 0.1 * u, e.boreD, colors.line)
 	end

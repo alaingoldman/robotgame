@@ -83,25 +83,28 @@ TitanMeshes.Meshes = {
 	-- replaces the whole primitive helmet (HelmetArmor), set "Collar" the
 	-- whole HeadBuilder gorget (CollarArmor) and, via ThroatFold, the
 	-- ChestBuilder ThroatPlates + CollarRing. Offsets: mesh bounding-box centre in the bone frame.
+	-- Owner review: the helmet pieces sit 0.408 studs (0.5 cell) above the sheet height
+	-- (folded into their Head offsets) so the lengthened face + pointed chin clear the
+	-- gorget / throat fold / chest yoke; the neck column (GorgetRecess) reaches up into it.
 	Titan_HeadMain = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "main",
-		offset = Vector3.new(0, 0.7222, -0.2596), size = Vector3.new(2.5786, 3.6312, 3.4628),
+		offset = Vector3.new(0, 1.0037, -0.2596), size = Vector3.new(2.5786, 3.8842, 3.4628),
 	},
 	Titan_HeadTrim = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "hi",
-		offset = Vector3.new(0, 0.1102, -0.5467), size = Vector3.new(2.9539, 2.5541, 2.8723),
+		offset = Vector3.new(0, 0.3754, -0.5467), size = Vector3.new(2.9539, 2.8397, 2.8723),
 	},
 	Titan_HeadCrest = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "trim",
-		offset = Vector3.new(0, 2.2114, -1.6238), size = Vector3.new(0.6202, 2.6602, 0.7181),
+		offset = Vector3.new(0, 2.5051, -1.6565), size = Vector3.new(0.6202, 2.8886, 0.7834), -- ridge runs down to just above the visor (owner)
 	},
 	Titan_HeadVisor = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "glow",
-		offset = Vector3.new(0, 0.5467, -1.325), size = Vector3.new(1.6157, 0.4896, 0.7119),
+		offset = Vector3.new(0, 0.9833, -1.3138), size = Vector3.new(1.8115, 0.661, 0.7181), -- fills the whole slit (owner)
 	},
 	Titan_HeadRecess = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "recess",
-		offset = Vector3.new(0, 0.9792, -0.083), size = Vector3.new(2.5214, 1.4688, 3.1469),
+		offset = Vector3.new(0, 1.3872, -0.083), size = Vector3.new(2.5214, 1.4688, 3.1469),
 	},
 	Titan_Gorget = {
 		bone = "Collar", model = "MechHead", folder = "CollarArmor", parts = {}, all = true, set = "Collar", role = "main",
@@ -109,7 +112,7 @@ TitanMeshes.Meshes = {
 	},
 	Titan_GorgetRecess = {
 		bone = "Collar", model = "MechHead", folder = "CollarArmor", parts = {}, all = true, set = "Collar", role = "recess",
-		offset = Vector3.new(0, 1.0608, 0.6528), size = Vector3.new(3.8189, 2.6112, 3.5904),
+		offset = Vector3.new(0, 1.2648, 0.6528), size = Vector3.new(3.8189, 3.0192, 3.5904),
 	},
 	-- also drops ChestBuilder's brass CollarRing: it doubled the gorget (the sheet
 	-- shows one ring round the head) and its 20 box segments looked jagged next to it

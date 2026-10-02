@@ -7,17 +7,17 @@
       "role": "main",
       "offset": [
         0.0,
-        0.7222,
+        1.0037,
         -0.2596
       ],
       "size": [
         2.5786,
-        3.6312,
+        3.8842,
         3.4628
       ],
       "tris": 688,
       "open_edges": 0,
-      "uv_islands": 91,
+      "uv_islands": 88,
       "max_uv_stretch": 1.189
     },
     "Titan_HeadTrim": {
@@ -27,12 +27,12 @@
       "role": "hi",
       "offset": [
         0.0,
-        0.1102,
+        0.3754,
         -0.5467
       ],
       "size": [
         2.9539,
-        2.5541,
+        2.8397,
         2.8723
       ],
       "tris": 324,
@@ -47,18 +47,18 @@
       "role": "trim",
       "offset": [
         0.0,
-        2.2114,
-        -1.6238
+        2.5051,
+        -1.6565
       ],
       "size": [
         0.6202,
-        2.6602,
-        0.7181
+        2.8886,
+        0.7834
       ],
-      "tris": 32,
+      "tris": 48,
       "open_edges": 0,
-      "uv_islands": 8,
-      "max_uv_stretch": 1.093
+      "uv_islands": 10,
+      "max_uv_stretch": 1.09
     },
     "Titan_HeadVisor": {
       "bone": "Head",
@@ -67,18 +67,18 @@
       "role": "glow",
       "offset": [
         0.0,
-        0.5467,
-        -1.325
+        0.9833,
+        -1.3138
       ],
       "size": [
-        1.6157,
-        0.4896,
-        0.7119
+        1.8115,
+        0.661,
+        0.7181
       ],
       "tris": 20,
       "open_edges": 0,
       "uv_islands": 10,
-      "max_uv_stretch": 1.0
+      "max_uv_stretch": 1.001
     },
     "Titan_HeadRecess": {
       "bone": "Head",
@@ -87,7 +87,7 @@
       "role": "recess",
       "offset": [
         0.0,
-        0.9792,
+        1.3872,
         -0.083
       ],
       "size": [
@@ -127,12 +127,12 @@
       "role": "recess",
       "offset": [
         0.0,
-        1.0608,
+        1.2648,
         0.6528
       ],
       "size": [
         3.8189,
-        2.6112,
+        3.0192,
         3.5904
       ],
       "tris": 252,
@@ -161,10 +161,16 @@
       "max_uv_stretch": 1.065
     }
   },
-  "iou": {
+  "iou_as_mounted": {
+    "front": 0.9042,
+    "side": 0.7933,
+    "back": 0.8505
+  },
+  "iou_helmet_at_sheet_height": {
     "front": 0.9729,
-    "side": 0.9634,
+    "side": 0.9616,
     "back": 0.9616
   },
+  "head_raise_cells": 0.5,
   "studs_per_cell": 0.816
 }

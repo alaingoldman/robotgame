@@ -150,7 +150,11 @@ def crest():
         (5.58, 0.20, -2.27),
         (4.92, 0.29, -2.33),
         (4.20, 0.36, -2.40),
-        (3.80, 0.38, -2.43),
+        (3.80, 0.38, -2.46),
+        # owner review: the ridge runs on DOWN over the brow as a raised,
+        # tapering ridge, its point just above the visor's peak (h 2.93)
+        (3.62, 0.33, -2.50),
+        (3.30, 0.20, -2.51),
     ]
     rings = []
     for h, w, zfr in rows:
@@ -159,8 +163,11 @@ def crest():
         if h > 5.0:
             zbk = lerp(-1.87, -1.55, (5.58 - h) / 0.66)  # SIDE: blade's own back edge above the dome
         zm = zbk - 0.08
+        if h < 3.75:  # on the brow: sides sunk just into the brow's front (z -2.44 + 0.62|x|)
+            zm = -2.44 + 0.62 * w + 0.02
+            zbk = zm + 0.05
         rings.append([(0, h, zfr), (w, h, zm), (0, h, zbk), (-w, h, zm)])
-    return loft(rings, apex0=SPIKE_TIP, apex1=(0.0, 3.28, -2.28))
+    return loft(rings, apex0=SPIKE_TIP, apex1=(0.0, 3.00, -2.47))
 
 
 # ======================================================================
@@ -173,7 +180,7 @@ def face_zc(h):
     """the faceplate's centre crease (SIDE front contour): top ledge under the
     visor (81,197) -> z -2.10 h 2.58, jutting corner (67,207) -> -2.43 h 2.34,
     sloping back to the chin (90,268) -> -1.88 h 0.88."""
-    return interp([(0.75, -1.84), (0.88, -1.88), (2.34, -2.43), (2.60, -2.08)], h)
+    return interp([(0.42, -1.70), (0.88, -1.88), (2.34, -2.43), (2.60, -2.08)], h)  # CHIN: recedes to its point (owner: pointed chin piece)
 
 
 FACE_FOLDS = (2.34, 0.88)
@@ -190,12 +197,17 @@ def face_z(x, h):
 BROW_POLY = [(-1.16, 3.31), (0.0, 2.93), (1.16, 3.31), (1.12, 3.80), (-1.12, 3.80)]
 FRAME_POLY = [(-1.12, 3.31), (0.0, 2.93), (1.12, 3.31), (1.08, 2.93), (0.0, 2.50), (-1.08, 2.93)]
 SLIT_POLY = [(-0.99, 3.17), (0.0, 2.81), (0.99, 3.17), (0.99, 2.98), (0.0, 2.57), (-0.99, 2.98)]
+# owner review: the faceplate continues below the cheek bars into a pointed
+# CHIN (two angled plates meeting at the centre crease), ending at h 0.42 -
+# the face is lengthened ~0.35 below the sheet's chin (0.77) and the whole
+# helmet is mounted HEAD_RAISE higher (build.py) so it clears the gorget,
+# throat fold and chest yoke in perspective.
 # faceplate (between the cheek bars), cheek bars (cx 98..111 at cy 197 ->
 # 120 at cy 248), jaw side plates out to the face's outer contour (78,187)
 # -> (+-1.50, 2.45), (78,213) -> 1.80, (115,248) -> (+-0.61, 0.98), chin
 # (140.5, 257) -> 0.77
-FACE_POLY = [(0.0, 2.50), (1.04, 2.93), (1.02, 2.21), (0.71, 2.13), (0.49, 0.99), (0.24, 0.85), (0.0, 0.77),
-             (-0.24, 0.85), (-0.49, 0.99), (-0.71, 2.13), (-1.02, 2.21), (-1.04, 2.93)]
+FACE_POLY = [(0.0, 2.50), (1.04, 2.93), (1.02, 2.21), (0.71, 2.13), (0.49, 0.99), (0.40, 0.70), (0.0, 0.42),
+             (-0.40, 0.70), (-0.49, 0.99), (-0.71, 2.13), (-1.02, 2.21), (-1.04, 2.93)]
 BAR_POLY = [(1.02, 2.21), (0.71, 2.13), (0.49, 0.99), (0.66, 0.97)]  # right; mirrored
 JAW_POLY = [(1.04, 2.93), (1.47, 2.47), (1.49, 1.80), (0.64, 0.95), (1.02, 2.21)]  # right; mirrored
 
@@ -211,7 +223,11 @@ def visor_frame():
 
 
 def visor_slit():
-    return slab(SLIT_POLY, lambda x, h: -2.07 + SWEEP * abs(x) + 0.01, 0.12)
+    # owner: the glow must fill the WHOLE slit opening edge to edge, i.e. the
+    # visor surround's face (FRAME_POLY) between brow and faceplate, inset
+    # 0.01 and set 0.02 in front of it (no z-fighting); same facets as the frame
+    inset = [(x * (1 - 0.01 / 1.12), h) for x, h in FRAME_POLY]
+    return slab(inset, lambda x, h: -2.07 + SWEEP * min(abs(x), 1.0) + 0.02, 0.12)
 
 
 def faceplate():
@@ -230,7 +246,7 @@ def jaw_plates():
 
 
 def face_core():
-    poly = [(-1.42, 2.95), (1.42, 2.95), (1.42, 1.80), (0.55, 0.98), (0.0, 0.86), (-0.55, 0.98), (-1.42, 1.80)]
+    poly = [(-1.42, 2.95), (1.42, 2.95), (1.42, 1.80), (0.52, 0.95), (0.0, 0.55), (-0.52, 0.95), (-1.42, 1.80)]
     return slab(poly, lambda x, h: face_z(x, h) + 0.3, lambda x, h: max(0.3, -0.2 - (face_z(x, h) + 0.3)), cuts_h=FACE_FOLDS)
 
 
@@ -363,7 +379,7 @@ def recess_liner():
 
 def neck():
     pts = neck_outline()
-    return prism(pts, "y", -0.3, 2.9)
+    return prism(pts, "y", -0.3, 3.4)  # up into the helmet, which the Titan mounts HEAD_RAISE higher
 
 
 # ======================================================================

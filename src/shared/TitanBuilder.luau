@@ -284,6 +284,33 @@ local function buildCockpit(model: Model, chestModel: Model, chest: BasePart)
 			p:Destroy() -- the solid core becomes the hollow cockpit
 		end
 	end
+	-- the roof sits under the collar: the gorget / throat (mesh skins or
+	-- primitives) dip below the torso core's top and would show inside
+	local top = hi.Y
+	local asmRoot: Instance = chestModel.Parent or model -- the assembly (head, bones) at build time
+	local headModel = asmRoot:FindFirstChild("MechHead", true)
+	if headModel then
+		for _, d in headModel:GetDescendants() do
+			if d:IsA("BasePart") and d.Transparency < 1 then
+				local blo = bounds({ d })
+				top = math.min(top, blo.Y - 0.05)
+			end
+		end
+	end
+	local okMeshes, TitanMeshes = pcall(require, script.Parent:FindFirstChild("TitanMeshes"))
+	if okMeshes and typeof(TitanMeshes) == "table" and TitanMeshes.Meshes then
+		for _, name in { "Titan_Gorget", "Titan_GorgetRecess", "Titan_ThroatFold" } do
+			local e = TitanMeshes.Meshes[name]
+			local boneName = e and e.bone
+			local bonePart = boneName and asmRoot:FindFirstChild(boneName, true)
+			if e and bonePart and bonePart:IsA("BasePart") then
+				top = math.min(top, bonePart.Position.Y + e.offset.Y - e.size.Y / 2 - 0.05)
+			end
+		end
+	end
+	top = math.max(top, lo.Y + 4.4) -- never lower than a seated pilot needs
+	hi = Vector3.new(hi.X, top, hi.Z)
+
 	local folder = Instance.new("Folder")
 	folder.Name = "Cockpit"
 	folder.Parent = chestModel
@@ -302,14 +329,35 @@ local function buildCockpit(model: Model, chestModel: Model, chest: BasePart)
 	box("CockpitFloor", Vector3.new(innerW, t, slabZ1 - slabZ0), Vector3.new(cx, lo.Y + t / 2, (slabZ0 + slabZ1) / 2), "recess")
 	box("CockpitRoof", Vector3.new(innerW, t, slabZ1 - slabZ0), Vector3.new(cx, hi.Y - t / 2, (slabZ0 + slabZ1) / 2), "dark")
 	box("CockpitBack", Vector3.new(innerW, h - 2 * t - 2 * E, t), Vector3.new(cx, (lo.Y + hi.Y) / 2, hi.Z - t / 2), "dark")
+	local backFace = hi.Z - t -- inner face of the back wall
 	for _, s in { 1, -1 } do
 		local x = if s > 0 then hi.X - t / 2 else lo.X + t / 2
+		local wallFace = x - s * t / 2
 		box("CockpitWall", Vector3.new(t, h, hi.Z - lo.Z), Vector3.new(x, (lo.Y + hi.Y) / 2, (lo.Z + hi.Z) / 2), "dark")
-		-- console screens on the side walls, a strip down the back wall
-		box("CockpitScreen", Vector3.new(0.08, 0.6, 1.2), Vector3.new(x - s * 0.12, lo.Y + 2.2, lo.Z + 1.3), "glow")
-		box("CockpitStrip", Vector3.new(0.12, h - 1.2, 0.08), Vector3.new(cx + s * 1.2, (lo.Y + hi.Y) / 2, hi.Z - t - 0.05), "glow")
+		-- console screen in a dark bezel on each side wall
+		box("CockpitBezel", Vector3.new(0.1, 0.8, 1.4), Vector3.new(wallFace - s * 0.06, lo.Y + 2.2, lo.Z + 1.3), "recess")
+		box("CockpitScreen", Vector3.new(0.06, 0.6, 1.2), Vector3.new(wallFace - s * 0.12, lo.Y + 2.2, lo.Z + 1.3), "glow")
+		-- cockpit light bars down the back wall: a lit tube in a dark channel, capped
+		local barX = cx + s * 1.25
+		local barH = h - 2 * t - 1.0
+		local barY = (lo.Y + hi.Y) / 2
+		box("CockpitLightFrame", Vector3.new(0.28, barH + 0.2, 0.12), Vector3.new(barX, barY, backFace - 0.07), "dark")
+		box("CockpitLightBar", Vector3.new(0.12, barH, 0.08), Vector3.new(barX, barY, backFace - 0.13), "glow")
+		for _, e in { 1, -1 } do
+			box("CockpitLightCap", Vector3.new(0.3, 0.12, 0.18), Vector3.new(barX, barY + e * (barH / 2 + 0.03), backFace - 0.1), "trim")
+		end
 	end
-	box("CockpitDome", Vector3.new(1.4, 0.08, 0.5), Vector3.new(cx, hi.Y - t - 0.05, (lo.Z + hi.Z) / 2), "glow")
+	-- dome light in a frame under the roof, plus a soft fill light
+	local roofFace = hi.Y - t
+	local zc = (lo.Z + hi.Z) / 2
+	box("CockpitDomeFrame", Vector3.new(1.7, 0.1, 0.75), Vector3.new(cx, roofFace - 0.06, zc), "dark")
+	local dome = box("CockpitDome", Vector3.new(1.4, 0.06, 0.5), Vector3.new(cx, roofFace - 0.12, zc), "glow")
+	local fill = Instance.new("PointLight")
+	fill.Name = "CockpitLight"
+	fill.Range = 7
+	fill.Brightness = 0.6
+	fill.Shadows = false
+	fill.Parent = dome
 
 	-- seat against the back wall: an R15 avatar sits with its head ~3.5 above the seat
 	local seatY = lo.Y + 1.25
@@ -330,6 +378,106 @@ local function buildCockpit(model: Model, chestModel: Model, chest: BasePart)
 	box("SeatBack", Vector3.new(1.7, 2.2, 0.25), Vector3.new(cx, seatY + 1.2, hi.Z - t - 0.15), "dark")
 	local postBottom = lo.Y + t + 0.02 -- clear of the floor's top face
 	box("SeatPost", Vector3.new(0.8, seatY - postBottom, 0.8), Vector3.new(cx, (seatY + postBottom) / 2, seatZ), "dark")
+	-- the clear interior (inside the wall / floor / roof / back panels)
+	return Vector3.new(lo.X + t, lo.Y + t, lo.Z), Vector3.new(hi.X - t, hi.Y - t, hi.Z - t)
+end
+
+local function weldOf(part: BasePart): BasePart?
+	for _, w in part:GetChildren() do
+		if w:IsA("Weld") and w.Part1 == part and w.Part0 then
+			return w.Part0
+		end
+	end
+	return nil
+end
+
+-- Keeps the torso's own parts out of the cockpit: with the core gone, the
+-- inner ends of the exhaust tubes, the back / shoulder blocks and the lower
+-- flank fill would show through the open hatch. Rest pose, build space.
+--   * exhaust tubes: left alone (ChestBuilder slides them clear: owner's edit)
+--   * axis-aligned blocks: trimmed back out of the cockpit along the axis
+--     that removes the least
+--   * anything else (wedge fill) mostly (>= 60 %) inside: hidden
+-- Hatch parts (they swing away), mesh skins, the cockpit and battery are left alone.
+local function clearCockpit(chestModel: Model, ilo: Vector3, ihi: Vector3)
+	local cleared = 0
+	local function hide(p: BasePart)
+		p.Transparency = 1
+		p.CastShadow = false
+		p:SetAttribute("CockpitHidden", true)
+		cleared += 1
+	end
+	for _, d in chestModel:GetDescendants() do
+		if not d:IsA("BasePart") or d:IsA("MeshPart") or d.Transparency >= 1 then
+			continue
+		end
+		local f = d.Parent
+		if f and (f.Name == "Cockpit" or f.Name == "Battery") then
+			continue
+		end
+		local bone = weldOf(d)
+		if not bone or bone.Name == "Hatch" then
+			continue -- a bone itself, or swings away with the hatch
+		end
+		local plo, phi = bounds({ d })
+		local olo, ohi = plo:Max(ilo), phi:Min(ihi)
+		local ov = ohi - olo
+		if ov.X <= 0.03 or ov.Y <= 0.03 or ov.Z <= 0.03 then
+			continue
+		end
+		if string.find(d.Name, "^Exhaust") then
+			continue -- the tubes were slid clear of the cockpit by the owner (ChestBuilder EXHAUST.slide)
+		end
+		local isBlock = d:IsA("Part") and d.Shape == Enum.PartType.Block
+		local R = d.CFrame
+		local aligned = math.abs(R.RightVector:Dot(Vector3.xAxis)) > 0.999 or math.abs(R.RightVector:Dot(Vector3.zAxis)) > 0.999 or math.abs(R.RightVector:Dot(Vector3.yAxis)) > 0.999
+		aligned = aligned and (math.abs(R.UpVector.X) > 0.999 or math.abs(R.UpVector.Y) > 0.999 or math.abs(R.UpVector.Z) > 0.999)
+		if isBlock and aligned then
+			-- trim along the axis that removes the least (the part keeps its outer side)
+			local best, bestCut = nil, math.huge
+			for _, axis in { "X", "Y", "Z" } do
+				local pl, ph = (plo :: any)[axis] :: number, (phi :: any)[axis] :: number
+				local il, ih = (ilo :: any)[axis] :: number, (ihi :: any)[axis] :: number
+				local cut = (ov :: any)[axis] :: number
+				if (ph > ih + 0.05 or pl < il - 0.05) and cut < bestCut then
+					best, bestCut = axis, cut
+				end
+			end
+			if not best then
+				hide(d)
+				continue
+			end
+			local pl, ph = (plo :: any)[best] :: number, (phi :: any)[best] :: number
+			local il, ih = (ilo :: any)[best] :: number, (ihi :: any)[best] :: number
+			local keepLo, keepHi
+			if ph > ih + 0.05 then
+				keepLo, keepHi = ih + 0.01, ph
+			else
+				keepLo, keepHi = pl, il - 0.01
+			end
+			local newLo, newHi = plo, phi
+			if best == "X" then
+				newLo, newHi = Vector3.new(keepLo, plo.Y, plo.Z), Vector3.new(keepHi, phi.Y, phi.Z)
+			elseif best == "Y" then
+				newLo, newHi = Vector3.new(plo.X, keepLo, plo.Z), Vector3.new(phi.X, keepHi, phi.Z)
+			else
+				newLo, newHi = Vector3.new(plo.X, plo.Y, keepLo), Vector3.new(phi.X, phi.Y, keepHi)
+			end
+			local worldSize = newHi - newLo
+			-- back into the part's local axes (axis-aligned: just a permutation)
+			local ls = R:VectorToObjectSpace(worldSize)
+			d.Size = Vector3.new(math.abs(ls.X), math.abs(ls.Y), math.abs(ls.Z))
+			d.CFrame = R.Rotation + (newLo + newHi) / 2
+			weldTo(bone, d)
+			cleared += 1
+			continue
+		end
+		local vol = (phi.X - plo.X) * (phi.Y - plo.Y) * (phi.Z - plo.Z)
+		if vol > 0 and ov.X * ov.Y * ov.Z >= 0.6 * vol then
+			hide(d)
+		end
+	end
+	return cleared
 end
 
 -- Re-welds the chest front to a hinged "Hatch" bone.
@@ -387,8 +535,27 @@ local function buildBattery(chestModel: Model, chest: BasePart)
 	if #exhausts > 0 then
 		local inner = math.huge
 		local ylo, yhi = math.huge, -math.huge
+		-- the tubes slide down / out along their axis (ChestBuilder EXHAUST.slide,
+		-- the owner's edit): measure them where they were before, so the battery
+		-- keeps its place between them
+		local slideStuds = 0
+		local okChest, CB = pcall(require, script.Parent:FindFirstChild("ChestBuilder"))
+		local okBoot, BB = pcall(require, script.Parent:FindFirstChild("BootBuilder"))
+		if okChest and okBoot and typeof(CB) == "table" and typeof(CB.ExhaustSlide) == "number" then
+			slideStuds = CB.ExhaustSlide * BB.CELL * TitanBuilder.Scale
+		end
 		for _, e in exhausts do
-			local lo, hi = bounds({ e })
+			local probe = e
+			if slideStuds > 0 and e.Name == "Exhaust" then
+				local ax = e.CFrame.RightVector
+				local down = if ax.Y < 0 then ax else -ax
+				probe = e:Clone()
+				probe.CFrame = e.CFrame - down * slideStuds
+			end
+			local lo, hi = bounds({ probe })
+			if probe ~= e then
+				probe:Destroy()
+			end
 			local edge = if lo.X > 0 then lo.X elseif hi.X < 0 then -hi.X else 0
 			if edge > 0.3 then
 				inner = math.min(inner, edge)
@@ -483,9 +650,10 @@ function TitanBuilder.buildRig(name: string): Model
 	assert(chestModel, "[TitanBuilder] MechAssembly built no 'MechChest' model")
 	local chest = chestModel:FindFirstChild("Chest") :: BasePart
 	assert(chest, "[TitanBuilder] MechChest has no 'Chest' bone")
-	buildCockpit(model, chestModel, chest)
+	local ilo, ihi = buildCockpit(model, chestModel, chest)
 	buildHatch(chestModel, chest)
 	buildBattery(chestModel, chest)
+	clearCockpit(chestModel, ilo, ihi)
 
 	-- a soft glow from the chest gems
 	for _, p in partsNamed(chestModel, { "DiscBigFace" }) do

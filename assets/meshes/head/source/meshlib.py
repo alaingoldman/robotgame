@@ -230,7 +230,7 @@ def split_x(poly):
     return split_line(poly, 0, 0.0)
 
 
-def slab(poly, zfront, thick, fold_x=True, cuts_h=()):
+def slab(poly, zfront, thick, fold_x=True, cuts_h=(), cuts_x=()):
     """Front-view polygon [(x, h)] lifted onto a front surface z = zfront(x, h),
     given depth `thick` (number or fn(x, h)) toward +Z. fold_x splits it at
     x = 0 so a V-shaped (prow) front keeps a crisp centre crease; cuts_h adds
@@ -240,6 +240,8 @@ def slab(poly, zfront, thick, fold_x=True, cuts_h=()):
         pieces = [q for p in pieces for q in split_line(p, 0, 0.0)]
     for c in cuts_h:
         pieces = [q for p in pieces for q in split_line(p, 1, c)]
+    for c in cuts_x:
+        pieces = [q for p in pieces for q in split_line(p, 0, c)]
     m = Mesh()
     th = thick if callable(thick) else (lambda x, h: thick)
     key = {}

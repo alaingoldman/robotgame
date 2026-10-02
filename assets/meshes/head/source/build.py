@@ -23,7 +23,12 @@ STUDS = 0.816  # studs per cell at MechConfig.Scale 1.7 (BootBuilder.CELL 0.48 x
 # bone origin in head space (cells): HeadBuilder Head bone (NECK_JOINT_H 2.2),
 # Collar bone = head origin, ChestBuilder Chest bone = leg (0, 23.4, -1.5) =
 # head (0, -7.8, 0)
-BONES = {"Head": (0, 2.2, 0), "Collar": (0, 0, 0), "Chest": (0, -7.8, 0)}
+# Owner review: the Titan mounts the helmet HEAD_RAISE cells higher than the
+# sheet so the (lengthened) face and chin clear the gorget / throat fold /
+# chest yoke in perspective. Applied through the Head-bone offsets only (the
+# Head bone itself and the collar stay where HeadBuilder puts them).
+HEAD_RAISE = 0.5
+BONES = {"Head": (0, 2.2 - HEAD_RAISE, 0), "Collar": (0, 0, 0), "Chest": (0, -7.8, 0)}
 
 PIECES = {
     # name: (bone, sub-model, folder, role, replaces)
@@ -63,10 +68,13 @@ def main():
         off = (c - np.array(BONES[bone], float)) * STUDS
         size = (hi - lo) * STUDS
         ms = m.transformed(lambda p: (p - c) * STUDS)
+        # header offset at the SHEET height (helmet pieces: TitanMeshes adds HEAD_RAISE) so pieces
+        # whose geometry did not change stay byte-identical (no re-import needed)
+        off0 = off - (np.array([0, HEAD_RAISE * STUDS, 0]) if bone == "Head" else 0)
         hdr = ("%s - BRZ-01 Titan head/collar mesh (assets/meshes/head/source/build.py)\n"
                "units: studs (Scale 1.7), +Y up, face toward -Z, centred on the bounding box\n"
                "weld to bone '%s' (%s) at bone.CFrame * CFrame.new(%.4f, %.4f, %.4f) * ImportRotation\n"
-               "size %.4f x %.4f x %.4f, role %s" % (name, bone, sub, off[0], off[1], off[2], size[0], size[1], size[2], role))
+               "size %.4f x %.4f x %.4f, role %s" % (name, bone, sub, off0[0], off0[1], off0[2], size[0], size[1], size[2], role))
         tris, stretch, islands = write_obj(os.path.join(OUT, name + ".obj"), ms, hdr)
         meta[name] = {"bone": bone, "model": sub, "folder": folder, "role": role,
                       "offset": [round(float(v), 4) for v in off], "size": [round(float(v), 4) for v in size],
@@ -74,14 +82,20 @@ def main():
                       "max_uv_stretch": round(float(stretch), 3)}
         print("%-20s %-6s %-6s tris %4d  stretch %.3f  islands %3d  open %d  off (%.4f, %.4f, %.4f)  size (%.4f, %.4f, %.4f)" % (
             name, bone, role, tris, stretch, islands, meta[name]["open_edges"], *off, *size))
-        items.append((m, role))
+        items.append((m, role, bone))
+    raised = [((m.transformed(lambda p: p + np.array([0, HEAD_RAISE, 0])) if b == "Head" else m), r) for m, r, b in items]
+    sheet_aligned = [(m, r) for m, r, b in items]
+    items = raised
     ious = {}
+    ious_sheet = {}
     imgs = []
     for view in ("front", "side", "back"):
-        v, im = render.compare_image(view, items, os.path.join(OUT, "Titan_Head_compare_%s.png" % view))
+        v, im = render.compare_image(view, raised, os.path.join(OUT, "Titan_Head_compare_%s.png" % view))
+        v2, _ = render.iou(view, sheet_aligned)[:2]
         ious[view] = round(float(v), 4)
+        ious_sheet[view] = round(float(v2), 4)
         imgs.append(im)
-        print("IoU %-5s %.4f" % (view, v))
+        print("IoU %-5s as mounted %.4f   helmet at sheet height %.4f" % (view, v, v2))
     # 3/4 previews
     panels = []
     for yaw, pit in ((-35, -22), (40, -22), (150, -22)):
@@ -103,7 +117,7 @@ def main():
         y += i.height + 10
     sheet.save(os.path.join(OUT, "Titan_Head_compare_all.png"))
     with open(os.path.join(HERE, "meta.json"), "w") as fh:
-        json.dump({"pieces": meta, "iou": ious, "studs_per_cell": STUDS}, fh, indent=2)
+        json.dump({"pieces": meta, "iou_as_mounted": ious, "iou_helmet_at_sheet_height": ious_sheet, "head_raise_cells": HEAD_RAISE, "studs_per_cell": STUDS}, fh, indent=2)
 
 
 if __name__ == "__main__":
