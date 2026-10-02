@@ -27,6 +27,7 @@ local TitanAnimator = require(script.Parent.TitanAnimator) -- BRZ-01 jump windup
 local KnightAnimator = require(script.Parent.KnightAnimator) -- VK-01 airborne / landing / footsteps
 local GunnerAnimator = require(script.Parent.GunnerAnimator) -- GR-07 airborne / landing / footsteps
 local Mech2Animator = require(script.Parent.Mech2Animator) -- PLD-02 jump windup / airborne / landing / footsteps
+local CrimsonAnimator = require(script.Parent.CrimsonAnimator) -- CRM-01 jump windup / airborne / landing / footsteps
 local MechConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechConfig"))
 local MechTypes = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechTypes"))
 
@@ -125,6 +126,9 @@ local function jumpOf(model: Model?): (number, number)
 	if model ~= nil and MechTypes.idOf(model) == "Mech2" then
 		return MechConfig.JumpPower, Mech2Animator.JumpWindup
 	end
+	if model ~= nil and MechTypes.idOf(model) == "Crimson" then
+		return MechConfig.JumpPower, CrimsonAnimator.JumpWindup
+	end
 	return MechConfig.JumpPower, MechConfig.JumpWindup
 end
 
@@ -140,6 +144,8 @@ local function isAirborne(model: Model): boolean
 		return GunnerAnimator.isAirborne(model)
 	elseif id == "Mech2" then
 		return Mech2Animator.isAirborne(model)
+	elseif id == "Crimson" then
+		return CrimsonAnimator.isAirborne(model)
 	end
 	return if isType99(model) then Type99Animator.isAirborne(model) else MechAnimator.isAirborne(model)
 end
@@ -207,6 +213,8 @@ local function onJumpAction(_: string, state: Enum.UserInputState)
 			GunnerAnimator.windup(model)
 		elseif MechTypes.idOf(model) == "Mech2" then
 			Mech2Animator.windup(model)
+		elseif MechTypes.idOf(model) == "Crimson" then
+			CrimsonAnimator.windup(model)
 		else
 			MechAnimator.windup(model)
 		end
@@ -474,8 +482,8 @@ function PilotController.start()
 		end
 	end)
 
-	-- VK-01 / GR-07 / PLD-02 animators: footfall shake and landing thumps
-	for _, anim in { KnightAnimator, GunnerAnimator, Mech2Animator } :: { any } do
+	-- VK-01 / GR-07 / PLD-02 / CRM-01 animators: footfall shake and landing thumps
+	for _, anim in { KnightAnimator, GunnerAnimator, Mech2Animator, CrimsonAnimator } :: { any } do
 		anim.onFootstep(function(model: Model, _side: string)
 			if model == current then
 				shake = math.max(shake, if sprinting then 0.5 else 0.35)
