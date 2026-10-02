@@ -10,7 +10,8 @@
 --     Armor_Legs folders (MechPattern, inventory slots).
 --   * Motors: Root, Waist, Spine, Neck, CanopyHinge, Right|Left Shoulder /
 --     Elbow / Wrist, Right|Left Hip / Knee / Ankle, Right|Left PauldronJoint
---     (the pauldron follows part of the arm swing, Mech2Animator).
+--     (the pauldron follows part of the arm swing, Mech2Animator), Right|Left
+--     TassetJoint (the skirt plates follow part of the thigh swing, Mech2Pose).
 --   * Head cockpit: the pilot seat sits inside the head; the gold crown is a
 --     canopy on "CanopyHinge" that lifts open while parked (Mech2Pose).
 --   * Battery pack on the back between the gold fins: casing, four charge
@@ -49,6 +50,7 @@ local KNEE = Vector3.new(0.2856, -4.4064, 0.1632)
 local ANKLE = Vector3.new(0.5059, -7.548, 0.1632)
 local ELBOW = Vector3.new(0, -3.13, 0)
 local WRIST = Vector3.new(0.3, -6.93, 0)
+local TASSET = Vector3.new(1.9511, 4.5696, 0) -- torso meta.json RightTasset
 -- the arms hang rolled out by the fitted rest roll (torso README, fit_arms.py)
 local ARM_ROLL = math.rad(17)
 
@@ -61,6 +63,8 @@ local SLOT_OF_BONE: { [string]: string } = {
 	LeftThigh = "Legs",
 	LeftShin = "Legs",
 	LeftFoot = "Legs",
+	RightTasset = "Legs",
+	LeftTasset = "Legs",
 }
 
 -- ===== helpers ==============================================================
@@ -240,6 +244,9 @@ function Mech2Builder.buildRig(name: string): Model
 		motor(side .. "Shoulder", chest, upper)
 		motor(side .. "Elbow", upper, lower)
 		motor(side .. "Wrist", lower, hand)
+		-- TASSETS: the skirt plates over this hip swing with the thigh (Mech2Pose.apply)
+		local tasset = bone(side .. "Tasset", CFrame.new(hip + TASSET * mirror))
+		motor(side .. "TassetJoint", pelvis, tasset)
 		-- leg
 		local hipPos = hip + HIP * mirror
 		local thigh = bone(side .. "Thigh", CFrame.new(hipPos))

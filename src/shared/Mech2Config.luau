@@ -148,16 +148,16 @@ Mech2Config.Exit = {
 -- Gait (Mech2Animator). Speeds are the shared MechConfig ones (22 / 46).
 -- Cycle = studs travelled per full two-step cycle, Duty = stance fraction.
 Mech2Config.Gait = {
-	WalkCycle = 11.5,
-	SprintCycle = 21,
+	WalkCycle = 12.5,
+	SprintCycle = 24,
 	WalkDuty = 0.62,
 	SprintDuty = 0.4,
-	WalkLift = 1.3,
+	WalkLift = 1.5,
 	SprintLift = 2.2,
-	WalkCrouch = 0.75,
-	SprintCrouch = 1.25,
-	WalkBob = 0.25,
-	SprintBob = 0.5,
+	WalkCrouch = 1.1, -- reach: stance +-3.9 studs with a 7.55 leg
+	SprintCrouch = 1.8, -- reach: stance +-4.8 studs
+	WalkBob = 0.4,
+	SprintBob = 0.65,
 	SprintLean = 0.22,
 	ArmSwing = 0.3,
 	SprintArmSwing = 0.55,

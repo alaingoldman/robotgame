@@ -423,8 +423,13 @@ local function standPose(st: State, now: number): { [string]: CFrame }
 
 	local crouch = lerp(0.18, lerp(G.WalkCrouch, G.SprintCrouch, st.sprint), a) + breathe * 0.03 * idle + st.compress * 2.4
 	local bob = lerp(G.WalkBob, G.SprintBob, st.sprint) * a * (0.5 + 0.5 * math.cos(p * 2 * TAU))
-	local sway = math.sin(p * TAU) * 0.3 * a * (1 - 0.5 * st.sprint) + shift * 0.2 * idle
-	local pelvis = CFrame.new(sway, -crouch - bob, 0) * CFrame.Angles(0, math.sin(p * TAU) * 0.08 * a, -math.sin(p * TAU) * 0.035 * a - shift * 0.02 * idle)
+	-- hips: sway over the planted foot, yaw with the stride (the leading hip
+	-- swings forward with its leg) and roll down toward the swing leg, so the
+	-- whole pelvis visibly walks, not just the knees
+	local sway = math.sin(p * TAU) * 0.42 * a * (1 - 0.4 * st.sprint) + shift * 0.2 * idle
+	local hipYaw = math.sin(p * TAU) * (0.15 * a + 0.05 * r)
+	local hipRoll = -math.sin(p * TAU) * (0.07 * a - 0.02 * r) - shift * 0.02 * idle
+	local pelvis = CFrame.new(sway, -crouch - bob, 0) * CFrame.Angles(0, hipYaw, hipRoll)
 	pose.Root = pelvis
 
 	local L, R = rig.legs.Left, rig.legs.Right
@@ -439,7 +444,8 @@ local function standPose(st: State, now: number): { [string]: CFrame }
 		Mech2Pose.legIK(rig, "Right", targets.Right, pelvis, 0, fr, pose, true)
 	end
 
-	local twist = -math.sin(p * TAU) * (0.1 * a + 0.06 * r)
+	-- the torso counter-twists against the hip yaw (shoulders stay square-ish)
+	local twist = -math.sin(p * TAU) * (0.17 * a + 0.07 * r)
 	pose.Waist = CFrame.Angles(-(0.04 * a + G.SprintLean * r * 0.6 + 0.2 * st.compress), twist * 0.6, math.sin(p * TAU) * 0.03 * a)
 	pose.Spine = CFrame.Angles(-(G.SprintLean * r * 0.4) - breathe * 0.02 * idle, twist * 0.4, 0)
 	local lookYaw = math.noise(t * 0.18, st.seed + 7) * 0.8 * idle

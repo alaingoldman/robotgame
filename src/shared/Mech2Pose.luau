@@ -117,7 +117,20 @@ function Mech2Pose.rig(motors: { [string]: Motor6D }): Rig?
 	return r
 end
 
+-- TASSETS: each side's skirt plates (tasset_R / tasset_L meshes, hinged over
+-- the hip ball at the top of the side plate) follow part of that thigh's
+-- swing, clamped so the back plate never reaches the hip housing / core.
+local TASSET_FOLLOW = 0.45
+local TASSET_MAX = 0.22
+
 function Mech2Pose.apply(rig: Rig, pose: { [string]: CFrame })
+	for _, side in { "Right", "Left" } do
+		local hip = pose[side .. "Hip"]
+		if hip and not pose[side .. "TassetJoint"] then
+			local rx, _, rz = hip:ToEulerAnglesXYZ()
+			pose[side .. "TassetJoint"] = CFrame.Angles(math.clamp(rx * TASSET_FOLLOW, -TASSET_MAX, TASSET_MAX), 0, math.clamp(rz * 0.3, -0.08, 0.08))
+		end
+	end
 	for name, rel in pose do
 		local j = rig.joints[name]
 		if j then
