@@ -195,6 +195,10 @@ local function onJumpAction(_: string, state: Enum.UserInputState)
 			Type99Animator.windup(model)
 		elseif isTitan(model) then
 			TitanAnimator.windup(model)
+		elseif MechTypes.idOf(model) == "Knight" then
+			KnightAnimator.windup(model)
+		elseif MechTypes.idOf(model) == "Gunner" then
+			GunnerAnimator.windup(model)
 		else
 			MechAnimator.windup(model)
 		end

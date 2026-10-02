@@ -380,6 +380,14 @@ function GunnerAnimator.onFootstep(fn: (model: Model, side: string) -> ())
 	table.insert(stepListeners, fn)
 end
 
+-- Jump windup (the pilot's client, just before the jump): a quick squat.
+function GunnerAnimator.windup(model: Model)
+	local st = states[model]
+	if st then
+		st.jump.compV += 16
+	end
+end
+
 -- Subscribe to landings (impact = fall speed, studs/s).
 function GunnerAnimator.onLand(fn: (model: Model, impact: number) -> ())
 	table.insert(landListeners, fn)
