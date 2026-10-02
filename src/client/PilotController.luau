@@ -24,6 +24,8 @@ local Boarding = require(script.Parent.Boarding)
 local MechAnimator = require(script.Parent.MechAnimator)
 local Type99Animator = require(script.Parent.Type99Animator)
 local TitanAnimator = require(script.Parent.TitanAnimator) -- BRZ-01 jump windup / airborne / landing
+local KnightAnimator = require(script.Parent.KnightAnimator) -- VK-01 airborne / landing / footsteps
+local GunnerAnimator = require(script.Parent.GunnerAnimator) -- GR-07 airborne / landing / footsteps
 local MechConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechConfig"))
 local MechTypes = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechTypes"))
 
@@ -126,6 +128,12 @@ end
 local function isAirborne(model: Model): boolean
 	if isTitan(model) then
 		return TitanAnimator.isAirborne(model)
+	end
+	local id = MechTypes.idOf(model)
+	if id == "Knight" then
+		return KnightAnimator.isAirborne(model)
+	elseif id == "Gunner" then
+		return GunnerAnimator.isAirborne(model)
 	end
 	return if isType99(model) then Type99Animator.isAirborne(model) else MechAnimator.isAirborne(model)
 end
@@ -313,6 +321,63 @@ local function setPiloting(model: Model?)
 	changedSignal:Fire(model)
 end
 
+-- Back on foot after an exit: if the avatar was put down inside something
+-- solid (the mech was parked against another mech or a wall, so the ramp /
+-- nose / hatch exit spot is blocked), move it to the nearest clear spot on
+-- the ground instead of leaving it wedged (stuck "Climbing" in the armor).
+local STUCK_BOX = Vector3.new(2.6, 4.6, 1.6)
+local function overlapsAt(char: Model, cf: CFrame): boolean
+	local hrp = char:FindFirstChild("HumanoidRootPart") :: BasePart?
+	local params = OverlapParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { char }
+	params.RespectCanCollide = true
+	params.CollisionGroup = if hrp then hrp.CollisionGroup else "Default"
+	return #workspace:GetPartBoundsInBox(cf, STUCK_BOX, params) > 0
+end
+
+local function unstick()
+	local char = player.Character
+	local hrp = char and char:FindFirstChild("HumanoidRootPart") :: BasePart?
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not (char and hrp and hum) or hum.Sit or hum.Health <= 0 or current then
+		return
+	end
+	if not overlapsAt(char, hrp.CFrame) then
+		return
+	end
+	local mechs = workspace:FindFirstChild("Mechs")
+	local ray = RaycastParams.new()
+	ray.FilterType = Enum.RaycastFilterType.Exclude
+	ray.FilterDescendantsInstances = { char }
+	ray.RespectCanCollide = true
+	local lift = hum.HipHeight + hrp.Size.Y / 2 -- root center above the feet
+	local origin = hrp.Position
+	for radius = 4, 40, 3 do
+		local steps = math.max(8, math.floor(radius * 1.5))
+		local best: CFrame? = nil
+		for i = 0, steps - 1 do
+			local a = i / steps * math.pi * 2
+			local p = origin + Vector3.new(math.cos(a) * radius, 0, math.sin(a) * radius)
+			local hit = workspace:Raycast(p + Vector3.new(0, 60, 0), Vector3.new(0, -120, 0), ray)
+			-- stand on the world, not on top of a mech
+			if hit and not (mechs and hit.Instance:IsDescendantOf(mechs)) then
+				local cf = CFrame.new(hit.Position + Vector3.new(0, lift + 0.2, 0)) * hrp.CFrame.Rotation
+				if not overlapsAt(char, cf) then
+					best = cf
+					break
+				end
+			end
+		end
+		if best then
+			hrp.AssemblyLinearVelocity = Vector3.zero
+			char:PivotTo(best)
+			hum:ChangeState(Enum.HumanoidStateType.Landed)
+			return
+		end
+	end
+end
+
 local function onPilotChanged(model: Model?, phase: string?)
 	if model and phase == "Boarding" then
 		-- no prompts (the E that boarded must not trigger anything else)
@@ -349,6 +414,7 @@ local function onPilotChanged(model: Model?, phase: string?)
 		lockAvatar(false)
 		Boarding.lockControls(false)
 		ProximityPromptService.Enabled = true
+		task.delay(0.4, unstick)
 	end
 end
 
@@ -395,6 +461,21 @@ function PilotController.start()
 			lastLanded = os.clock()
 		end
 	end)
+
+	-- VK-01 / GR-07 animators: footfall shake and landing thumps
+	for _, anim in { KnightAnimator, GunnerAnimator } :: { any } do
+		anim.onFootstep(function(model: Model, _side: string)
+			if model == current then
+				shake = math.max(shake, if sprinting then 0.5 else 0.35)
+			end
+		end)
+		anim.onLand(function(model: Model, impact: number)
+			if model == current then
+				lastLanded = os.clock()
+				shake = math.max(shake, 0.6 + impact / 35)
+			end
+		end)
+	end
 
 	-- the WTK-99's animator: heavier stomps, scaled per step
 	Type99Animator.onLand(function(model, impact)
