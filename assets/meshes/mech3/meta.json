@@ -1,0 +1,453 @@
+{
+  "units": "studs (1 glTF unit = 1 stud)",
+  "up": "+Y",
+  "front": "-Z",
+  "mech_right": "+X",
+  "height": 20.0,
+  "source_scale": 10.537002430664298,
+  "depth_boost_z": 1.12,
+  "wing_shift_back": 0.6,
+  "parts": {
+    "Head": {
+      "tris": 6130,
+      "core_tris": 5780,
+      "overlap_tris": 350,
+      "cap_tris": 0,
+      "bbox_min": [
+        -0.972,
+        17.067,
+        -2.165
+      ],
+      "bbox_max": [
+        0.979,
+        20.0,
+        1.311
+      ]
+    },
+    "Torso": {
+      "tris": 17440,
+      "core_tris": 15869,
+      "overlap_tris": 1530,
+      "cap_tris": 41,
+      "bbox_min": [
+        -2.76,
+        12.234,
+        -2.169
+      ],
+      "bbox_max": [
+        2.764,
+        19.194,
+        2.405
+      ]
+    },
+    "Pelvis": {
+      "tris": 5916,
+      "core_tris": 4705,
+      "overlap_tris": 1180,
+      "cap_tris": 31,
+      "bbox_min": [
+        -1.643,
+        9.822,
+        -1.406
+      ],
+      "bbox_max": [
+        1.671,
+        12.573,
+        1.384
+      ]
+    },
+    "Wing_L": {
+      "tris": 1738,
+      "core_tris": 1738,
+      "overlap_tris": 0,
+      "cap_tris": 0,
+      "bbox_min": [
+        -4.53,
+        14.373,
+        -0.311
+      ],
+      "bbox_max": [
+        -2.322,
+        19.216,
+        2.369
+      ]
+    },
+    "Wing_R": {
+      "tris": 1458,
+      "core_tris": 1458,
+      "overlap_tris": 0,
+      "cap_tris": 0,
+      "bbox_min": [
+        2.321,
+        14.375,
+        -0.31
+      ],
+      "bbox_max": [
+        4.524,
+        19.215,
+        2.369
+      ]
+    },
+    "ShoulderPad_L": {
+      "tris": 2454,
+      "core_tris": 1903,
+      "overlap_tris": 551,
+      "cap_tris": 0,
+      "bbox_min": [
+        -3.451,
+        15.659,
+        -1.259
+      ],
+      "bbox_max": [
+        -1.836,
+        17.947,
+        1.438
+      ]
+    },
+    "ShoulderPad_R": {
+      "tris": 2278,
+      "core_tris": 1770,
+      "overlap_tris": 508,
+      "cap_tris": 0,
+      "bbox_min": [
+        1.834,
+        15.737,
+        -1.26
+      ],
+      "bbox_max": [
+        3.449,
+        17.768,
+        1.432
+      ]
+    },
+    "UpperArm_L": {
+      "tris": 4002,
+      "core_tris": 3249,
+      "overlap_tris": 725,
+      "cap_tris": 28,
+      "bbox_min": [
+        -4.303,
+        13.707,
+        -0.91
+      ],
+      "bbox_max": [
+        -1.863,
+        16.234,
+        1.546
+      ]
+    },
+    "UpperArm_R": {
+      "tris": 3619,
+      "core_tris": 2998,
+      "overlap_tris": 593,
+      "cap_tris": 28,
+      "bbox_min": [
+        1.862,
+        13.738,
+        -0.933
+      ],
+      "bbox_max": [
+        4.32,
+        16.258,
+        1.543
+      ]
+    },
+    "Forearm_L": {
+      "tris": 4107,
+      "core_tris": 3587,
+      "overlap_tris": 479,
+      "cap_tris": 41,
+      "bbox_min": [
+        -4.954,
+        10.729,
+        -1.346
+      ],
+      "bbox_max": [
+        -2.741,
+        13.952,
+        1.633
+      ]
+    },
+    "Forearm_R": {
+      "tris": 3969,
+      "core_tris": 3419,
+      "overlap_tris": 506,
+      "cap_tris": 44,
+      "bbox_min": [
+        2.736,
+        10.779,
+        -1.315
+      ],
+      "bbox_max": [
+        4.95,
+        13.935,
+        1.634
+      ]
+    },
+    "Hand_L": {
+      "tris": 2754,
+      "core_tris": 2493,
+      "overlap_tris": 242,
+      "cap_tris": 19,
+      "bbox_min": [
+        -4.974,
+        8.956,
+        -1.795
+      ],
+      "bbox_max": [
+        -4.009,
+        10.955,
+        -0.145
+      ]
+    },
+    "Hand_R": {
+      "tris": 2744,
+      "core_tris": 2496,
+      "overlap_tris": 232,
+      "cap_tris": 16,
+      "bbox_min": [
+        3.994,
+        8.954,
+        -1.795
+      ],
+      "bbox_max": [
+        4.974,
+        10.959,
+        -0.14
+      ]
+    },
+    "Thigh_L": {
+      "tris": 6125,
+      "core_tris": 5357,
+      "overlap_tris": 726,
+      "cap_tris": 42,
+      "bbox_min": [
+        -2.464,
+        6.957,
+        -1.672
+      ],
+      "bbox_max": [
+        -0.328,
+        11.729,
+        1.447
+      ]
+    },
+    "Thigh_R": {
+      "tris": 5940,
+      "core_tris": 5203,
+      "overlap_tris": 694,
+      "cap_tris": 43,
+      "bbox_min": [
+        0.331,
+        7.022,
+        -1.67
+      ],
+      "bbox_max": [
+        2.465,
+        11.693,
+        1.447
+      ]
+    },
+    "Shin_L": {
+      "tris": 8326,
+      "core_tris": 7561,
+      "overlap_tris": 699,
+      "cap_tris": 66,
+      "bbox_min": [
+        -2.609,
+        1.29,
+        -1.277
+      ],
+      "bbox_max": [
+        -0.517,
+        7.472,
+        1.914
+      ]
+    },
+    "Shin_R": {
+      "tris": 8149,
+      "core_tris": 7472,
+      "overlap_tris": 616,
+      "cap_tris": 61,
+      "bbox_min": [
+        0.516,
+        1.345,
+        -1.267
+      ],
+      "bbox_max": [
+        2.611,
+        7.415,
+        1.917
+      ]
+    },
+    "Foot_L": {
+      "tris": 4164,
+      "core_tris": 3807,
+      "overlap_tris": 326,
+      "cap_tris": 31,
+      "bbox_min": [
+        -2.654,
+        0.001,
+        -2.405
+      ],
+      "bbox_max": [
+        -1.14,
+        1.847,
+        1.871
+      ]
+    },
+    "Foot_R": {
+      "tris": 4034,
+      "core_tris": 3693,
+      "overlap_tris": 313,
+      "cap_tris": 28,
+      "bbox_min": [
+        1.138,
+        0.0,
+        -2.403
+      ],
+      "bbox_max": [
+        2.652,
+        1.727,
+        1.869
+      ]
+    }
+  },
+  "pivots": {
+    "Neck": [
+      0.0,
+      17.45,
+      -0.156
+    ],
+    "Waist": [
+      0.0,
+      12.4,
+      -0.058
+    ],
+    "WingRoot_R": [
+      3.015,
+      16.795,
+      1.021
+    ],
+    "Shoulder_R": [
+      2.612,
+      15.6,
+      0.094
+    ],
+    "ShoulderPad_R": [
+      1.85,
+      16.9,
+      0.086
+    ],
+    "Elbow_R": [
+      3.389,
+      13.85,
+      0.406
+    ],
+    "Wrist_R": [
+      4.378,
+      10.85,
+      -0.602
+    ],
+    "Hip_R": [
+      1.294,
+      11.0,
+      -0.008
+    ],
+    "Knee_R": [
+      1.522,
+      7.2,
+      -0.064
+    ],
+    "Ankle_R": [
+      1.845,
+      1.55,
+      0.407
+    ],
+    "WingRoot_L": [
+      -3.015,
+      16.795,
+      1.021
+    ],
+    "Shoulder_L": [
+      -2.616,
+      15.6,
+      0.092
+    ],
+    "ShoulderPad_L": [
+      -1.85,
+      16.9,
+      0.089
+    ],
+    "Elbow_L": [
+      -3.384,
+      13.85,
+      0.406
+    ],
+    "Wrist_L": [
+      -4.396,
+      10.85,
+      -0.588
+    ],
+    "Hip_L": [
+      -1.298,
+      11.0,
+      -0.009
+    ],
+    "Knee_L": [
+      -1.521,
+      7.2,
+      -0.116
+    ],
+    "Ankle_L": [
+      -1.847,
+      1.55,
+      0.405
+    ]
+  },
+  "hierarchy": {
+    "Pelvis": null,
+    "Torso": "Pelvis",
+    "Head": "Torso",
+    "Wing_L": "Torso",
+    "Wing_R": "Torso",
+    "ShoulderPad_L": "Torso",
+    "ShoulderPad_R": "Torso",
+    "UpperArm_L": "Torso",
+    "UpperArm_R": "Torso",
+    "Forearm_L": "UpperArm_L",
+    "Forearm_R": "UpperArm_R",
+    "Hand_L": "Forearm_L",
+    "Hand_R": "Forearm_R",
+    "Thigh_L": "Pelvis",
+    "Thigh_R": "Pelvis",
+    "Shin_L": "Thigh_L",
+    "Shin_R": "Thigh_R",
+    "Foot_L": "Shin_L",
+    "Foot_R": "Shin_R"
+  },
+  "joint_of_part": {
+    "Torso": "Waist",
+    "Head": "Neck",
+    "Wing_L": "WingRoot_L",
+    "Wing_R": "WingRoot_R",
+    "ShoulderPad_L": "ShoulderPad_L",
+    "ShoulderPad_R": "ShoulderPad_R",
+    "UpperArm_L": "Shoulder_L",
+    "UpperArm_R": "Shoulder_R",
+    "Forearm_L": "Elbow_L",
+    "Forearm_R": "Elbow_R",
+    "Hand_L": "Wrist_L",
+    "Hand_R": "Wrist_R",
+    "Thigh_L": "Hip_L",
+    "Thigh_R": "Hip_R",
+    "Shin_L": "Knee_L",
+    "Shin_R": "Knee_R",
+    "Foot_L": "Ankle_L",
+    "Foot_R": "Ankle_R"
+  },
+  "wing_axes": {
+    "flap": "about +Z through WingRoot (positive = tip swings up/out on the R wing; mirror for L)",
+    "fold": "about +Y through WingRoot (swings the panel back along the body)"
+  }
+}
