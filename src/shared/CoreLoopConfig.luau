@@ -52,7 +52,7 @@ CoreLoopConfig.Battery = {
 	IdleDelay = 1.8,
 	BaseCharge = 45, -- per second on your base pad (the charger)
 	SprintDrain = 7, -- per second while sprinting and moving
-	CarryDrain = 1.5, -- per second while carrying cargo
+	CarryDrain = 0.6, -- per second while carrying cargo
 	-- scrap shop at the charger: +Step max battery per purchase
 	ShopStep = 20,
 	ShopCosts = { 40, 80, 140, 220, 320, 450, 600 },
