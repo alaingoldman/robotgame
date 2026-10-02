@@ -179,7 +179,7 @@ def build_chest():
     # COCKPIT: the core is hollowed in front for the chest cockpit (the front plates are the
     # "hatch" segment): back block, plus full-depth top (under the collar) and floor slabs
     add(seg, "darkgrey", box(-2.95, 2.95, 8.65, 12.45, 0.3, 1.5, 0.2))
-    add(seg, "darkgrey", box(-2.95, 2.95, 10.95, 12.45, -1.1, 0.35, 0.2))
+    add(seg, "darkgrey", box(-2.95, 2.95, 11.8, 12.45, -1.1, 0.35, 0.2))  # roof high (H 9.63 studs): headroom behind the yoke / collar
     add(seg, "darkgrey", box(-2.95, 2.95, 8.65, 8.98, -1.1, 0.35, 0.1))
     # --- grey neck collar ring around the neck socket (259: grey neck x 262..309, y 150..170)
     rings = [oct_ring(0, 12.2, 0.95, -0.75, 0.95, 0.35), oct_ring(0, 12.75, 0.95, -0.75, 0.95, 0.35),
