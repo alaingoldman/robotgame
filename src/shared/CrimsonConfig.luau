@@ -65,10 +65,12 @@ CrimsonConfig.Pivots = {
 	Elbow = { Right = Vector3.new(6.066, 13.85, 0.367), Left = Vector3.new(-6.027, 13.85, 0.34) },
 	Wrist = { Right = Vector3.new(6.903, 9.95, 0.048), Left = Vector3.new(-6.886, 9.95, 0.059) },
 	Hip = { Right = Vector3.new(2.334, 12.2, 0.07), Left = Vector3.new(-2.314, 12.2, 0.111) },
-	-- the knee hinge is at the FRONT of the knee (meta.json has the centre,
-	-- z 0.1): bent, the front stays closed and the flat cut caps turn into the
-	-- leg instead of facing out (the back of the knee folds inside the meshes)
-	Knee = { Right = Vector3.new(2.581, 7.85, -1.5), Left = Vector3.new(-2.522, 7.85, -1.5) },
+	-- the knee hinge sits toward the FRONT of the knee (meta.json has the
+	-- centre, z 0.1; the thigh front is at about z -2.1 there): bent, the front
+	-- stays closed and the flat cut caps fold into the leg instead of facing
+	-- out (the back of the knee folds inside the meshes). Further forward, the
+	-- shin's top cap pokes through the thigh's recessed lower front.
+	Knee = { Right = Vector3.new(2.581, 7.85, -1.0), Left = Vector3.new(-2.522, 7.85, -1.0) },
 	Ankle = { Right = Vector3.new(3.601, 1.95, 0.308), Left = Vector3.new(-3.621, 1.95, 0.307) },
 }
 
@@ -88,7 +90,7 @@ CrimsonConfig.Blade = {
 	Yaw = 0.06, -- tip a little outward
 	-- the second blade, arm-mounted on the outside of the left forearm, tip down
 	ArmMount = true,
-	ArmOffset = Vector3.new(-2.1, -0.4, 0.15), -- from the left elbow pivot (model space)
+	ArmOffset = Vector3.new(-2.1, 0.0, 0.15), -- from the left elbow pivot (model space)
 	ArmTilt = 0.04, -- tip out from the forearm (radians)
 }
 
@@ -108,8 +110,8 @@ CrimsonConfig.PilotScale = 0.5 -- the stand-in pilot seated in the pod
 -- to a reverse grip standing up along the right forearm, the arm blade's
 -- tip resting on the floor by the left foot.
 CrimsonConfig.Kneel = {
-	KneeClear = 1.0, -- right knee hinge (near the front of the knee) above the ground: the knee front on the floor
-	ThighLean = 0.05, -- right thigh tipped forward (radians)
+	KneeClear = 1.15, -- right knee hinge (towards the front of the knee) above the ground: the knee front on the floor
+	ThighLean = 0.15, -- right thigh tipped forward (radians)
 	PelvisBack = 0.4,
 	LeftForward = 4.6, -- left ankle ahead of its hip (studs): the shin about vertical
 	LeftOut = 0.2,
@@ -118,7 +120,7 @@ CrimsonConfig.Kneel = {
 	RightFootLift = 2.5, -- ankle raised so the toe-down foot stands on its toe
 	RightFootPitch = -1.1, -- toe tucked down under the ankle
 	StepLift = 1.6,
-	Lean = 0.12, -- torso pitch forward
+	Lean = 0.2, -- torso pitch forward
 	Neck = -0.2,
 	LeftShoulder = 0.45,
 	LeftRoll = 0.06, -- out, clear of the raised left thigh
