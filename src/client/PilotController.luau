@@ -26,6 +26,7 @@ local Type99Animator = require(script.Parent.Type99Animator)
 local TitanAnimator = require(script.Parent.TitanAnimator) -- BRZ-01 jump windup / airborne / landing
 local KnightAnimator = require(script.Parent.KnightAnimator) -- VK-01 airborne / landing / footsteps
 local GunnerAnimator = require(script.Parent.GunnerAnimator) -- GR-07 airborne / landing / footsteps
+local Mech2Animator = require(script.Parent.Mech2Animator) -- PLD-02 jump windup / airborne / landing / footsteps
 local MechConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechConfig"))
 local MechTypes = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("MechTypes"))
 
@@ -121,6 +122,9 @@ local function jumpOf(model: Model?): (number, number)
 	if isTitan(model) then
 		return MechConfig.JumpPower, TitanAnimator.JumpWindup -- deeper crouch before the legs fire
 	end
+	if model ~= nil and MechTypes.idOf(model) == "Mech2" then
+		return MechConfig.JumpPower, Mech2Animator.JumpWindup
+	end
 	return MechConfig.JumpPower, MechConfig.JumpWindup
 end
 
@@ -134,6 +138,8 @@ local function isAirborne(model: Model): boolean
 		return KnightAnimator.isAirborne(model)
 	elseif id == "Gunner" then
 		return GunnerAnimator.isAirborne(model)
+	elseif id == "Mech2" then
+		return Mech2Animator.isAirborne(model)
 	end
 	return if isType99(model) then Type99Animator.isAirborne(model) else MechAnimator.isAirborne(model)
 end
@@ -199,6 +205,8 @@ local function onJumpAction(_: string, state: Enum.UserInputState)
 			KnightAnimator.windup(model)
 		elseif MechTypes.idOf(model) == "Gunner" then
 			GunnerAnimator.windup(model)
+		elseif MechTypes.idOf(model) == "Mech2" then
+			Mech2Animator.windup(model)
 		else
 			MechAnimator.windup(model)
 		end
@@ -466,8 +474,8 @@ function PilotController.start()
 		end
 	end)
 
-	-- VK-01 / GR-07 animators: footfall shake and landing thumps
-	for _, anim in { KnightAnimator, GunnerAnimator } :: { any } do
+	-- VK-01 / GR-07 / PLD-02 animators: footfall shake and landing thumps
+	for _, anim in { KnightAnimator, GunnerAnimator, Mech2Animator } :: { any } do
 		anim.onFootstep(function(model: Model, _side: string)
 			if model == current then
 				shake = math.max(shake, if sprinting then 0.5 else 0.35)

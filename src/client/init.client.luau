@@ -25,6 +25,9 @@ require(script.PlaceholderPilot).start()
 -- BRZ-01 Titan (assembled mech): animation / lights / battery cells, boarding camera
 require(script.TitanAnimator).start()
 require(script.TitanPilot).start()
+-- PLD-02 (mech2, imported meshes): animation / battery cells / dock arc / hidden pilot, boarding camera
+require(script.Mech2Animator).start()
+require(script.Mech2Pilot).start()
 CordController.Snapped:Connect(BatteryHud.cordSnapped)
 Type99CableController.Ejected:Connect(BatteryHud.cordSnapped)
 -- EXO-1 exoskeleton: light pulse, pistons, hoisted frame walk, debug key

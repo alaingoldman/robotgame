@@ -1,6 +1,6 @@
 --!strict
 -- Mech type registry. Every mech model carries a "MechType" attribute
--- ("HWM04B", "Type99", "Knight", "Gunner" or "Titan"; missing = "HWM04B"); shared code looks up the
+-- ("HWM04B", "Type99", "Knight", "Gunner", "Titan" or "Mech2"; missing = "HWM04B"); shared code looks up the
 -- builder, pose module and per-type behavior here instead of assuming the
 -- HWM-04B.
 --
@@ -28,6 +28,11 @@ local TitanBuilder = require(script.Parent.TitanBuilder)
 local TitanPose = require(script.Parent.TitanPose)
 local TitanDock = require(script.Parent.TitanDock)
 local TitanConfig = require(script.Parent.TitanConfig)
+-- PLD-02 "Paladin" (mech2, imported meshes): Mech2Builder / Mech2Pose / Mech2Dock / Mech2Config
+local Mech2Builder = require(script.Parent.Mech2Builder)
+local Mech2Pose = require(script.Parent.Mech2Pose)
+local Mech2Dock = require(script.Parent.Mech2Dock)
+local Mech2Config = require(script.Parent.Mech2Config)
 
 local MechTypes = {}
 
@@ -174,6 +179,35 @@ MechTypes.Types = {
 		chargeRate = TitanDock.ChargeRate,
 		variantName = function(variantId: string): string
 			return TitanConfig.getVariant(variantId).displayName
+		end,
+	},
+	-- PLD-02 "Paladin" (Mech2Builder / Mech2Pose / Mech2Animator / Mech2Pilot)
+	Mech2 = {
+		id = Mech2Builder.TypeId,
+		displayName = Mech2Builder.DisplayName,
+		Builder = Mech2Builder,
+		Pose = Mech2Pose,
+		rootHeight = Mech2Builder.RootHeight,
+		hasCord = false, -- charges from its dock post (Mech2Dock)
+		hwmAnimator = false, -- Mech2Animator
+		cinematicBoarding = false, -- instant seat-in (head cockpit) + Mech2Pilot camera move
+		promptPoint = function(rootCF: CFrame, _style: string?): Vector3
+			return Mech2Builder.offPoints(rootCF).prompt
+		end,
+		applyPowerPose = function(model: Model, motors: { [string]: Motor6D })
+			local crouch, canopy = Mech2Pose.powerTargets(model)
+			Mech2Pose.applyStatic(motors, crouch, canopy)
+		end,
+		applyOff = function(motors: { [string]: Motor6D }, _style: string?)
+			Mech2Pose.applyOff(motors)
+		end,
+		buildDock = function(home: CFrame, parent: Instance)
+			Mech2Dock.buildDock(home, parent)
+		end,
+		updatePlug = Mech2Dock.updatePlug,
+		chargeRate = Mech2Dock.ChargeRate,
+		variantName = function(variantId: string): string
+			return Mech2Config.getVariant(variantId).displayName
 		end,
 	},
 } :: { [string]: TypeDef }

@@ -30,6 +30,7 @@ local Type99Charger = require(Shared:WaitForChild("Type99Charger"))
 local KnightBuilder = require(Shared:WaitForChild("KnightBuilder"))
 local GunnerBuilder = require(Shared:WaitForChild("GunnerBuilder"))
 local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
+local Mech2Config = require(Shared:WaitForChild("Mech2Config"))
 
 local MechService = {}
 
@@ -151,6 +152,11 @@ local function buildSpecs(): { SpawnSpec }
 	-- failing build of the (still evolving) assembled mech can't stop the rest.
 	for _, t in TitanConfig.Lineup do
 		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), pattern = t.pattern, mechType = TitanConfig.TypeId })
+	end
+	-- PLD-02s (Mech2Config.Lineup): left of the GR-07 block; built from the
+	-- imported meshes (loaded on demand), so last as well
+	for _, t in Mech2Config.Lineup do
+		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), mechType = Mech2Config.TypeId })
 	end
 	return specs
 end
