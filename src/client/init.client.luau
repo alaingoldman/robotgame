@@ -29,3 +29,5 @@ CordController.Snapped:Connect(BatteryHud.cordSnapped)
 Type99CableController.Ejected:Connect(BatteryHud.cordSnapped)
 -- EXO-1 exoskeleton: light pulse, pistons, hoisted frame walk, debug key
 require(script.ExoAnimator).start()
+-- Core gameplay loop: attack / sprint, HUD, part locker, loot + crate visuals (CoreLoop / CoreLoopConfig)
+task.spawn(require(script.CoreLoop).start)

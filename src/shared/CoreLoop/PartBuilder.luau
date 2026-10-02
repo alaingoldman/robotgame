@@ -571,8 +571,8 @@ function PartBuilder.weapon(id: string): Model
 		edge.CastShadow = false
 		add(ctx, handle, "Block", Vector3.new(0.14, 0.9, 0.3), H * CFrame.new(0, -1.0, 0.18), Color3.fromRGB(140, 78, 48), Enum.Material.CorrodedMetal, "Patch")
 	elseif id == "Hammer" then
-		add(ctx, handle, "Cyl", Vector3.new(2.6, 0.28, 0.28), H * CFrame.new(0, -1.3, 0) * CFrame.Angles(0, 0, math.pi / 2), Color3.fromRGB(70, 72, 76), Enum.Material.Metal, "Shaft")
-		local headCF = H * CFrame.new(0, -2.75, 0)
+		add(ctx, handle, "Cyl", Vector3.new(1.9, 0.28, 0.28), H * CFrame.new(0, -0.95, 0) * CFrame.Angles(0, 0, math.pi / 2), Color3.fromRGB(70, 72, 76), Enum.Material.Metal, "Shaft")
+		local headCF = H * CFrame.new(0, -2.15, 0)
 		add(ctx, handle, "Block", Vector3.new(1.0, 1.1, 1.9), headCF, Color3.fromRGB(62, 65, 70), Enum.Material.DiamondPlate, "Head")
 		add(ctx, handle, "Cyl", Vector3.new(0.5, 1.15, 1.15), headCF * CFrame.new(0, 0, -1.15) * CFrame.Angles(0, math.pi / 2, 0), Color3.fromRGB(150, 155, 160), Enum.Material.Metal, "Face")
 		add(ctx, handle, "Cyl", Vector3.new(0.3, 0.7, 0.7), headCF * CFrame.new(0, 0, 1.05) * CFrame.Angles(0, math.pi / 2, 0), Color3.fromRGB(236, 205, 40), Enum.Material.Metal, "Piston")
