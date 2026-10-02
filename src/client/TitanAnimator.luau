@@ -442,10 +442,10 @@ local function standPose(st: State, now: number): { [string]: CFrame }
 
 	local L, R = rig.legs.Left, rig.legs.Right
 	if L then
-		TitanPose.legIK(rig, "Left", L.ankle + Vector3.new(0, yl, zl), pelvis, 0, 0.3 * sl - 0.1 * a * math.max(0, zl / math.max(travel, 1e-3)), pose)
+		TitanPose.legIK(rig, "Left", L.ankle + Vector3.new(0, yl, zl), pelvis, 0, 0.3 * sl - 0.1 * a * math.max(0, zl / math.max(travel, 1e-3)), pose, true)
 	end
 	if R then
-		TitanPose.legIK(rig, "Right", R.ankle + Vector3.new(0, yr, zr), pelvis, 0, 0.3 * sr - 0.1 * a * math.max(0, zr / math.max(travel, 1e-3)), pose)
+		TitanPose.legIK(rig, "Right", R.ankle + Vector3.new(0, yr, zr), pelvis, 0, 0.3 * sr - 0.1 * a * math.max(0, zr / math.max(travel, 1e-3)), pose, true)
 	end
 
 	-- torso: counter-twist against the hips, lean at a run, breathing

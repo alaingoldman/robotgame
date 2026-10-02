@@ -13,7 +13,7 @@
 --
 --   TitanPose.rig(motors)         rest data measured from the motors (cached)
 --   TitanPose.apply(motors, pose) writes a pose (rel table) to the Transforms
---   TitanPose.legIK(rig, side, ankleTarget, pelvisRel, yaw, footPitch, pose)
+--   TitanPose.legIK(rig, side, ankleTarget, pelvisRel, yaw, footPitch, pose, lateral?)
 --   TitanPose.kneel(rig, k)       the powered-down one-knee kneel, 0..1
 --   TitanPose.setHatch(motors, h) chest hatch 0 shut .. 1 open
 --   TitanPose.powerTargets(model) kneel / hatch / light from PowerState
@@ -138,7 +138,7 @@ end
 -- `pelvisRel` = the pose's Root rel (pelvis offset + rotation about its own
 -- origin), `yaw` turns the leg plane out, `foot` = the foot's pitch relative
 -- to the ground (0 = flat, positive = toe up). Writes Hip / Knee / Ankle.
-function TitanPose.legIK(rig: Rig, side: string, ankle: Vector3, pelvisRel: CFrame, yaw: number, foot: number, pose: { [string]: CFrame })
+function TitanPose.legIK(rig: Rig, side: string, ankle: Vector3, pelvisRel: CFrame, yaw: number, foot: number, pose: { [string]: CFrame }, lateral: boolean?)
 	local leg = rig.legs[side]
 	if not leg then
 		return
@@ -148,6 +148,15 @@ function TitanPose.legIK(rig: Rig, side: string, ankle: Vector3, pelvisRel: CFra
 	local hipWorld = rig.pelvis + pelvisRel.Position + (pr * (leg.hip - rig.pelvis)) :: Vector3
 	local v = (pr:Inverse() * (ankle - hipWorld)) :: Vector3 -- pelvis frame
 	v = (CFrame.Angles(0, -yaw, 0) * v) :: Vector3
+	-- `lateral`: a hip roll takes the sideways part (pelvis sway / roll over
+	-- the planted foot) so a planted foot doesn't slip sideways; the planar
+	-- IK does the rest (the kneel poses stay planar)
+	local roll = 0
+	if lateral then
+		local rest = leg.ankle - leg.hip
+		roll = math.atan2(v.X, -v.Y) - math.atan2(rest.X, -rest.Y)
+		v = (CFrame.Angles(0, 0, -roll) * v) :: Vector3
+	end
 	local p = Vector2.new(v.Y, v.Z)
 	local l1, l2 = leg.l1, leg.l2
 	local d = math.clamp(p.Magnitude, math.abs(l1 - l2) + 1e-3, l1 + l2 - 1e-3)
@@ -155,11 +164,11 @@ function TitanPose.legIK(rig: Rig, side: string, ankle: Vector3, pelvisRel: CFra
 	local thigh = math.atan2(-v.Z, -v.Y) + spread
 	local kneeY, kneeZ = -l1 * math.cos(thigh), -l1 * math.sin(thigh)
 	local shin = math.atan2(-(v.Z - kneeZ), -(v.Y - kneeY))
-	local yawCF = CFrame.Angles(0, yaw, 0)
+	local yawCF = CFrame.Angles(0, yaw, 0) * CFrame.Angles(0, 0, roll)
 	local aThigh = yawCF * CFrame.Angles(thigh - leg.t0, 0, 0)
 	local aShin = yawCF * CFrame.Angles(shin - leg.s0, 0, 0)
 	-- foot: level with the ground (undo the pelvis rotation), then pitched
-	local aFoot = pr:Inverse() * yawCF * CFrame.Angles(foot, 0, 0)
+	local aFoot = pr:Inverse() * CFrame.Angles(0, yaw, 0) * CFrame.Angles(foot, 0, 0)
 	pose[side .. "Hip"] = aThigh
 	pose[side .. "Knee"] = aThigh:Inverse() * aShin
 	pose[side .. "Ankle"] = aShin:Inverse() * aFoot
