@@ -1,6 +1,6 @@
 --!strict
 -- Mech type registry. Every mech model carries a "MechType" attribute
--- ("HWM04B", "Type99", "Knight", "Gunner", "Titan" or "Mech2"; missing = "HWM04B"); shared code looks up the
+-- ("HWM04B", "Type99", "Knight", "Gunner", "Titan", "Mech2" or "Crimson"; missing = "HWM04B"); shared code looks up the
 -- builder, pose module and per-type behavior here instead of assuming the
 -- HWM-04B.
 --
@@ -33,6 +33,11 @@ local Mech2Builder = require(script.Parent.Mech2Builder)
 local Mech2Pose = require(script.Parent.Mech2Pose)
 local Mech2Dock = require(script.Parent.Mech2Dock)
 local Mech2Config = require(script.Parent.Mech2Config)
+-- CRM-01 "Crimson" (owner's textured meshes): CrimsonBuilder / CrimsonPose / CrimsonDock / CrimsonConfig
+local CrimsonBuilder = require(script.Parent.CrimsonBuilder)
+local CrimsonPose = require(script.Parent.CrimsonPose)
+local CrimsonDock = require(script.Parent.CrimsonDock)
+local CrimsonConfig = require(script.Parent.CrimsonConfig)
 
 local MechTypes = {}
 
@@ -208,6 +213,35 @@ MechTypes.Types = {
 		chargeRate = Mech2Dock.ChargeRate,
 		variantName = function(variantId: string): string
 			return Mech2Config.getVariant(variantId).displayName
+		end,
+	},
+	-- CRM-01 "Crimson" (CrimsonBuilder / CrimsonPose / CrimsonAnimator / CrimsonPilot)
+	Crimson = {
+		id = CrimsonBuilder.TypeId,
+		displayName = CrimsonBuilder.DisplayName,
+		Builder = CrimsonBuilder,
+		Pose = CrimsonPose,
+		rootHeight = CrimsonBuilder.RootHeight,
+		hasCord = false, -- charges from its dock post (CrimsonDock)
+		hwmAnimator = false, -- CrimsonAnimator
+		cinematicBoarding = false, -- instant seat-in (back pod) + CrimsonPilot camera move
+		promptPoint = function(rootCF: CFrame, _style: string?): Vector3
+			return CrimsonBuilder.offPoints(rootCF).prompt
+		end,
+		applyPowerPose = function(model: Model, motors: { [string]: Motor6D })
+			local kneel, hatch = CrimsonPose.powerTargets(model)
+			CrimsonPose.applyStatic(motors, kneel, hatch)
+		end,
+		applyOff = function(motors: { [string]: Motor6D }, _style: string?)
+			CrimsonPose.applyOff(motors)
+		end,
+		buildDock = function(home: CFrame, parent: Instance)
+			CrimsonDock.buildDock(home, parent)
+		end,
+		updatePlug = CrimsonDock.updatePlug,
+		chargeRate = CrimsonDock.ChargeRate,
+		variantName = function(variantId: string): string
+			return CrimsonConfig.getVariant(variantId).displayName
 		end,
 	},
 } :: { [string]: TypeDef }

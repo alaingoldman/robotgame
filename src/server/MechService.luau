@@ -31,6 +31,7 @@ local KnightBuilder = require(Shared:WaitForChild("KnightBuilder"))
 local GunnerBuilder = require(Shared:WaitForChild("GunnerBuilder"))
 local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
 local Mech2Config = require(Shared:WaitForChild("Mech2Config"))
+local CrimsonConfig = require(Shared:WaitForChild("CrimsonConfig"))
 
 local MechService = {}
 
@@ -157,6 +158,11 @@ local function buildSpecs(): { SpawnSpec }
 	-- imported meshes (loaded on demand), so last as well
 	for _, t in Mech2Config.Lineup do
 		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), mechType = Mech2Config.TypeId })
+	end
+	-- CRM-01 Crimson (CrimsonConfig.Lineup): left of the PLD-02s; textured
+	-- meshes loaded on demand, so last as well
+	for _, t in CrimsonConfig.Lineup do
+		table.insert(specs, { key = t.key, variantId = t.variantId, home = facingSpawn(t.x, t.z), mechType = CrimsonConfig.TypeId })
 	end
 	return specs
 end
