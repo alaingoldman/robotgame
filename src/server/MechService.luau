@@ -233,6 +233,15 @@ local function setupCollisionGroups()
 	for _, other in { cord, armor, root, players, pilot } do
 		PhysicsService:CollisionGroupSetCollidable(cord, other, false)
 	end
+	-- the WTK-99 charger's invisible block stops walker roots only
+	local block = Type99Charger.BlockGroup
+	if not PhysicsService:IsCollisionGroupRegistered(block) then
+		PhysicsService:RegisterCollisionGroup(block)
+	end
+	for _, other in { "Default", cord, armor, players, pilot, block } do
+		PhysicsService:CollisionGroupSetCollidable(block, other, false)
+	end
+	PhysicsService:CollisionGroupSetCollidable(block, root, true)
 end
 
 -- The group a character's parts belong in: "Pilot" while strapped into a seat.

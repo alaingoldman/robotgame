@@ -17,6 +17,8 @@
 -- Type99CableController (client) animates them; MechService.buildPreview
 -- places them statically; MechBattery uses portCFrame / glandCenter / reach.
 
+local PhysicsService = game:GetService("PhysicsService")
+
 local MechConfig = require(script.Parent.MechConfig)
 local MechTypes = require(script.Parent.MechTypes)
 
@@ -28,6 +30,12 @@ local R = D / 2
 
 Type99Charger.TypeId = "Type99"
 Type99Charger.Group = "MechCord" -- collides with the world only (see MechService)
+-- invisible block round the charger that only walker roots collide with, so a
+-- walker can't back up over / through its charger (MechService registers it)
+Type99Charger.BlockGroup = "ChargerBlock"
+local BLOCK_REACH = 4.6 -- reaches out toward the walker past the box (before the charger's ScaleTo CS)
+local BLOCK_MARGIN = 1.2
+local BLOCK_HEIGHT = 20 -- x CS: above the walker's root box
 Type99Charger.Diameter = D
 
 local SLATE = Color3.fromRGB(92, 99, 102)
@@ -357,6 +365,16 @@ function Type99Charger.buildCharger(home: CFrame, parent: Instance): Model
 	add("Conduit", CYL, Vector3.new(4.0, 0.8, 0.8), Vector3.new(-1.4, PLINTH_H + 2.0, D_BOX / 2 + 0.4), DARK, METAL, false, ALONG_Y)
 	add("ConduitBox", BLOCK, Vector3.new(1.2, 1.0, 0.6), Vector3.new(-1.4, PLINTH_H + 4.1, D_BOX / 2 + 0.3), SLATE_DARK, METAL, false)
 
+	-- walker block (see BlockGroup): invisible, collides with mech roots only
+	local depth = D_BOX + BLOCK_MARGIN * 2 + BLOCK_REACH
+	local blocker = add("WalkerBlock", BLOCK, Vector3.new(W + BLOCK_MARGIN * 2, BLOCK_HEIGHT, depth), Vector3.new(0, BLOCK_HEIGHT / 2, D_BOX / 2 + BLOCK_MARGIN - depth / 2), DARK, SMOOTH, false)
+	blocker.Transparency = 1
+	blocker.CastShadow = false
+	blocker.CanTouch = false
+	if PhysicsService:IsCollisionGroupRegistered(Type99Charger.BlockGroup) then
+		blocker.CollisionGroup = Type99Charger.BlockGroup
+		blocker.CanCollide = true
+	end
 	model.PrimaryPart = model:FindFirstChild("Body") :: BasePart
 	model.WorldPivot = cf
 	model:ScaleTo(CS)
