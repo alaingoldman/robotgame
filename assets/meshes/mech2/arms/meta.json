@@ -1,0 +1,2647 @@
+{
+ "name": "mech2_arms",
+ "units": "studs",
+ "cell_studs": 0.816,
+ "frame": "per arm: origin = shoulder ball centre, +Y up, -Z forward, R arm outward = +X, L arm outward = -X",
+ "rest_pose": "arm hanging straight down; reference A-pose (261.png back view): shoulder roll ~19-22 deg outward, elbow ~-3..-6 deg (renders/iou.json); the arm silhouette puts the R shoulder ball centre ~(3.5, 9.2, -) studs from the hip-line centre",
+ "uv": "planar per facet group, 1 repeat = 4 studs, Roblox box-mapping orientation (meshlib.py)",
+ "colours": {
+  "White": {
+   "rgb": [
+    242,
+    242,
+    242
+   ],
+   "hex": "#F2F2F2"
+  },
+  "Gold": {
+   "rgb": [
+    212,
+    169,
+    58
+   ],
+   "hex": "#D4A93A"
+  },
+  "Blue": {
+   "rgb": [
+    47,
+    111,
+    191
+   ],
+   "hex": "#2F6FBF"
+  },
+  "Grey": {
+   "rgb": [
+    138,
+    138,
+    138
+   ],
+   "hex": "#8A8A8A"
+  },
+  "DarkGrey": {
+   "rgb": [
+    90,
+    90,
+    90
+   ],
+   "hex": "#5A5A5A"
+  }
+ },
+ "arms": {
+  "R": {
+   "segments": {
+    "Upper": {
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint": "ball",
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Upper_Grey.obj",
+       "colour": "Grey",
+       "tris": 1292,
+       "open_edges": 0,
+       "uv_max_stretch": 1.188,
+       "uv_islands": 66,
+       "bbox_min": [
+        -0.72,
+        -3.85,
+        -0.72
+       ],
+       "bbox_max": [
+        0.72,
+        0.65,
+        0.72
+       ],
+       "bbox_centre": [
+        0.0,
+        -1.6,
+        0.0
+       ],
+       "size": [
+        1.44,
+        4.5,
+        1.44
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Upper_White.obj",
+       "colour": "White",
+       "tris": 92,
+       "open_edges": 0,
+       "uv_max_stretch": 1.021,
+       "uv_islands": 26,
+       "bbox_min": [
+        -0.78,
+        -2.7,
+        -0.75
+       ],
+       "bbox_max": [
+        0.98,
+        -0.55,
+        0.75
+       ],
+       "bbox_centre": [
+        0.1,
+        -1.625,
+        0.0
+       ],
+       "size": [
+        1.76,
+        2.15,
+        1.5
+       ]
+      }
+     ]
+    },
+    "Lower": {
+     "parent": "Upper",
+     "pivot": [
+      0.0,
+      -3.13,
+      0.0
+     ],
+     "joint": "ball (elbow; hinge axis +X = flex forward)",
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Lower_White.obj",
+       "colour": "White",
+       "tris": 1642,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 66,
+       "bbox_min": [
+        -0.82,
+        -7.515,
+        -0.83
+       ],
+       "bbox_max": [
+        1.6163,
+        -2.88,
+        1.2621
+       ],
+       "bbox_centre": [
+        0.3982,
+        -5.1975,
+        0.2161
+       ],
+       "size": [
+        2.4363,
+        4.635,
+        2.0921
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Lower_Gold.obj",
+       "colour": "Gold",
+       "tris": 288,
+       "open_edges": 0,
+       "uv_max_stretch": 1.146,
+       "uv_islands": 17,
+       "bbox_min": [
+        -0.5,
+        -6.39,
+        -0.855
+       ],
+       "bbox_max": [
+        1.6106,
+        -3.93,
+        1.2848
+       ],
+       "bbox_centre": [
+        0.5553,
+        -5.16,
+        0.2149
+       ],
+       "size": [
+        2.1106,
+        2.46,
+        2.1398
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Lower_Grey.obj",
+       "colour": "Grey",
+       "tris": 304,
+       "open_edges": 0,
+       "uv_max_stretch": 1.163,
+       "uv_islands": 97,
+       "bbox_min": [
+        -0.6,
+        -6.77,
+        -0.58
+       ],
+       "bbox_max": [
+        1.4011,
+        -3.48,
+        0.58
+       ],
+       "bbox_centre": [
+        0.4006,
+        -5.125,
+        0.0
+       ],
+       "size": [
+        2.0011,
+        3.29,
+        1.16
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Lower_DarkGrey.obj",
+       "colour": "DarkGrey",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.042,
+       "uv_islands": 18,
+       "bbox_min": [
+        -0.29,
+        -6.96,
+        -0.45
+       ],
+       "bbox_max": [
+        0.71,
+        -6.73,
+        0.45
+       ],
+       "bbox_centre": [
+        0.21,
+        -6.845,
+        0.0
+       ],
+       "size": [
+        1.0,
+        0.23,
+        0.9
+       ]
+      }
+     ]
+    },
+    "Hand": {
+     "parent": "Lower",
+     "pivot": [
+      0.3,
+      -6.93,
+      0.0
+     ],
+     "joint": "ball (wrist)",
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Hand_White.obj",
+       "colour": "White",
+       "tris": 136,
+       "open_edges": 0,
+       "uv_max_stretch": 1.111,
+       "uv_islands": 30,
+       "bbox_min": [
+        0.03,
+        -7.87,
+        -0.64
+       ],
+       "bbox_max": [
+        0.76,
+        -6.98,
+        0.64
+       ],
+       "bbox_centre": [
+        0.395,
+        -7.425,
+        0.0
+       ],
+       "size": [
+        0.73,
+        0.89,
+        1.28
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Hand_Grey.obj",
+       "colour": "Grey",
+       "tris": 396,
+       "open_edges": 0,
+       "uv_max_stretch": 1.146,
+       "uv_islands": 63,
+       "bbox_min": [
+        -0.12,
+        -7.965,
+        -0.655
+       ],
+       "bbox_max": [
+        0.5925,
+        -6.83,
+        0.64
+       ],
+       "bbox_centre": [
+        0.2362,
+        -7.3975,
+        -0.0075
+       ],
+       "size": [
+        0.7125,
+        1.135,
+        1.295
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Hand_DarkGrey.obj",
+       "colour": "DarkGrey",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.0,
+       "uv_islands": 26,
+       "bbox_min": [
+        -0.01,
+        -7.75,
+        -0.5
+       ],
+       "bbox_max": [
+        0.15,
+        -7.16,
+        0.5
+       ],
+       "bbox_centre": [
+        0.07,
+        -7.455,
+        0.0
+       ],
+       "size": [
+        0.16,
+        0.59,
+        1.0
+       ]
+      }
+     ]
+    },
+    "Index1": {
+     "parent": "Hand",
+     "pivot": [
+      0.36,
+      -7.87,
+      -0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 4,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Index1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        0.1815,
+        -8.4487,
+        -0.61
+       ],
+       "bbox_max": [
+        0.546,
+        -7.8226,
+        -0.35
+       ],
+       "bbox_centre": [
+        0.3638,
+        -8.1356,
+        -0.48
+       ],
+       "size": [
+        0.3646,
+        0.6262,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Index1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        0.2352,
+        -8.5195,
+        -0.63
+       ],
+       "bbox_max": [
+        0.4052,
+        -8.3578,
+        -0.33
+       ],
+       "bbox_centre": [
+        0.3202,
+        -8.4386,
+        -0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Index2": {
+     "parent": "Index1",
+     "pivot": [
+      0.3202388099658486,
+      -8.4386115086481,
+      -0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 36,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Index2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.0944,
+        -8.9302,
+        -0.61
+       ],
+       "bbox_max": [
+        0.4593,
+        -8.3385,
+        -0.35
+       ],
+       "bbox_centre": [
+        0.1824,
+        -8.6344,
+        -0.48
+       ],
+       "size": [
+        0.5538,
+        0.5916,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Index2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.099,
+        -8.9178,
+        -0.63
+       ],
+       "bbox_max": [
+        0.071,
+        -8.7561,
+        -0.33
+       ],
+       "bbox_centre": [
+        -0.014,
+        -8.837,
+        -0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Index3": {
+     "parent": "Index2",
+     "pivot": [
+      -0.014010747071151852,
+      -8.836954619069967,
+      -0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 12,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Index3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.3754,
+        -9.1448,
+        -0.61
+       ],
+       "bbox_max": [
+        0.1086,
+        -8.7272,
+        -0.35
+       ],
+       "bbox_centre": [
+        -0.1334,
+        -8.936,
+        -0.48
+       ],
+       "size": [
+        0.484,
+        0.4176,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Middle1": {
+     "parent": "Hand",
+     "pivot": [
+      0.36,
+      -7.87,
+      -0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 5,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Middle1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        0.173,
+        -8.4505,
+        -0.29
+       ],
+       "bbox_max": [
+        0.5449,
+        -7.8207,
+        -0.03
+       ],
+       "bbox_centre": [
+        0.3589,
+        -8.1356,
+        -0.16
+       ],
+       "size": [
+        0.3719,
+        0.6297,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Middle1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        0.2253,
+        -8.5187,
+        -0.31
+       ],
+       "bbox_max": [
+        0.3953,
+        -8.357,
+        -0.01
+       ],
+       "bbox_centre": [
+        0.3103,
+        -8.4378,
+        -0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Middle2": {
+     "parent": "Middle1",
+     "pivot": [
+      0.3103212266338348,
+      -8.437830977912295,
+      -0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 37,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Middle2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.1157,
+        -8.9213,
+        -0.29
+       ],
+       "bbox_max": [
+        0.4471,
+        -8.3358,
+        -0.03
+       ],
+       "bbox_centre": [
+        0.1657,
+        -8.6286,
+        -0.16
+       ],
+       "size": [
+        0.5627,
+        0.5855,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Middle2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.1226,
+        -8.9051,
+        -0.31
+       ],
+       "bbox_max": [
+        0.0474,
+        -8.7434,
+        -0.01
+       ],
+       "bbox_centre": [
+        -0.0376,
+        -8.8243,
+        -0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Middle3": {
+     "parent": "Middle2",
+     "pivot": [
+      -0.03762668867277147,
+      -8.82426628716054,
+      -0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 13,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Middle3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.4083,
+        -9.1217,
+        -0.29
+       ],
+       "bbox_max": [
+        0.08,
+        -8.7129,
+        -0.03
+       ],
+       "bbox_centre": [
+        -0.1641,
+        -8.9173,
+        -0.16
+       ],
+       "size": [
+        0.4883,
+        0.4088,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Ring1": {
+     "parent": "Hand",
+     "pivot": [
+      0.36,
+      -7.87,
+      0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 6,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Ring1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        0.1645,
+        -8.452,
+        0.03
+       ],
+       "bbox_max": [
+        0.5437,
+        -7.8189,
+        0.29
+       ],
+       "bbox_centre": [
+        0.3541,
+        -8.1355,
+        0.16
+       ],
+       "size": [
+        0.3792,
+        0.6331,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Ring1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        0.2154,
+        -8.5177,
+        0.01
+       ],
+       "bbox_max": [
+        0.3854,
+        -8.356,
+        0.31
+       ],
+       "bbox_centre": [
+        0.3004,
+        -8.4369,
+        0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Ring2": {
+     "parent": "Ring1",
+     "pivot": [
+      0.3004187759374375,
+      -8.436877480359916,
+      0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 39,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Ring2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.1415,
+        -8.9071,
+        0.03
+       ],
+       "bbox_max": [
+        0.4334,
+        -8.3322,
+        0.29
+       ],
+       "bbox_centre": [
+        0.1459,
+        -8.6197,
+        0.16
+       ],
+       "size": [
+        0.5749,
+        0.5749,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Ring2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.1523,
+        -8.8854,
+        0.01
+       ],
+       "bbox_max": [
+        0.0177,
+        -8.7237,
+        0.31
+       ],
+       "bbox_centre": [
+        -0.0673,
+        -8.8046,
+        0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Ring3": {
+     "parent": "Ring2",
+     "pivot": [
+      -0.06727675027956725,
+      -8.804573006576922,
+      0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 14,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Ring3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.4488,
+        -9.0868,
+        0.03
+       ],
+       "bbox_max": [
+        0.0432,
+        -8.6914,
+        0.29
+       ],
+       "bbox_centre": [
+        -0.2028,
+        -8.8891,
+        0.16
+       ],
+       "size": [
+        0.492,
+        0.3954,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Pinky1": {
+     "parent": "Hand",
+     "pivot": [
+      0.36,
+      -7.87,
+      0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 8,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Pinky1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        0.1478,
+        -8.4546,
+        0.35
+       ],
+       "bbox_max": [
+        0.5412,
+        -7.8154,
+        0.61
+       ],
+       "bbox_centre": [
+        0.3445,
+        -8.135,
+        0.48
+       ],
+       "size": [
+        0.3934,
+        0.6393,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Pinky1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        0.1957,
+        -8.5153,
+        0.33
+       ],
+       "bbox_max": [
+        0.3657,
+        -8.3536,
+        0.63
+       ],
+       "bbox_centre": [
+        0.2807,
+        -8.4345,
+        0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Pinky2": {
+     "parent": "Pinky1",
+     "pivot": [
+      0.2806713324527627,
+      -8.434452799182695,
+      0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 41,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Pinky2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.1807,
+        -8.885,
+        0.35
+       ],
+       "bbox_max": [
+        0.408,
+        -8.3267,
+        0.61
+       ],
+       "bbox_centre": [
+        0.1136,
+        -8.6059,
+        0.48
+       ],
+       "size": [
+        0.5886,
+        0.5583,
+        0.26
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Pinky2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.1968,
+        -8.8564,
+        0.33
+       ],
+       "bbox_max": [
+        -0.0268,
+        -8.6948,
+        0.63
+       ],
+       "bbox_centre": [
+        -0.1118,
+        -8.7756,
+        0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Pinky3": {
+     "parent": "Pinky2",
+     "pivot": [
+      -0.11177764926307876,
+      -8.775603494257759,
+      0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      0.0,
+      -1.0
+     ],
+     "rest_curl_deg": 15,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Pinky3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.5042,
+        -9.037,
+        0.35
+       ],
+       "bbox_max": [
+        -0.0109,
+        -8.661,
+        0.61
+       ],
+       "bbox_centre": [
+        -0.2576,
+        -8.849,
+        0.48
+       ],
+       "size": [
+        0.4932,
+        0.376,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Thumb1": {
+     "parent": "Hand",
+     "pivot": [
+      0.08,
+      -7.28,
+      -0.46
+     ],
+     "joint": "hinge",
+     "axis": [
+      -0.90482,
+      0.4258,
+      0.0
+     ],
+     "rest_curl_deg": 6,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Thumb1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.159,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.199,
+        -7.6834,
+        -0.7255
+       ],
+       "bbox_max": [
+        0.2013,
+        -7.1949,
+        -0.2901
+       ],
+       "bbox_centre": [
+        0.0012,
+        -7.4392,
+        -0.5078
+       ],
+       "size": [
+        0.4004,
+        0.4885,
+        0.4354
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Thumb1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 22,
+       "bbox_min": [
+        -0.2579,
+        -7.7672,
+        -0.6262
+       ],
+       "bbox_max": [
+        0.0843,
+        -7.5016,
+        -0.4562
+       ],
+       "bbox_centre": [
+        -0.0868,
+        -7.6344,
+        -0.5412
+       ],
+       "size": [
+        0.3422,
+        0.2655,
+        0.17
+       ]
+      }
+     ]
+    },
+    "Thumb2": {
+     "parent": "Thumb1",
+     "pivot": [
+      -0.08677357498616707,
+      -7.634393846845605,
+      -0.541188521382688
+     ],
+     "joint": "hinge",
+     "axis": [
+      -0.90482,
+      0.4258,
+      0.0
+     ],
+     "rest_curl_deg": 12,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Thumb2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.159,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.3391,
+        -7.988,
+        -0.7505
+       ],
+       "bbox_max": [
+        0.0312,
+        -7.5495,
+        -0.357
+       ],
+       "bbox_centre": [
+        -0.1539,
+        -7.7688,
+        -0.5538
+       ],
+       "size": [
+        0.3704,
+        0.4385,
+        0.3934
+       ]
+      },
+      {
+       "file": "R/Mech2Arm_R_Thumb2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 21,
+       "bbox_min": [
+        -0.4026,
+        -8.0748,
+        -0.6245
+       ],
+       "bbox_max": [
+        -0.0604,
+        -7.8093,
+        -0.4545
+       ],
+       "bbox_centre": [
+        -0.2315,
+        -7.942,
+        -0.5395
+       ],
+       "size": [
+        0.3422,
+        0.2655,
+        0.17
+       ]
+      }
+     ]
+    },
+    "Thumb3": {
+     "parent": "Thumb2",
+     "pivot": [
+      -0.2315427227406205,
+      -7.9420282858238185,
+      -0.5394721842919427
+     ],
+     "joint": "hinge",
+     "axis": [
+      -0.90482,
+      0.4258,
+      0.0
+     ],
+     "rest_curl_deg": 14,
+     "files": [
+      {
+       "file": "R/Mech2Arm_R_Thumb3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.129,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.4335,
+        -8.2244,
+        -0.7302
+       ],
+       "bbox_max": [
+        -0.1162,
+        -7.8408,
+        -0.3295
+       ],
+       "bbox_centre": [
+        -0.2748,
+        -8.0326,
+        -0.5298
+       ],
+       "size": [
+        0.3173,
+        0.3836,
+        0.4007
+       ]
+      }
+     ]
+    }
+   },
+   "hand_merged_alternative": [
+    {
+     "file": "R/Mech2Arm_R_HandMerged_White.obj",
+     "colour": "White",
+     "tris": 1046,
+     "open_edges": 0,
+     "uv_max_stretch": 1.192,
+     "bbox_centre": [
+      0.1279,
+      -8.0624,
+      -0.0552
+     ],
+     "size": [
+      1.2642,
+      2.1648,
+      1.3905
+     ]
+    },
+    {
+     "file": "R/Mech2Arm_R_HandMerged_Grey.obj",
+     "colour": "Grey",
+     "tris": 1156,
+     "open_edges": 0,
+     "uv_max_stretch": 1.146,
+     "bbox_centre": [
+      0.0949,
+      -7.8739,
+      -0.0075
+     ],
+     "size": [
+      0.9951,
+      2.0878,
+      1.295
+     ]
+    },
+    {
+     "file": "R/Mech2Arm_R_HandMerged_DarkGrey.obj",
+     "colour": "DarkGrey",
+     "tris": 60,
+     "open_edges": 0,
+     "uv_max_stretch": 1.0,
+     "bbox_centre": [
+      0.07,
+      -7.455,
+      0.0
+     ],
+     "size": [
+      0.16,
+      0.59,
+      1.0
+     ]
+    }
+   ]
+  },
+  "L": {
+   "segments": {
+    "Upper": {
+     "parent": null,
+     "pivot": [
+      -0.0,
+      0.0,
+      0.0
+     ],
+     "joint": "ball",
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Upper_Grey.obj",
+       "colour": "Grey",
+       "tris": 1292,
+       "open_edges": 0,
+       "uv_max_stretch": 1.188,
+       "uv_islands": 66,
+       "bbox_min": [
+        -0.72,
+        -3.85,
+        -0.72
+       ],
+       "bbox_max": [
+        0.72,
+        0.65,
+        0.72
+       ],
+       "bbox_centre": [
+        0.0,
+        -1.6,
+        0.0
+       ],
+       "size": [
+        1.44,
+        4.5,
+        1.44
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Upper_White.obj",
+       "colour": "White",
+       "tris": 92,
+       "open_edges": 0,
+       "uv_max_stretch": 1.021,
+       "uv_islands": 26,
+       "bbox_min": [
+        -0.98,
+        -2.7,
+        -0.75
+       ],
+       "bbox_max": [
+        0.78,
+        -0.55,
+        0.75
+       ],
+       "bbox_centre": [
+        -0.1,
+        -1.625,
+        0.0
+       ],
+       "size": [
+        1.76,
+        2.15,
+        1.5
+       ]
+      }
+     ]
+    },
+    "Lower": {
+     "parent": "Upper",
+     "pivot": [
+      -0.0,
+      -3.13,
+      0.0
+     ],
+     "joint": "ball (elbow; hinge axis +X = flex forward)",
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Lower_White.obj",
+       "colour": "White",
+       "tris": 1642,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 66,
+       "bbox_min": [
+        -1.6163,
+        -7.515,
+        -0.83
+       ],
+       "bbox_max": [
+        0.82,
+        -2.88,
+        1.2621
+       ],
+       "bbox_centre": [
+        -0.3982,
+        -5.1975,
+        0.2161
+       ],
+       "size": [
+        2.4363,
+        4.635,
+        2.0921
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Lower_Gold.obj",
+       "colour": "Gold",
+       "tris": 288,
+       "open_edges": 0,
+       "uv_max_stretch": 1.146,
+       "uv_islands": 17,
+       "bbox_min": [
+        -1.6106,
+        -6.39,
+        -0.855
+       ],
+       "bbox_max": [
+        0.5,
+        -3.93,
+        1.2848
+       ],
+       "bbox_centre": [
+        -0.5553,
+        -5.16,
+        0.2149
+       ],
+       "size": [
+        2.1106,
+        2.46,
+        2.1398
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Lower_Grey.obj",
+       "colour": "Grey",
+       "tris": 304,
+       "open_edges": 0,
+       "uv_max_stretch": 1.163,
+       "uv_islands": 97,
+       "bbox_min": [
+        -1.4011,
+        -6.77,
+        -0.58
+       ],
+       "bbox_max": [
+        0.6,
+        -3.48,
+        0.58
+       ],
+       "bbox_centre": [
+        -0.4006,
+        -5.125,
+        0.0
+       ],
+       "size": [
+        2.0011,
+        3.29,
+        1.16
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Lower_DarkGrey.obj",
+       "colour": "DarkGrey",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.042,
+       "uv_islands": 18,
+       "bbox_min": [
+        -0.71,
+        -6.96,
+        -0.45
+       ],
+       "bbox_max": [
+        0.29,
+        -6.73,
+        0.45
+       ],
+       "bbox_centre": [
+        -0.21,
+        -6.845,
+        0.0
+       ],
+       "size": [
+        1.0,
+        0.23,
+        0.9
+       ]
+      }
+     ]
+    },
+    "Hand": {
+     "parent": "Lower",
+     "pivot": [
+      -0.3,
+      -6.93,
+      0.0
+     ],
+     "joint": "ball (wrist)",
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Hand_White.obj",
+       "colour": "White",
+       "tris": 136,
+       "open_edges": 0,
+       "uv_max_stretch": 1.111,
+       "uv_islands": 30,
+       "bbox_min": [
+        -0.76,
+        -7.87,
+        -0.64
+       ],
+       "bbox_max": [
+        -0.03,
+        -6.98,
+        0.64
+       ],
+       "bbox_centre": [
+        -0.395,
+        -7.425,
+        0.0
+       ],
+       "size": [
+        0.73,
+        0.89,
+        1.28
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Hand_Grey.obj",
+       "colour": "Grey",
+       "tris": 396,
+       "open_edges": 0,
+       "uv_max_stretch": 1.146,
+       "uv_islands": 63,
+       "bbox_min": [
+        -0.5925,
+        -7.965,
+        -0.655
+       ],
+       "bbox_max": [
+        0.12,
+        -6.83,
+        0.64
+       ],
+       "bbox_centre": [
+        -0.2362,
+        -7.3975,
+        -0.0075
+       ],
+       "size": [
+        0.7125,
+        1.135,
+        1.295
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Hand_DarkGrey.obj",
+       "colour": "DarkGrey",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.0,
+       "uv_islands": 26,
+       "bbox_min": [
+        -0.15,
+        -7.75,
+        -0.5
+       ],
+       "bbox_max": [
+        0.01,
+        -7.16,
+        0.5
+       ],
+       "bbox_centre": [
+        -0.07,
+        -7.455,
+        0.0
+       ],
+       "size": [
+        0.16,
+        0.59,
+        1.0
+       ]
+      }
+     ]
+    },
+    "Index1": {
+     "parent": "Hand",
+     "pivot": [
+      -0.36,
+      -7.87,
+      -0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 4,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Index1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.546,
+        -8.4487,
+        -0.61
+       ],
+       "bbox_max": [
+        -0.1815,
+        -7.8226,
+        -0.35
+       ],
+       "bbox_centre": [
+        -0.3638,
+        -8.1356,
+        -0.48
+       ],
+       "size": [
+        0.3646,
+        0.6262,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Index1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.4052,
+        -8.5195,
+        -0.63
+       ],
+       "bbox_max": [
+        -0.2352,
+        -8.3578,
+        -0.33
+       ],
+       "bbox_centre": [
+        -0.3202,
+        -8.4386,
+        -0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Index2": {
+     "parent": "Index1",
+     "pivot": [
+      -0.3202388099658486,
+      -8.4386115086481,
+      -0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 36,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Index2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.4593,
+        -8.9302,
+        -0.61
+       ],
+       "bbox_max": [
+        0.0944,
+        -8.3385,
+        -0.35
+       ],
+       "bbox_centre": [
+        -0.1824,
+        -8.6344,
+        -0.48
+       ],
+       "size": [
+        0.5538,
+        0.5916,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Index2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.071,
+        -8.9178,
+        -0.63
+       ],
+       "bbox_max": [
+        0.099,
+        -8.7561,
+        -0.33
+       ],
+       "bbox_centre": [
+        0.014,
+        -8.837,
+        -0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Index3": {
+     "parent": "Index2",
+     "pivot": [
+      0.014010747071151852,
+      -8.836954619069967,
+      -0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 12,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Index3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.1086,
+        -9.1448,
+        -0.61
+       ],
+       "bbox_max": [
+        0.3754,
+        -8.7272,
+        -0.35
+       ],
+       "bbox_centre": [
+        0.1334,
+        -8.936,
+        -0.48
+       ],
+       "size": [
+        0.484,
+        0.4176,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Middle1": {
+     "parent": "Hand",
+     "pivot": [
+      -0.36,
+      -7.87,
+      -0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 5,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Middle1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.5449,
+        -8.4505,
+        -0.29
+       ],
+       "bbox_max": [
+        -0.173,
+        -7.8207,
+        -0.03
+       ],
+       "bbox_centre": [
+        -0.3589,
+        -8.1356,
+        -0.16
+       ],
+       "size": [
+        0.3719,
+        0.6297,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Middle1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.3953,
+        -8.5187,
+        -0.31
+       ],
+       "bbox_max": [
+        -0.2253,
+        -8.357,
+        -0.01
+       ],
+       "bbox_centre": [
+        -0.3103,
+        -8.4378,
+        -0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Middle2": {
+     "parent": "Middle1",
+     "pivot": [
+      -0.3103212266338348,
+      -8.437830977912295,
+      -0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 37,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Middle2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.4471,
+        -8.9213,
+        -0.29
+       ],
+       "bbox_max": [
+        0.1157,
+        -8.3358,
+        -0.03
+       ],
+       "bbox_centre": [
+        -0.1657,
+        -8.6286,
+        -0.16
+       ],
+       "size": [
+        0.5627,
+        0.5855,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Middle2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.0474,
+        -8.9051,
+        -0.31
+       ],
+       "bbox_max": [
+        0.1226,
+        -8.7434,
+        -0.01
+       ],
+       "bbox_centre": [
+        0.0376,
+        -8.8243,
+        -0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Middle3": {
+     "parent": "Middle2",
+     "pivot": [
+      0.03762668867277147,
+      -8.82426628716054,
+      -0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 13,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Middle3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.08,
+        -9.1217,
+        -0.29
+       ],
+       "bbox_max": [
+        0.4083,
+        -8.7129,
+        -0.03
+       ],
+       "bbox_centre": [
+        0.1641,
+        -8.9173,
+        -0.16
+       ],
+       "size": [
+        0.4883,
+        0.4088,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Ring1": {
+     "parent": "Hand",
+     "pivot": [
+      -0.36,
+      -7.87,
+      0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 6,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Ring1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.5437,
+        -8.452,
+        0.03
+       ],
+       "bbox_max": [
+        -0.1645,
+        -7.8189,
+        0.29
+       ],
+       "bbox_centre": [
+        -0.3541,
+        -8.1355,
+        0.16
+       ],
+       "size": [
+        0.3792,
+        0.6331,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Ring1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.3854,
+        -8.5177,
+        0.01
+       ],
+       "bbox_max": [
+        -0.2154,
+        -8.356,
+        0.31
+       ],
+       "bbox_centre": [
+        -0.3004,
+        -8.4369,
+        0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Ring2": {
+     "parent": "Ring1",
+     "pivot": [
+      -0.3004187759374375,
+      -8.436877480359916,
+      0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 39,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Ring2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.4334,
+        -8.9071,
+        0.03
+       ],
+       "bbox_max": [
+        0.1415,
+        -8.3322,
+        0.29
+       ],
+       "bbox_centre": [
+        -0.1459,
+        -8.6197,
+        0.16
+       ],
+       "size": [
+        0.5749,
+        0.5749,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Ring2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.0177,
+        -8.8854,
+        0.01
+       ],
+       "bbox_max": [
+        0.1523,
+        -8.7237,
+        0.31
+       ],
+       "bbox_centre": [
+        0.0673,
+        -8.8046,
+        0.16
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Ring3": {
+     "parent": "Ring2",
+     "pivot": [
+      0.06727675027956725,
+      -8.804573006576922,
+      0.16
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 14,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Ring3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        -0.0432,
+        -9.0868,
+        0.03
+       ],
+       "bbox_max": [
+        0.4488,
+        -8.6914,
+        0.29
+       ],
+       "bbox_centre": [
+        0.2028,
+        -8.8891,
+        0.16
+       ],
+       "size": [
+        0.492,
+        0.3954,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Pinky1": {
+     "parent": "Hand",
+     "pivot": [
+      -0.36,
+      -7.87,
+      0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 8,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Pinky1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.191,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.5412,
+        -8.4546,
+        0.35
+       ],
+       "bbox_max": [
+        -0.1478,
+        -7.8154,
+        0.61
+       ],
+       "bbox_centre": [
+        -0.3445,
+        -8.135,
+        0.48
+       ],
+       "size": [
+        0.3934,
+        0.6393,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Pinky1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        -0.3657,
+        -8.5153,
+        0.33
+       ],
+       "bbox_max": [
+        -0.1957,
+        -8.3536,
+        0.63
+       ],
+       "bbox_centre": [
+        -0.2807,
+        -8.4345,
+        0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Pinky2": {
+     "parent": "Pinky1",
+     "pivot": [
+      -0.2806713324527627,
+      -8.434452799182695,
+      0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 41,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Pinky2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.192,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.408,
+        -8.885,
+        0.35
+       ],
+       "bbox_max": [
+        0.1807,
+        -8.3267,
+        0.61
+       ],
+       "bbox_centre": [
+        -0.1136,
+        -8.6059,
+        0.48
+       ],
+       "size": [
+        0.5886,
+        0.5583,
+        0.26
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Pinky2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 20,
+       "bbox_min": [
+        0.0268,
+        -8.8564,
+        0.33
+       ],
+       "bbox_max": [
+        0.1968,
+        -8.6948,
+        0.63
+       ],
+       "bbox_centre": [
+        0.1118,
+        -8.7756,
+        0.48
+       ],
+       "size": [
+        0.17,
+        0.1617,
+        0.3
+       ]
+      }
+     ]
+    },
+    "Pinky3": {
+     "parent": "Pinky2",
+     "pivot": [
+      0.11177764926307876,
+      -8.775603494257759,
+      0.48
+     ],
+     "joint": "hinge",
+     "axis": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "rest_curl_deg": 15,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Pinky3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.134,
+       "uv_islands": 14,
+       "bbox_min": [
+        0.0109,
+        -9.037,
+        0.35
+       ],
+       "bbox_max": [
+        0.5042,
+        -8.661,
+        0.61
+       ],
+       "bbox_centre": [
+        0.2576,
+        -8.849,
+        0.48
+       ],
+       "size": [
+        0.4932,
+        0.376,
+        0.26
+       ]
+      }
+     ]
+    },
+    "Thumb1": {
+     "parent": "Hand",
+     "pivot": [
+      -0.08,
+      -7.28,
+      -0.46
+     ],
+     "joint": "hinge",
+     "axis": [
+      -0.90482,
+      -0.4258,
+      -0.0
+     ],
+     "rest_curl_deg": 6,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Thumb1_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.159,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.2013,
+        -7.6834,
+        -0.7255
+       ],
+       "bbox_max": [
+        0.199,
+        -7.1949,
+        -0.2901
+       ],
+       "bbox_centre": [
+        -0.0012,
+        -7.4392,
+        -0.5078
+       ],
+       "size": [
+        0.4004,
+        0.4885,
+        0.4354
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Thumb1_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 22,
+       "bbox_min": [
+        -0.0843,
+        -7.7672,
+        -0.6262
+       ],
+       "bbox_max": [
+        0.2579,
+        -7.5016,
+        -0.4562
+       ],
+       "bbox_centre": [
+        0.0868,
+        -7.6344,
+        -0.5412
+       ],
+       "size": [
+        0.3422,
+        0.2655,
+        0.17
+       ]
+      }
+     ]
+    },
+    "Thumb2": {
+     "parent": "Thumb1",
+     "pivot": [
+      0.08677357498616707,
+      -7.634393846845605,
+      -0.541188521382688
+     ],
+     "joint": "hinge",
+     "axis": [
+      -0.90482,
+      -0.4258,
+      -0.0
+     ],
+     "rest_curl_deg": 12,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Thumb2_White.obj",
+       "colour": "White",
+       "tris": 60,
+       "open_edges": 0,
+       "uv_max_stretch": 1.159,
+       "uv_islands": 12,
+       "bbox_min": [
+        -0.0312,
+        -7.988,
+        -0.7505
+       ],
+       "bbox_max": [
+        0.3391,
+        -7.5495,
+        -0.357
+       ],
+       "bbox_centre": [
+        0.1539,
+        -7.7688,
+        -0.5538
+       ],
+       "size": [
+        0.3704,
+        0.4385,
+        0.3934
+       ]
+      },
+      {
+       "file": "L/Mech2Arm_L_Thumb2_Grey.obj",
+       "colour": "Grey",
+       "tris": 76,
+       "open_edges": 0,
+       "uv_max_stretch": 1.106,
+       "uv_islands": 21,
+       "bbox_min": [
+        0.0604,
+        -8.0748,
+        -0.6245
+       ],
+       "bbox_max": [
+        0.4026,
+        -7.8093,
+        -0.4545
+       ],
+       "bbox_centre": [
+        0.2315,
+        -7.942,
+        -0.5395
+       ],
+       "size": [
+        0.3422,
+        0.2655,
+        0.17
+       ]
+      }
+     ]
+    },
+    "Thumb3": {
+     "parent": "Thumb2",
+     "pivot": [
+      0.2315427227406205,
+      -7.9420282858238185,
+      -0.5394721842919427
+     ],
+     "joint": "hinge",
+     "axis": [
+      -0.90482,
+      -0.4258,
+      -0.0
+     ],
+     "rest_curl_deg": 14,
+     "files": [
+      {
+       "file": "L/Mech2Arm_L_Thumb3_White.obj",
+       "colour": "White",
+       "tris": 62,
+       "open_edges": 0,
+       "uv_max_stretch": 1.129,
+       "uv_islands": 14,
+       "bbox_min": [
+        0.1162,
+        -8.2244,
+        -0.7302
+       ],
+       "bbox_max": [
+        0.4335,
+        -7.8408,
+        -0.3295
+       ],
+       "bbox_centre": [
+        0.2748,
+        -8.0326,
+        -0.5298
+       ],
+       "size": [
+        0.3173,
+        0.3836,
+        0.4007
+       ]
+      }
+     ]
+    }
+   },
+   "hand_merged_alternative": [
+    {
+     "file": "L/Mech2Arm_L_HandMerged_White.obj",
+     "colour": "White",
+     "tris": 1046,
+     "open_edges": 0,
+     "uv_max_stretch": 1.192,
+     "bbox_centre": [
+      -0.1279,
+      -8.0624,
+      -0.0552
+     ],
+     "size": [
+      1.2642,
+      2.1648,
+      1.3905
+     ]
+    },
+    {
+     "file": "L/Mech2Arm_L_HandMerged_Grey.obj",
+     "colour": "Grey",
+     "tris": 1156,
+     "open_edges": 0,
+     "uv_max_stretch": 1.146,
+     "bbox_centre": [
+      -0.0949,
+      -7.8739,
+      -0.0075
+     ],
+     "size": [
+      0.9951,
+      2.0878,
+      1.295
+     ]
+    },
+    {
+     "file": "L/Mech2Arm_L_HandMerged_DarkGrey.obj",
+     "colour": "DarkGrey",
+     "tris": 60,
+     "open_edges": 0,
+     "uv_max_stretch": 1.0,
+     "bbox_centre": [
+      -0.07,
+      -7.455,
+      0.0
+     ],
+     "size": [
+      0.16,
+      0.59,
+      1.0
+     ]
+    }
+   ]
+  }
+ },
+ "total_tris_segment_files": 11880
+}

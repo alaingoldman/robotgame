@@ -1,0 +1,227 @@
+{
+  "units": "studs",
+  "cell_studs": 0.816,
+  "axes": "+Y up, -Z forward (face), X symmetric",
+  "origin": "neck base = attachment to the torso (top of the torso collar); neck plug runs 0.49 studs below it",
+  "attach_point": [
+    0,
+    0,
+    0
+  ],
+  "pieces": {
+    "Gold": {
+      "file": "Head_Gold.obj",
+      "rgb": [
+        212,
+        169,
+        58
+      ],
+      "hex": "#D4A93A",
+      "tris": 158,
+      "verts": 83,
+      "shells": 2,
+      "open_edges": 0,
+      "uv_islands": 24,
+      "uv_max_stretch": 1.079,
+      "bbox_min": [
+        -1.224,
+        0.228,
+        -2.056
+      ],
+      "bbox_max": [
+        1.224,
+        2.432,
+        0.228
+      ],
+      "size": [
+        2.448,
+        2.203,
+        2.285
+      ],
+      "centre": [
+        0.0,
+        1.33,
+        -0.914
+      ]
+    },
+    "White": {
+      "file": "Head_White.obj",
+      "rgb": [
+        236,
+        236,
+        236
+      ],
+      "hex": "#ECECEC",
+      "tris": 508,
+      "verts": 276,
+      "shells": 11,
+      "open_edges": 0,
+      "uv_islands": 115,
+      "uv_max_stretch": 1.136,
+      "bbox_min": [
+        -1.777,
+        -0.449,
+        -1.224
+      ],
+      "bbox_max": [
+        1.777,
+        3.468,
+        2.481
+      ],
+      "size": [
+        3.554,
+        3.917,
+        3.705
+      ],
+      "centre": [
+        0.0,
+        1.51,
+        0.628
+      ]
+    },
+    "Blue": {
+      "file": "Head_Blue.obj",
+      "rgb": [
+        47,
+        111,
+        191
+      ],
+      "hex": "#2F6FBF",
+      "tris": 156,
+      "verts": 86,
+      "shells": 4,
+      "open_edges": 0,
+      "uv_islands": 32,
+      "uv_max_stretch": 1.14,
+      "bbox_min": [
+        -1.338,
+        -0.18,
+        -0.857
+      ],
+      "bbox_max": [
+        1.338,
+        2.424,
+        0.963
+      ],
+      "size": [
+        2.676,
+        2.603,
+        1.82
+      ],
+      "centre": [
+        0.0,
+        1.122,
+        0.053
+      ]
+    },
+    "Neck": {
+      "file": "Head_Neck.obj",
+      "rgb": [
+        120,
+        122,
+        128
+      ],
+      "hex": "#787A80",
+      "tris": 28,
+      "verts": 16,
+      "shells": 1,
+      "open_edges": 0,
+      "uv_islands": 10,
+      "uv_max_stretch": 1.0,
+      "bbox_min": [
+        -0.618,
+        -0.49,
+        -0.558
+      ],
+      "bbox_max": [
+        0.618,
+        1.061,
+        0.558
+      ],
+      "size": [
+        1.236,
+        1.55,
+        1.116
+      ],
+      "centre": [
+        -0.0,
+        0.286,
+        0.0
+      ]
+    }
+  },
+  "head_bbox_min": [
+    -1.777,
+    -0.49,
+    -2.056
+  ],
+  "head_bbox_max": [
+    1.777,
+    3.468,
+    2.481
+  ],
+  "head_size": [
+    3.554,
+    3.958,
+    4.537
+  ],
+  "visor": "none - the art shows no eyes: the face is the gold V brow/visor plate over two white chin chevrons",
+  "iou": {
+    "front": {
+      "sil_iou": 0.9274,
+      "sil_iou_raw": 0.9218,
+      "colour_agreement": 0.8421,
+      "gold_iou": 0.927,
+      "white_iou": 0.734,
+      "blue_iou": 0.505
+    },
+    "side": {
+      "sil_iou": 0.9245,
+      "sil_iou_raw": 0.929,
+      "colour_agreement": 0.8808,
+      "gold_iou": 0.932,
+      "white_iou": 0.822,
+      "blue_iou": 0.773
+    },
+    "back": {
+      "sil_iou": 0.9133,
+      "sil_iou_raw": 0.9318,
+      "colour_agreement": 0.8544,
+      "gold_iou": 0.35,
+      "white_iou": 0.854,
+      "blue_iou": 0.41
+    }
+  },
+  "depth": {
+    "prow_z (brow/visor tip)": -2.056,
+    "band_temple_z (brow ends at the cheek sides)": 0.147,
+    "face_projection_prow_vs_temples": 2.203,
+    "crown_ridge_z_at_Y2.31": -1.142,
+    "crown_back_plane_z": -0.204,
+    "skull_back_z": 1.518,
+    "chin_upper_plate_front_z": -1.224,
+    "chin_lower_plate_front_z (top..tip)": [
+      -1.126,
+      -1.175
+    ],
+    "band_overhang_over_chin": 0.098,
+    "B1_root_z..tip_z": [
+      0.898,
+      2.481
+    ],
+    "B1_sweep_angle_deg (side view, from horizontal)": 50.7,
+    "B1_tip_behind_skull_back": 0.963,
+    "B2_root_z..tip_z": [
+      0.612,
+      2.007
+    ],
+    "B2_sweep_angle_deg (side view, from horizontal)": 32.1,
+    "B2_tip_behind_skull_back": 0.49,
+    "B3_root_z..tip_z": [
+      0.408,
+      1.722
+    ],
+    "B3_sweep_angle_deg (side view, from horizontal)": 31.4,
+    "B3_tip_behind_skull_back": 0.204
+  }
+}

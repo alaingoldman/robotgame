@@ -1,0 +1,570 @@
+{
+  "part": "mech2 torso",
+  "units": "studs",
+  "cell_studs": 0.816,
+  "axes": "+Y up, -Z forward (Roblox), +X = robot's right",
+  "origin": "centre of the hip-joint line (hip-ball centres, back sheet y=525px)",
+  "vertex_space": "model space (all OBJs already in assembled position relative to the origin); pivots/sockets below are in the same space",
+  "uv": "planar per facet group, Roblox box-mapping orientation, 1 UV repeat = 4 studs, stretch <= 1.2",
+  "colours": {
+    "white": "#F2F2F2",
+    "gold": "#D4A93A",
+    "blue": "#2F6FBF",
+    "grey": "#8A8A8A",
+    "darkgrey": "#5A5A5A"
+  },
+  "segments": {
+    "pelvis": {
+      "pivot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "parent": null,
+      "files": [
+        "pelvis_blue.obj",
+        "pelvis_darkgrey.obj",
+        "pelvis_grey.obj",
+        "pelvis_white.obj"
+      ]
+    },
+    "abdomen": {
+      "pivot": [
+        0.0,
+        5.2632,
+        0.0
+      ],
+      "parent": "pelvis",
+      "files": [
+        "abdomen_darkgrey.obj",
+        "abdomen_grey.obj"
+      ]
+    },
+    "chest": {
+      "pivot": [
+        0.0,
+        7.3032,
+        0.0816
+      ],
+      "parent": "abdomen",
+      "files": [
+        "chest_blue.obj",
+        "chest_darkgrey.obj",
+        "chest_gold.obj",
+        "chest_grey.obj",
+        "chest_white.obj"
+      ]
+    },
+    "pauldron_R": {
+      "pivot": [
+        3.5,
+        9.2,
+        0.1632
+      ],
+      "parent": "chest",
+      "files": [
+        "pauldron_R_gold.obj",
+        "pauldron_R_grey.obj",
+        "pauldron_R_white.obj"
+      ]
+    },
+    "pauldron_L": {
+      "pivot": [
+        -3.5,
+        9.2,
+        0.1632
+      ],
+      "parent": "chest",
+      "files": [
+        "pauldron_L_gold.obj",
+        "pauldron_L_grey.obj",
+        "pauldron_L_white.obj"
+      ]
+    }
+  },
+  "sockets": {
+    "Neck": [
+      0.0,
+      10.5672,
+      0.0816
+    ],
+    "RightShoulder": [
+      3.5,
+      9.2,
+      0.1632
+    ],
+    "LeftShoulder": [
+      -3.5,
+      9.2,
+      0.1632
+    ],
+    "RightHip": [
+      1.9511,
+      0.0,
+      0.0
+    ],
+    "LeftHip": [
+      -1.9511,
+      0.0,
+      0.0
+    ],
+    "Waist": [
+      0.0,
+      5.2632,
+      0.0
+    ],
+    "Spine": [
+      0.0,
+      7.3032,
+      0.0816
+    ]
+  },
+  "sockets_cells": {
+    "Neck": [
+      0.0,
+      12.95,
+      0.1
+    ],
+    "RightShoulder": [
+      4.28921568627451,
+      11.274509803921568,
+      0.2
+    ],
+    "LeftShoulder": [
+      -4.28921568627451,
+      11.274509803921568,
+      0.2
+    ],
+    "RightHip": [
+      2.3910539215686275,
+      0.0,
+      0.0
+    ],
+    "LeftHip": [
+      -2.3910539215686275,
+      0.0,
+      0.0
+    ],
+    "Waist": [
+      0.0,
+      6.45,
+      0.0
+    ],
+    "Spine": [
+      0.0,
+      8.95,
+      0.1
+    ]
+  },
+  "files": [
+    {
+      "file": "abdomen_darkgrey.obj",
+      "segment": "abdomen",
+      "colour": "darkgrey",
+      "hex": "#5A5A5A",
+      "tris": 28,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        -1.2648,
+        5.1408,
+        -0.816
+      ],
+      "bbox_max": [
+        1.2648,
+        7.5072,
+        0.816
+      ],
+      "bbox_centre": [
+        0.0,
+        6.324,
+        0.0
+      ]
+    },
+    {
+      "file": "abdomen_grey.obj",
+      "segment": "abdomen",
+      "colour": "grey",
+      "hex": "#8A8A8A",
+      "tris": 268,
+      "open_edges": 0,
+      "max_uv_stretch": 1.086,
+      "bbox_min": [
+        -1.7136,
+        5.2224,
+        -1.3219
+      ],
+      "bbox_max": [
+        1.7136,
+        7.3032,
+        1.0608
+      ],
+      "bbox_centre": [
+        0.0,
+        6.2628,
+        -0.1306
+      ]
+    },
+    {
+      "file": "chest_blue.obj",
+      "segment": "chest",
+      "colour": "blue",
+      "hex": "#2F6FBF",
+      "tris": 240,
+      "open_edges": 0,
+      "max_uv_stretch": 1.068,
+      "bbox_min": [
+        -2.7907,
+        6.2832,
+        -1.6728
+      ],
+      "bbox_max": [
+        2.7907,
+        10.1592,
+        1.8768
+      ],
+      "bbox_centre": [
+        0.0,
+        8.2212,
+        0.102
+      ]
+    },
+    {
+      "file": "chest_darkgrey.obj",
+      "segment": "chest",
+      "colour": "darkgrey",
+      "hex": "#5A5A5A",
+      "tris": 28,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        -2.4072,
+        7.0584,
+        -0.8976
+      ],
+      "bbox_max": [
+        2.4072,
+        10.1592,
+        1.224
+      ],
+      "bbox_centre": [
+        0.0,
+        8.6088,
+        0.1632
+      ]
+    },
+    {
+      "file": "chest_gold.obj",
+      "segment": "chest",
+      "colour": "gold",
+      "hex": "#D4A93A",
+      "tris": 496,
+      "open_edges": 0,
+      "max_uv_stretch": 1.124,
+      "bbox_min": [
+        -3.0192,
+        6.8136,
+        -2.3612
+      ],
+      "bbox_max": [
+        3.0192,
+        12.1639,
+        3.5088
+      ],
+      "bbox_centre": [
+        0.0,
+        9.4887,
+        0.5738
+      ]
+    },
+    {
+      "file": "chest_grey.obj",
+      "segment": "chest",
+      "colour": "grey",
+      "hex": "#8A8A8A",
+      "tris": 220,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        -2.9539,
+        7.14,
+        -0.612
+      ],
+      "bbox_max": [
+        2.9539,
+        10.7222,
+        1.7544
+      ],
+      "bbox_centre": [
+        0.0,
+        8.9311,
+        0.5712
+      ]
+    },
+    {
+      "file": "chest_white.obj",
+      "segment": "chest",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 296,
+      "open_edges": 0,
+      "max_uv_stretch": 1.076,
+      "bbox_min": [
+        -2.6446,
+        6.4056,
+        -2.7744
+      ],
+      "bbox_max": [
+        2.6446,
+        10.0858,
+        2.905
+      ],
+      "bbox_centre": [
+        0.0,
+        8.2457,
+        0.0653
+      ]
+    },
+    {
+      "file": "pauldron_L_gold.obj",
+      "segment": "pauldron_L",
+      "colour": "gold",
+      "hex": "#D4A93A",
+      "tris": 60,
+      "open_edges": 0,
+      "max_uv_stretch": 1.046,
+      "bbox_min": [
+        -7.0251,
+        8.2157,
+        -1.0661
+      ],
+      "bbox_max": [
+        -2.9738,
+        9.5525,
+        1.0661
+      ],
+      "bbox_centre": [
+        -4.9994,
+        8.8841,
+        0.0
+      ]
+    },
+    {
+      "file": "pauldron_L_grey.obj",
+      "segment": "pauldron_L",
+      "colour": "grey",
+      "hex": "#8A8A8A",
+      "tris": 28,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        -4.2432,
+        9.588,
+        -0.6936
+      ],
+      "bbox_max": [
+        -2.7336,
+        10.1592,
+        0.6936
+      ],
+      "bbox_centre": [
+        -3.4884,
+        9.8736,
+        0.0
+      ]
+    },
+    {
+      "file": "pauldron_L_white.obj",
+      "segment": "pauldron_L",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 96,
+      "open_edges": 0,
+      "max_uv_stretch": 1.063,
+      "bbox_min": [
+        -6.2493,
+        9.079,
+        -1.293
+      ],
+      "bbox_max": [
+        -2.7439,
+        10.8336,
+        1.293
+      ],
+      "bbox_centre": [
+        -4.4966,
+        9.9563,
+        0.0
+      ]
+    },
+    {
+      "file": "pauldron_R_gold.obj",
+      "segment": "pauldron_R",
+      "colour": "gold",
+      "hex": "#D4A93A",
+      "tris": 60,
+      "open_edges": 0,
+      "max_uv_stretch": 1.046,
+      "bbox_min": [
+        2.9738,
+        8.2157,
+        -1.0661
+      ],
+      "bbox_max": [
+        7.0251,
+        9.5525,
+        1.0661
+      ],
+      "bbox_centre": [
+        4.9994,
+        8.8841,
+        0.0
+      ]
+    },
+    {
+      "file": "pauldron_R_grey.obj",
+      "segment": "pauldron_R",
+      "colour": "grey",
+      "hex": "#8A8A8A",
+      "tris": 28,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        2.7336,
+        9.588,
+        -0.6936
+      ],
+      "bbox_max": [
+        4.2432,
+        10.1592,
+        0.6936
+      ],
+      "bbox_centre": [
+        3.4884,
+        9.8736,
+        0.0
+      ]
+    },
+    {
+      "file": "pauldron_R_white.obj",
+      "segment": "pauldron_R",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 96,
+      "open_edges": 0,
+      "max_uv_stretch": 1.063,
+      "bbox_min": [
+        2.7439,
+        9.079,
+        -1.293
+      ],
+      "bbox_max": [
+        6.2493,
+        10.8336,
+        1.293
+      ],
+      "bbox_centre": [
+        4.4966,
+        9.9563,
+        0.0
+      ]
+    },
+    {
+      "file": "pelvis_blue.obj",
+      "segment": "pelvis",
+      "colour": "blue",
+      "hex": "#2F6FBF",
+      "tris": 232,
+      "open_edges": 0,
+      "max_uv_stretch": 1.068,
+      "bbox_min": [
+        -3.6155,
+        0.8568,
+        -1.4256
+      ],
+      "bbox_max": [
+        3.6155,
+        4.1779,
+        1.4256
+      ],
+      "bbox_centre": [
+        0.0,
+        2.5174,
+        0.0
+      ]
+    },
+    {
+      "file": "pelvis_darkgrey.obj",
+      "segment": "pelvis",
+      "colour": "darkgrey",
+      "hex": "#5A5A5A",
+      "tris": 28,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        -1.8768,
+        2.2032,
+        -1.1016
+      ],
+      "bbox_max": [
+        1.8768,
+        5.3448,
+        1.1016
+      ],
+      "bbox_centre": [
+        0.0,
+        3.774,
+        0.0
+      ]
+    },
+    {
+      "file": "pelvis_grey.obj",
+      "segment": "pelvis",
+      "colour": "grey",
+      "hex": "#8A8A8A",
+      "tris": 168,
+      "open_edges": 0,
+      "max_uv_stretch": 1.0,
+      "bbox_min": [
+        -2.6447,
+        0.612,
+        -1.3056
+      ],
+      "bbox_max": [
+        2.6447,
+        4.9776,
+        1.3056
+      ],
+      "bbox_centre": [
+        0.0,
+        2.7948,
+        0.0
+      ]
+    },
+    {
+      "file": "pelvis_white.obj",
+      "segment": "pelvis",
+      "colour": "white",
+      "hex": "#F2F2F2",
+      "tris": 992,
+      "open_edges": 0,
+      "max_uv_stretch": 1.139,
+      "bbox_min": [
+        -3.7644,
+        0.2856,
+        -2.1586
+      ],
+      "bbox_max": [
+        3.7644,
+        5.3856,
+        2.2467
+      ],
+      "bbox_centre": [
+        0.0,
+        2.8356,
+        0.0441
+      ]
+    }
+  ],
+  "total_tris": 3364
+}

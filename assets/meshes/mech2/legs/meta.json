@@ -1,0 +1,1019 @@
+{
+ "units": "studs (1 grid cell of the sheet = 0.816 studs, mech Scale 1.7)",
+ "frame": "each leg's own frame: origin = its HIP joint centre, +Y up, -Z forward (front faces -Z), +X = mech right",
+ "hip_offsets_from_mech_centre": {
+  "Leg_R": [
+   1.9511,
+   0.0,
+   0.0
+  ],
+  "Leg_L": [
+   -1.9511,
+   0.0,
+   0.0
+  ]
+ },
+ "hip_height_above_ground": 8.4603,
+ "hip_spacing": 3.9021,
+ "colours_rgb": {
+  "White": [
+   236,
+   236,
+   232
+  ],
+  "Gold": [
+   212,
+   169,
+   58
+  ],
+  "Blue": [
+   47,
+   111,
+   191
+  ],
+  "Joint": [
+   128,
+   128,
+   128
+  ]
+ },
+ "legs": {
+  "Leg_R": {
+   "pivots": {
+    "Hip": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Knee": [
+     0.2856,
+     -4.4064,
+     0.1632
+    ],
+    "Ankle": [
+     0.5059,
+     -7.548,
+     0.1632
+    ]
+   },
+   "segment_pivot": {
+    "Thigh": "Hip",
+    "Shin": "Knee",
+    "Foot": "Ankle"
+   },
+   "files": {
+    "Leg_R_Blue.obj": {
+     "segment": "All",
+     "colour": "Blue",
+     "pieces": [
+      "thigh_core",
+      "kneeback_inset",
+      "calf",
+      "ankle_front"
+     ],
+     "tris": 504,
+     "open_edges": 0,
+     "uv_islands": 62,
+     "uv_max_stretch": 1.119,
+     "bbox_centre": [
+      0.2162,
+      -3.8148,
+      0.049
+     ],
+     "bbox_size": [
+      1.9829,
+      6.8952,
+      2.5133
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.2162,
+      -3.8148,
+      0.049
+     ]
+    },
+    "Leg_R_Gold.obj": {
+     "segment": "All",
+     "colour": "Gold",
+     "pieces": [
+      "thigh_collar",
+      "guard_out",
+      "lower_out",
+      "guard_in",
+      "lower_in",
+      "thigh_rear",
+      "kneeback_top",
+      "kneeback_in",
+      "kneeback_out",
+      "kneeback_bottom",
+      "toe_tip",
+      "heel"
+     ],
+     "tris": 1712,
+     "open_edges": 0,
+     "uv_islands": 178,
+     "uv_max_stretch": 1.18,
+     "bbox_centre": [
+      0.0122,
+      -4.2057,
+      0.0082
+     ],
+     "bbox_size": [
+      2.8315,
+      8.5092,
+      3.672
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0122,
+      -4.2057,
+      0.0082
+     ]
+    },
+    "Leg_R_Joint.obj": {
+     "segment": "All",
+     "colour": "Joint",
+     "pieces": [
+      "hip_ball",
+      "knee_axle",
+      "ankle_disc",
+      "ankle_cover"
+     ],
+     "tris": 484,
+     "open_edges": 0,
+     "uv_islands": 82,
+     "uv_max_stretch": 1.178,
+     "bbox_centre": [
+      0.2869,
+      -3.6517,
+      0.2017
+     ],
+     "bbox_size": [
+      1.9559,
+      8.7069,
+      1.7509
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.2869,
+      -3.6517,
+      0.2017
+     ]
+    },
+    "Leg_R_White.obj": {
+     "segment": "All",
+     "colour": "White",
+     "pieces": [
+      "thigh_plate_out",
+      "thigh_plate_in",
+      "knee_block",
+      "shin_plate",
+      "shin_flank_out",
+      "shin_flank_in",
+      "achilles",
+      "toe_plate"
+     ],
+     "tris": 1152,
+     "open_edges": 0,
+     "uv_islands": 146,
+     "uv_max_stretch": 1.186,
+     "bbox_centre": [
+      0.1693,
+      -4.3852,
+      -0.5957
+     ],
+     "bbox_size": [
+      2.7948,
+      8.1502,
+      4.6512
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.1693,
+      -4.3852,
+      -0.5957
+     ]
+    },
+    "Leg_R_Foot_Gold.obj": {
+     "segment": "Foot",
+     "colour": "Gold",
+     "pieces": [
+      "toe_tip",
+      "heel"
+     ],
+     "tris": 212,
+     "open_edges": 0,
+     "uv_islands": 34,
+     "uv_max_stretch": 1.089,
+     "bbox_centre": [
+      0.5059,
+      -7.7389,
+      -0.1346
+     ],
+     "bbox_size": [
+      1.6973,
+      1.4427,
+      3.3864
+     ],
+     "pivot": [
+      0.5059,
+      -7.548,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0,
+      -0.1909,
+      -0.2978
+     ]
+    },
+    "Leg_R_Foot_White.obj": {
+     "segment": "Foot",
+     "colour": "White",
+     "pieces": [
+      "toe_plate"
+     ],
+     "tris": 116,
+     "open_edges": 0,
+     "uv_islands": 16,
+     "uv_max_stretch": 1.152,
+     "bbox_centre": [
+      0.5059,
+      -7.8001,
+      -1.583
+     ],
+     "bbox_size": [
+      1.6646,
+      1.3203,
+      2.6765
+     ],
+     "pivot": [
+      0.5059,
+      -7.548,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0,
+      -0.2521,
+      -1.7462
+     ]
+    },
+    "Leg_R_Shin_Blue.obj": {
+     "segment": "Shin",
+     "colour": "Blue",
+     "pieces": [
+      "calf",
+      "ankle_front"
+     ],
+     "tris": 272,
+     "open_edges": 0,
+     "uv_islands": 36,
+     "uv_max_stretch": 1.119,
+     "bbox_centre": [
+      0.3758,
+      -6.018,
+      -0.0898
+     ],
+     "bbox_size": [
+      1.6639,
+      2.4888,
+      2.2358
+     ],
+     "pivot": [
+      0.2856,
+      -4.4064,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0902,
+      -1.6116,
+      -0.253
+     ]
+    },
+    "Leg_R_Shin_Joint.obj": {
+     "segment": "Shin",
+     "colour": "Joint",
+     "pieces": [
+      "knee_axle",
+      "ankle_disc",
+      "ankle_cover"
+     ],
+     "tris": 260,
+     "open_edges": 0,
+     "uv_islands": 62,
+     "uv_max_stretch": 1.156,
+     "bbox_centre": [
+      0.4488,
+      -6.0481,
+      0.3916
+     ],
+     "bbox_size": [
+      1.632,
+      3.914,
+      1.3711
+     ],
+     "pivot": [
+      0.2856,
+      -4.4064,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      0.1632,
+      -1.6417,
+      0.2284
+     ]
+    },
+    "Leg_R_Shin_White.obj": {
+     "segment": "Shin",
+     "colour": "White",
+     "pieces": [
+      "shin_plate",
+      "shin_flank_out",
+      "shin_flank_in",
+      "achilles"
+     ],
+     "tris": 744,
+     "open_edges": 0,
+     "uv_islands": 70,
+     "uv_max_stretch": 1.186,
+     "bbox_centre": [
+      0.4325,
+      -5.916,
+      0.2407
+     ],
+     "bbox_size": [
+      2.2685,
+      3.5088,
+      2.9784
+     ],
+     "pivot": [
+      0.2856,
+      -4.4064,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      0.1469,
+      -1.5096,
+      0.0775
+     ]
+    },
+    "Leg_R_Thigh_Blue.obj": {
+     "segment": "Thigh",
+     "colour": "Blue",
+     "pieces": [
+      "thigh_core",
+      "kneeback_inset"
+     ],
+     "tris": 232,
+     "open_edges": 0,
+     "uv_islands": 26,
+     "uv_max_stretch": 1.038,
+     "bbox_centre": [
+      -0.0286,
+      -2.6112,
+      0.3264
+     ],
+     "bbox_size": [
+      1.4933,
+      4.488,
+      1.9584
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.0286,
+      -2.6112,
+      0.3264
+     ]
+    },
+    "Leg_R_Thigh_Gold.obj": {
+     "segment": "Thigh",
+     "colour": "Gold",
+     "pieces": [
+      "thigh_collar",
+      "guard_out",
+      "lower_out",
+      "guard_in",
+      "lower_in",
+      "thigh_rear",
+      "kneeback_top",
+      "kneeback_in",
+      "kneeback_out",
+      "kneeback_bottom"
+     ],
+     "tris": 1500,
+     "open_edges": 0,
+     "uv_islands": 144,
+     "uv_max_stretch": 1.18,
+     "bbox_centre": [
+      0.0122,
+      -2.4439,
+      0.0571
+     ],
+     "bbox_size": [
+      2.8315,
+      4.9858,
+      3.5741
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0122,
+      -2.4439,
+      0.0571
+     ]
+    },
+    "Leg_R_Thigh_Joint.obj": {
+     "segment": "Thigh",
+     "colour": "Joint",
+     "pieces": [
+      "hip_ball"
+     ],
+     "tris": 224,
+     "open_edges": 0,
+     "uv_islands": 18,
+     "uv_max_stretch": 1.178,
+     "bbox_centre": [
+      0.0,
+      0.0,
+      -0.0
+     ],
+     "bbox_size": [
+      1.3822,
+      1.4035,
+      1.3475
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0,
+      0.0,
+      -0.0
+     ]
+    },
+    "Leg_R_Thigh_White.obj": {
+     "segment": "Thigh",
+     "colour": "White",
+     "pieces": [
+      "thigh_plate_out",
+      "thigh_plate_in",
+      "knee_block"
+     ],
+     "tris": 292,
+     "open_edges": 0,
+     "uv_islands": 60,
+     "uv_max_stretch": 1.134,
+     "bbox_centre": [
+      0.1224,
+      -2.4398,
+      -0.9792
+     ],
+     "bbox_size": [
+      2.701,
+      4.2595,
+      2.8397
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.1224,
+      -2.4398,
+      -0.9792
+     ]
+    }
+   }
+  },
+  "Leg_L": {
+   "pivots": {
+    "Hip": [
+     -0.0,
+     0.0,
+     0.0
+    ],
+    "Knee": [
+     -0.2856,
+     -4.4064,
+     0.1632
+    ],
+    "Ankle": [
+     -0.5059,
+     -7.548,
+     0.1632
+    ]
+   },
+   "segment_pivot": {
+    "Thigh": "Hip",
+    "Shin": "Knee",
+    "Foot": "Ankle"
+   },
+   "files": {
+    "Leg_L_Blue.obj": {
+     "segment": "All",
+     "colour": "Blue",
+     "pieces": [
+      "thigh_core",
+      "kneeback_inset",
+      "calf",
+      "ankle_front"
+     ],
+     "tris": 504,
+     "open_edges": 0,
+     "uv_islands": 62,
+     "uv_max_stretch": 1.119,
+     "bbox_centre": [
+      -0.2162,
+      -3.8148,
+      0.049
+     ],
+     "bbox_size": [
+      1.9829,
+      6.8952,
+      2.5133
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.2162,
+      -3.8148,
+      0.049
+     ]
+    },
+    "Leg_L_Gold.obj": {
+     "segment": "All",
+     "colour": "Gold",
+     "pieces": [
+      "thigh_collar",
+      "guard_out",
+      "lower_out",
+      "guard_in",
+      "lower_in",
+      "thigh_rear",
+      "kneeback_top",
+      "kneeback_in",
+      "kneeback_out",
+      "kneeback_bottom",
+      "toe_tip",
+      "heel"
+     ],
+     "tris": 1712,
+     "open_edges": 0,
+     "uv_islands": 178,
+     "uv_max_stretch": 1.18,
+     "bbox_centre": [
+      -0.0122,
+      -4.2057,
+      0.0082
+     ],
+     "bbox_size": [
+      2.8315,
+      8.5092,
+      3.672
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.0122,
+      -4.2057,
+      0.0082
+     ]
+    },
+    "Leg_L_Joint.obj": {
+     "segment": "All",
+     "colour": "Joint",
+     "pieces": [
+      "hip_ball",
+      "knee_axle",
+      "ankle_disc",
+      "ankle_cover"
+     ],
+     "tris": 484,
+     "open_edges": 0,
+     "uv_islands": 82,
+     "uv_max_stretch": 1.178,
+     "bbox_centre": [
+      -0.2869,
+      -3.6517,
+      0.2017
+     ],
+     "bbox_size": [
+      1.9559,
+      8.7069,
+      1.7509
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.2869,
+      -3.6517,
+      0.2017
+     ]
+    },
+    "Leg_L_White.obj": {
+     "segment": "All",
+     "colour": "White",
+     "pieces": [
+      "thigh_plate_out",
+      "thigh_plate_in",
+      "knee_block",
+      "shin_plate",
+      "shin_flank_out",
+      "shin_flank_in",
+      "achilles",
+      "toe_plate"
+     ],
+     "tris": 1152,
+     "open_edges": 0,
+     "uv_islands": 146,
+     "uv_max_stretch": 1.186,
+     "bbox_centre": [
+      -0.1693,
+      -4.3852,
+      -0.5957
+     ],
+     "bbox_size": [
+      2.7948,
+      8.1502,
+      4.6512
+     ],
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.1693,
+      -4.3852,
+      -0.5957
+     ]
+    },
+    "Leg_L_Foot_Gold.obj": {
+     "segment": "Foot",
+     "colour": "Gold",
+     "pieces": [
+      "toe_tip",
+      "heel"
+     ],
+     "tris": 212,
+     "open_edges": 0,
+     "uv_islands": 34,
+     "uv_max_stretch": 1.089,
+     "bbox_centre": [
+      -0.5059,
+      -7.7389,
+      -0.1346
+     ],
+     "bbox_size": [
+      1.6973,
+      1.4427,
+      3.3864
+     ],
+     "pivot": [
+      -0.5059,
+      -7.548,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.0,
+      -0.1909,
+      -0.2978
+     ]
+    },
+    "Leg_L_Foot_White.obj": {
+     "segment": "Foot",
+     "colour": "White",
+     "pieces": [
+      "toe_plate"
+     ],
+     "tris": 116,
+     "open_edges": 0,
+     "uv_islands": 16,
+     "uv_max_stretch": 1.152,
+     "bbox_centre": [
+      -0.5059,
+      -7.8001,
+      -1.583
+     ],
+     "bbox_size": [
+      1.6646,
+      1.3203,
+      2.6765
+     ],
+     "pivot": [
+      -0.5059,
+      -7.548,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.0,
+      -0.2521,
+      -1.7462
+     ]
+    },
+    "Leg_L_Shin_Blue.obj": {
+     "segment": "Shin",
+     "colour": "Blue",
+     "pieces": [
+      "calf",
+      "ankle_front"
+     ],
+     "tris": 272,
+     "open_edges": 0,
+     "uv_islands": 36,
+     "uv_max_stretch": 1.119,
+     "bbox_centre": [
+      -0.3758,
+      -6.018,
+      -0.0898
+     ],
+     "bbox_size": [
+      1.6639,
+      2.4888,
+      2.2358
+     ],
+     "pivot": [
+      -0.2856,
+      -4.4064,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.0902,
+      -1.6116,
+      -0.253
+     ]
+    },
+    "Leg_L_Shin_Joint.obj": {
+     "segment": "Shin",
+     "colour": "Joint",
+     "pieces": [
+      "knee_axle",
+      "ankle_disc",
+      "ankle_cover"
+     ],
+     "tris": 260,
+     "open_edges": 0,
+     "uv_islands": 62,
+     "uv_max_stretch": 1.156,
+     "bbox_centre": [
+      -0.4488,
+      -6.0481,
+      0.3916
+     ],
+     "bbox_size": [
+      1.632,
+      3.914,
+      1.3711
+     ],
+     "pivot": [
+      -0.2856,
+      -4.4064,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.1632,
+      -1.6417,
+      0.2284
+     ]
+    },
+    "Leg_L_Shin_White.obj": {
+     "segment": "Shin",
+     "colour": "White",
+     "pieces": [
+      "shin_plate",
+      "shin_flank_out",
+      "shin_flank_in",
+      "achilles"
+     ],
+     "tris": 744,
+     "open_edges": 0,
+     "uv_islands": 70,
+     "uv_max_stretch": 1.186,
+     "bbox_centre": [
+      -0.4325,
+      -5.916,
+      0.2407
+     ],
+     "bbox_size": [
+      2.2685,
+      3.5088,
+      2.9784
+     ],
+     "pivot": [
+      -0.2856,
+      -4.4064,
+      0.1632
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.1469,
+      -1.5096,
+      0.0775
+     ]
+    },
+    "Leg_L_Thigh_Blue.obj": {
+     "segment": "Thigh",
+     "colour": "Blue",
+     "pieces": [
+      "thigh_core",
+      "kneeback_inset"
+     ],
+     "tris": 232,
+     "open_edges": 0,
+     "uv_islands": 26,
+     "uv_max_stretch": 1.038,
+     "bbox_centre": [
+      0.0286,
+      -2.6112,
+      0.3264
+     ],
+     "bbox_size": [
+      1.4933,
+      4.488,
+      1.9584
+     ],
+     "pivot": [
+      -0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0286,
+      -2.6112,
+      0.3264
+     ]
+    },
+    "Leg_L_Thigh_Gold.obj": {
+     "segment": "Thigh",
+     "colour": "Gold",
+     "pieces": [
+      "thigh_collar",
+      "guard_out",
+      "lower_out",
+      "guard_in",
+      "lower_in",
+      "thigh_rear",
+      "kneeback_top",
+      "kneeback_in",
+      "kneeback_out",
+      "kneeback_bottom"
+     ],
+     "tris": 1500,
+     "open_edges": 0,
+     "uv_islands": 144,
+     "uv_max_stretch": 1.18,
+     "bbox_centre": [
+      -0.0122,
+      -2.4439,
+      0.0571
+     ],
+     "bbox_size": [
+      2.8315,
+      4.9858,
+      3.5741
+     ],
+     "pivot": [
+      -0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.0122,
+      -2.4439,
+      0.0571
+     ]
+    },
+    "Leg_L_Thigh_Joint.obj": {
+     "segment": "Thigh",
+     "colour": "Joint",
+     "pieces": [
+      "hip_ball"
+     ],
+     "tris": 224,
+     "open_edges": 0,
+     "uv_islands": 18,
+     "uv_max_stretch": 1.178,
+     "bbox_centre": [
+      0.0,
+      0.0,
+      -0.0
+     ],
+     "bbox_size": [
+      1.3822,
+      1.4035,
+      1.3475
+     ],
+     "pivot": [
+      -0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      0.0,
+      0.0,
+      -0.0
+     ]
+    },
+    "Leg_L_Thigh_White.obj": {
+     "segment": "Thigh",
+     "colour": "White",
+     "pieces": [
+      "thigh_plate_out",
+      "thigh_plate_in",
+      "knee_block"
+     ],
+     "tris": 292,
+     "open_edges": 0,
+     "uv_islands": 60,
+     "uv_max_stretch": 1.134,
+     "bbox_centre": [
+      -0.1224,
+      -2.4398,
+      -0.9792
+     ],
+     "bbox_size": [
+      2.701,
+      4.2595,
+      2.8397
+     ],
+     "pivot": [
+      -0.0,
+      0.0,
+      0.0
+     ],
+     "bbox_centre_minus_pivot": [
+      -0.1224,
+      -2.4398,
+      -0.9792
+     ]
+    }
+   }
+  }
+ },
+ "verification": {
+  "front": {
+   "silhouette_iou": 0.9632,
+   "colour_iou": {
+    "White": 0.821,
+    "Gold": 0.662,
+    "Blue": 0.623,
+    "Joint": 0.252
+   },
+   "colour_agreement": 0.894
+  },
+  "side": {
+   "silhouette_iou": 0.9485,
+   "colour_iou": {
+    "White": 0.89,
+    "Gold": 0.905,
+    "Blue": 0.583,
+    "Joint": 0.608
+   },
+   "colour_agreement": 0.956
+  },
+  "back": {
+   "silhouette_iou": 0.9538,
+   "colour_iou": {
+    "White": 0.503,
+    "Gold": 0.75,
+    "Blue": 0.717,
+    "Joint": 0.462
+   },
+   "colour_agreement": 0.877
+  }
+ },
+ "files_total": 26
+}

@@ -1,0 +1,17 @@
+{
+  "sockets_studs": {
+    "RightShoulder": [
+      3.5,
+      9.2,
+      0.1632
+    ],
+    "LeftShoulder": [
+      -3.5,
+      9.2,
+      0.1632
+    ]
+  },
+  "roll_deg": 17.0,
+  "front_iou_torso_plus_arms": 0.8998427260812581,
+  "back_iou_torso_plus_arms": 0.8889912310261422
+}

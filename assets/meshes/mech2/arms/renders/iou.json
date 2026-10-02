@@ -1,0 +1,22 @@
+{
+ "R": {
+  "iou": 0.9188,
+  "shoulder_px": [
+   416.0,
+   198.0
+  ],
+  "shoulder_roll_deg": 21.6,
+  "elbow_deg": -6.0,
+  "wrist_deg": -2.0
+ },
+ "L": {
+  "iou": 0.9061,
+  "shoulder_px": [
+   172.0,
+   196.0
+  ],
+  "shoulder_roll_deg": 18.6,
+  "elbow_deg": -3.0,
+  "wrist_deg": 0.0
+ }
+}

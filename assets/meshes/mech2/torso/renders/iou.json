@@ -1,0 +1,23 @@
+{
+  "front_iou": 0.9113483021789625,
+  "back_iou": 0.923829900450081,
+  "side34_iou": 0.7735497921203722,
+  "side34_fitted_azimuth_deg": 60,
+  "depth_cells": {
+    "chest_prow_Z": -3.4,
+    "core_front_Z": -1.1,
+    "blue_side_block_front_Z": -1.25,
+    "back_plate_Z": 2.65,
+    "fin_top_back_Z": 4.3,
+    "pauldron_Z_extent": [
+      -1.585,
+      1.585
+    ],
+    "pauldron_outer_tip_X": 8.609,
+    "torso_side_X": 3.42,
+    "chest_projection_vs_core": 2.3,
+    "chest_projection_vs_blue_side": 2.15,
+    "prow_to_back_plate": 6.05,
+    "pauldron_standoff_past_torso_side": 5.189
+  }
+}
