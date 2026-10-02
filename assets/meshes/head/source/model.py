@@ -144,17 +144,24 @@ def helmet_back_strip(h0, h1, grow, inset, half=1.40):
 SPIKE_TIP = (0.0, 6.54, -2.20)
 
 
+BROW_TOP = 3.80  # BROW_POLY's top edge
+BROW_GAP = 0.05  # cells (~0.04 studs) between the blade's side edges and the brow
+
+
 def crest():
     rows = [
         # h, half-width, z front
         (5.58, 0.20, -2.27),
         (4.92, 0.29, -2.33),
         (4.20, 0.36, -2.40),
-        (3.80, 0.38, -2.46),
         # owner review: the ridge runs on DOWN over the brow as a raised,
-        # tapering ridge, its point just above the visor's peak (h 2.93)
-        (3.62, 0.33, -2.50),
-        (3.30, 0.20, -2.51),
+        # tapering ridge, its point just above the visor's peak (h 2.93).
+        # Over the brow it hugs the brow's front (z -2.44 + 0.62|x|) with a
+        # BROW_GAP standoff so the brow never pokes through the blade.
+        (3.86, 0.38, -2.50),
+        (3.80, 0.37, -2.52),
+        (3.62, 0.33, -2.53),
+        (3.30, 0.20, -2.52),
     ]
     rings = []
     for h, w, zfr in rows:
@@ -163,11 +170,13 @@ def crest():
         if h > 5.0:
             zbk = lerp(-1.87, -1.55, (5.58 - h) / 0.66)  # SIDE: blade's own back edge above the dome
         zm = zbk - 0.08
-        if h < 3.75:  # on the brow: sides sunk just into the brow's front (z -2.44 + 0.62|x|)
-            zm = -2.44 + 0.62 * w + 0.02
-            zbk = zm + 0.05
+        if h <= 5.0:  # on the flat forehead (|x| <= 1): side edges just in front of it, back buried
+            zm = zf - BROW_GAP
+        if h <= BROW_TOP:  # on the brow: side edges just in front of its surface, back buried in it
+            zm = -2.44 + 0.62 * w - BROW_GAP
+            zbk = -2.20
         rings.append([(0, h, zfr), (w, h, zm), (0, h, zbk), (-w, h, zm)])
-    return loft(rings, apex0=SPIKE_TIP, apex1=(0.0, 3.00, -2.47))
+    return loft(rings, apex0=SPIKE_TIP, apex1=(0.0, 3.00, -2.50))
 
 
 # ======================================================================

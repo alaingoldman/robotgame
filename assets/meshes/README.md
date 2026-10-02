@@ -119,7 +119,7 @@ Each colour role is its own MeshPart. Every piece is a closed shell with flat, h
 |---|---|---|---|---|---|---|
 | Titan_HeadMain.obj | Head | (0, 1.0037, -0.2596) | 2.5786 x 3.8842 x 3.4628 | 688 | main | set "Head": every part in MechHead/HelmetArmor |
 | Titan_HeadTrim.obj | Head | (0, 0.3754, -0.5467) | 2.9539 x 2.8397 x 2.8723 | 324 | hi | (set "Head") |
-| Titan_HeadCrest.obj | Head | (0, 2.5051, -1.6565) | 0.6202 x 2.8886 x 0.7834 | 48 | trim | (set "Head") |
+| Titan_HeadCrest.obj | Head | (0, 2.5051, -1.6646) | 0.6202 x 2.8886 x 0.7997 | 56 | trim | (set "Head") |
 | Titan_HeadVisor.obj | Head | (0, 0.9833, -1.3138) | 1.8115 x 0.661 x 0.7181 | 20 | glow | (set "Head") |
 | Titan_HeadRecess.obj | Head | (0, 1.3872, -0.083) | 2.5214 x 1.4688 x 3.1469 | 192 | recess | (set "Head") |
 | Titan_Gorget.obj | Collar | (0, 0.8609, 0.6528) | 4.4717 x 2.9458 x 4.2432 | 384 | main | set "Collar": every part in MechHead/CollarArmor |
@@ -131,7 +131,7 @@ What each piece contains:
 - **HeadMain**: the helmet dome, the faceted forehead, the brow, the jaw side plates, the raised band around each
   ear arch, the rim below the back band, and a hidden face core.
 - **HeadTrim** (brass): the prow faceplate with its centre crease, ending below the cheek bars in a pointed chin (two angled plates meeting at the crease), the two cheek bars and the ear pods.
-- **HeadCrest**: the crest spike and the raised ridge down the forehead, which runs on over the brow and tapers to a point just above the visor's peak.
+- **HeadCrest**: the crest spike and the raised ridge down the forehead, which runs on over the brow and tapers to a point just above the visor's peak. Its side edges stand 0.05 cell (0.04 studs) proud of the forehead and the brow, so neither pokes through the blade (`source/cliptest.py` checks this and the other face pieces).
 - **HeadVisor**: the chevron slit, filling the whole opening edge to edge (glow, so it dims with the other lights).
 - **HeadRecess**: the visor surround, the ear-arch recesses and the dark band across the back.
 - **Gorget**: the collar ring, which is high at the back and low at the front, with a top that slopes inward. It
@@ -170,8 +170,8 @@ Fit against the references:
 
 - Silhouette IoU against the thresholded drawings: the torso and the shoulder pad are masked out because they are
   other parts. In the side view, the pad hides the lower head.
-  - With the helmet at the sheet's height: **front 0.973, side 0.962, back 0.962**.
-  - As mounted (raised and lengthened, a deliberate deviation): front 0.904, side 0.793, back 0.851.
+  - With the helmet at the sheet's height: **front 0.973, side 0.960, back 0.962**.
+  - As mounted (raised and lengthened, a deliberate deviation): front 0.904, side 0.792, back 0.851.
 - The comparison images are `head/Titan_Head_compare_{front,side,back,all}.png`. Each one shows the reference, the
   render at the same scale (as mounted) and the diff. `head/Titan_Head_preview.png` shows 3/4 views.
 

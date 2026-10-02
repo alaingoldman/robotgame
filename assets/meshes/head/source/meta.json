@@ -48,17 +48,17 @@
       "offset": [
         0.0,
         2.5051,
-        -1.6565
+        -1.6646
       ],
       "size": [
         0.6202,
         2.8886,
-        0.7834
+        0.7997
       ],
-      "tris": 48,
+      "tris": 56,
       "open_edges": 0,
-      "uv_islands": 10,
-      "max_uv_stretch": 1.09
+      "uv_islands": 19,
+      "max_uv_stretch": 1.048
     },
     "Titan_HeadVisor": {
       "bone": "Head",
@@ -163,12 +163,12 @@
   },
   "iou_as_mounted": {
     "front": 0.9042,
-    "side": 0.7933,
+    "side": 0.7915,
     "back": 0.8505
   },
   "iou_helmet_at_sheet_height": {
     "front": 0.9729,
-    "side": 0.9616,
+    "side": 0.9604,
     "back": 0.9616
   },
   "head_raise_cells": 0.5,

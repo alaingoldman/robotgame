@@ -96,7 +96,7 @@ TitanMeshes.Meshes = {
 	},
 	Titan_HeadCrest = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "trim",
-		offset = Vector3.new(0, 2.5051, -1.6565), size = Vector3.new(0.6202, 2.8886, 0.7834), -- ridge runs down to just above the visor (owner)
+		offset = Vector3.new(0, 2.5051, -1.6646), size = Vector3.new(0.6202, 2.8886, 0.7997), -- ridge runs down to just above the visor (owner)
 	},
 	Titan_HeadVisor = {
 		bone = "Head", model = "MechHead", folder = "HelmetArmor", parts = {}, all = true, set = "Head", role = "glow",
