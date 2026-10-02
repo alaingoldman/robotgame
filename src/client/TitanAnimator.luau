@@ -98,6 +98,7 @@ TitanAnimator.JumpWindup = 0.22 -- PilotController waits this long (crouch) befo
 local rayParams = RaycastParams.new()
 rayParams.FilterType = Enum.RaycastFilterType.Exclude
 rayParams.RespectCanCollide = true
+rayParams.CollisionGroup = "MechRoot" -- what the root stands on (MechBuilder.RootGroup): not players / pilots
 local shake = 0
 
 local function lerp(a: number, b: number, t: number): number
