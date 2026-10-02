@@ -621,6 +621,20 @@ local SEATED = {
 	RightElbow = CFrame.Angles(math.rad(40), 0, 0),
 }
 
+-- Seats the stand-in: each SEATED joint's C0 = its rest rotation * the seat
+-- bend (absolute, so it can run again: ScaleTo on a model with a Humanoid
+-- rebuilds the joints, which straightened the legs).
+local function seatPose(doll: Model)
+	for _, x in doll:GetDescendants() do
+		if x:IsA("Motor6D") and SEATED[x.Name] then
+			local rest = x:GetAttribute("RestRot")
+			if typeof(rest) == "CFrame" then
+				x.C0 = CFrame.new(x.C0.Position) * rest * SEATED[x.Name]
+			end
+		end
+	end
+end
+
 local function makeDoll(char: Model, seat: BasePart): Model?
 	local was = char.Archivable
 	char.Archivable = true
@@ -633,7 +647,15 @@ local function makeDoll(char: Model, seat: BasePart): Model?
 	end
 	local d = doll :: Model
 	d.Name = "PilotStandIn"
+	for _, tag in CollectionService:GetTags(d) do
+		CollectionService:RemoveTag(d, tag)
+	end
 	for _, x in d:GetDescendants() do
+		-- drop the clone's tags, so nothing else drives it (ExoAnimator re-aims
+		-- tagged EXO-1 pistons with unscaled anchors: a bar across the cockpit)
+		for _, tag in CollectionService:GetTags(x) do
+			CollectionService:RemoveTag(x, tag)
+		end
 		if x:IsA("Script") or x:IsA("LocalScript") or x:IsA("Sound") or x:IsA("Animator") or x:IsA("ForceField") then
 			x:Destroy()
 		elseif x:IsA("BasePart") then
@@ -646,7 +668,7 @@ local function makeDoll(char: Model, seat: BasePart): Model?
 		elseif x:IsA("Beam") or x:IsA("Trail") or x:IsA("ParticleEmitter") then
 			x.Enabled = false
 		elseif x:IsA("Motor6D") and SEATED[x.Name] then
-			x.C0 = x.C0 * SEATED[x.Name]
+			x:SetAttribute("RestRot", x.C0.Rotation)
 		end
 	end
 	local hum = d:FindFirstChildOfClass("Humanoid")
@@ -663,6 +685,7 @@ local function makeDoll(char: Model, seat: BasePart): Model?
 	end
 	d.PrimaryPart = hrp
 	d:SetAttribute("BaseScale", d:GetScale())
+	seatPose(d)
 	d.Parent = workspace
 	return d
 end
@@ -699,6 +722,7 @@ local function placeDoll(doll: Model, seat: BasePart, model: Model)
 		pcall(function()
 			doll:ScaleTo(scale)
 		end)
+		seatPose(doll)
 		local root = model:FindFirstChild("HumanoidRootPart") :: BasePart?
 		local fromCF = seatedCF(doll, seat)
 		if root then
@@ -714,6 +738,7 @@ local function placeDoll(doll: Model, seat: BasePart, model: Model)
 	pcall(function()
 		doll:ScaleTo(base * Mech2Config.PilotScale)
 	end)
+	seatPose(doll)
 	doll:PivotTo(seatedCF(doll, seat))
 	for _, x in doll:GetDescendants() do
 		if x:IsA("BasePart") then
