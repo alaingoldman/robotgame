@@ -281,6 +281,7 @@ local LAND_COMP = 0.05 -- squat velocity factor per stud/s of impact
 local airParams = RaycastParams.new()
 airParams.FilterType = Enum.RaycastFilterType.Exclude
 airParams.RespectCanCollide = true
+airParams.CollisionGroup = "MechRoot" -- what the root stands on (MechBuilder.RootGroup): not players / pilots
 
 -- Returns the impact speed on the frame it lands (else nil).
 function LegIK.updateAir(air: Air, model: Model, root: BasePart, rootHeight: number, maxComp: number, dt: number): number?

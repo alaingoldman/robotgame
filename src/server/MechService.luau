@@ -290,11 +290,16 @@ local function setPower(model: Model, state: string)
 	model:SetAttribute("PowerTime", workspace:GetServerTimeNow())
 end
 
--- Height of the ground under a point, ignoring the given model.
+-- Height of the ground under a point, ignoring the given model. Only what a
+-- mech root stands on counts (the world and other roots): the seated pilot,
+-- players and armor don't, or a mech parked with its pilot's head under the
+-- ray (GR-07: the pilot stands right over the root) floats in the air.
 local function groundY(model: Model, pos: Vector3): number
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = { model }
+	params.CollisionGroup = MechBuilder.RootGroup
+	params.RespectCanCollide = true
 	local hit = workspace:Raycast(pos + Vector3.new(0, 20, 0), Vector3.new(0, -200, 0), params)
 	return if hit then hit.Position.Y else 0
 end
