@@ -56,11 +56,19 @@ Mech3Config.Lineup = {
 	{ key = "SRF03_Seraph", variantId = "Navy", x = -218, z = -150 },
 }
 
--- Pivots (studs, model space; assets/meshes/mech3/meta.json "pivots").
+-- Imported mesh asset. v1 (110252059423481) = the first GLB (paper-look
+-- texture). v2 = assets/meshes/mech3/Mech3_v2.glb: metal PBR texture
+-- (SurfaceAppearance), pad flaps pulled onto the arms, wings 0.2 studs in
+-- (meta_v2.json). Set AssetV2 to the owner's v2 import and the rig follows.
+Mech3Config.AssetV1 = 110252059423481
+Mech3Config.AssetV2 = nil :: number?
+local WING_X = if Mech3Config.AssetV2 then 2.815 else 3.015
+
+-- Pivots (studs, model space; assets/meshes/mech3/meta.json / meta_v2.json "pivots").
 Mech3Config.Pivots = {
 	Neck = Vector3.new(0, 17.45, -0.156),
 	Waist = Vector3.new(0, 12.4, -0.058),
-	Wing = { Right = Vector3.new(3.015, 16.795, 1.021), Left = Vector3.new(-3.015, 16.795, 1.021) },
+	Wing = { Right = Vector3.new(WING_X, 16.795, 1.021), Left = Vector3.new(-WING_X, 16.795, 1.021) },
 	Shoulder = { Right = Vector3.new(2.612, 15.6, 0.094), Left = Vector3.new(-2.616, 15.6, 0.092) },
 	Pad = { Right = Vector3.new(1.85, 16.9, 0.086), Left = Vector3.new(-1.85, 16.9, 0.089) },
 	Elbow = { Right = Vector3.new(3.389, 13.85, 0.406), Left = Vector3.new(-3.384, 13.85, 0.406) },

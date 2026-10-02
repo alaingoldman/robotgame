@@ -10,19 +10,25 @@
 -- Import rotation: Studio's importer turned the GLB 180 deg about Y (the
 -- "_L" parts load at +X, the front faces +Z). The source frame (meta.json)
 -- is the model frame: front -Z, +X = the mech's right. So a template's
--- model-space CFrame is ImportRotation * its loaded CFrame.
+-- model-space CFrame is ImportRotation * its loaded CFrame. The v2 import's
+-- PBR material comes in as a SurfaceAppearance under each MeshPart; it stays
+-- with the template and every clone (Mech3Builder keeps it).
 
 local InsertService = game:GetService("InsertService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Mech3Config = require(script.Parent.Mech3Config)
 
 local Mech3Meshes = {}
 
 Mech3Meshes.FolderName = "Mech3Meshes"
 Mech3Meshes.ImportRotation = CFrame.Angles(0, math.pi, 0)
-Mech3Meshes.MechAsset = 110252059423481
+-- the current import (v2 once set: metal PBR, the SurfaceAppearance rides on each template)
+Mech3Meshes.MechAsset = Mech3Config.AssetV2 or Mech3Config.AssetV1
+Mech3Meshes.AssetAttr = "Mech3Asset" -- set on every template: which import it came from
 
--- part name -> bone (Mech3Builder) and its MeshId (a template only counts
--- while it holds this mesh)
+-- part name -> bone (Mech3Builder). The mesh ids are v1's; a template only
+-- counts while it came from the current asset (Mech3Asset attribute).
 Mech3Meshes.Parts = {
 	Head = { bone = "Helmet", mesh = 98026773126829 },
 	Torso = { bone = "Torso", mesh = 98885215792558 },
@@ -55,9 +61,13 @@ function Mech3Meshes.template(name: string): MeshPart?
 	if not (t and t:IsA("MeshPart")) then
 		return nil
 	end
-	local e = Mech3Meshes.Parts[name]
-	if e and not string.find(t.MeshId, string.format("%.0f", e.mesh), 1, true) then
-		return nil -- stale (an older upload)
+	if t:GetAttribute(Mech3Meshes.AssetAttr) ~= Mech3Meshes.MechAsset then
+		local e = Mech3Meshes.Parts[name]
+		-- v1 templates loaded before the attribute existed: recognised by their MeshId
+		local legacy = Mech3Meshes.MechAsset == Mech3Config.AssetV1 and e and string.find(t.MeshId, string.format("%.0f", e.mesh), 1, true)
+		if not legacy then
+			return nil -- stale (an older upload)
+		end
 	end
 	return t
 end
@@ -114,6 +124,7 @@ function Mech3Meshes.ensure(): { string }
 				mp.CanCollide = false
 				mp.CanTouch = false
 				mp.CanQuery = false
+				mp:SetAttribute(Mech3Meshes.AssetAttr, Mech3Meshes.MechAsset)
 				mp.Parent = f
 				mp.CFrame = cf
 			end

@@ -304,7 +304,9 @@ function Mech3Builder.buildRig(name: string): Model
 		mp.Massless = true
 		mp.CastShadow = true
 		for _, c in mp:GetChildren() do
-			c:Destroy()
+			if not c:IsA("SurfaceAppearance") then -- v2: the metal PBR material stays
+				c:Destroy()
+			end
 		end
 		weld(b, mp, b.CFrame:ToObjectSpace(mp.CFrame))
 		mp.Parent = folderOf(e.bone)
@@ -323,6 +325,19 @@ function Mech3Builder.buildRig(name: string): Model
 	for _, sx in { 1, -1 } do
 		local slit = addPart(folders.Chest, torso, "ChestSlit", Vector3.new(0.42, 0.1, 0.06), CFrame.new(sx * 1.36, 15.45, -1.68) * CFrame.Angles(0, -sx * 0.8, 0) * CFrame.Angles(0, 0, sx * 0.12), "glow")
 		slit:SetAttribute("Mech3Core", true)
+	end
+
+	-- wing mounts: a charcoal bracket out of the backpack's flank to each wing
+	-- root (behind the shoulder pad) and a hinge drum there, so the wings
+	-- visibly hang off the back like the sheet's
+	for _, side in { "Right", "Left" } do
+		local sx = if side == "Right" then 1 else -1
+		local root = PV.Wing[side]
+		local x0, x1 = 1.45, math.abs(root.X) + 0.05
+		local z = root.Z + 0.3
+		addPart(folders.Chest, torso, "WingBracket", Vector3.new(x1 - x0, 0.42, 0.5), CFrame.new(sx * (x0 + x1) / 2, root.Y, z), "dark")
+		addPart(folders.Chest, torso, "WingBracketCap", Vector3.new(x1 - x0 - 0.3, 0.12, 0.3), CFrame.new(sx * (x0 + x1) / 2, root.Y + 0.25, z), "trim")
+		addPart(folders.Chest, torso, "WingHinge", Vector3.new(0.7, 0.62, 0.62), CFrame.new(sx * math.abs(root.X), root.Y, z) * CFrame.Angles(0, math.pi / 2, 0), "dark", Enum.PartType.Cylinder)
 	end
 
 	buildCockpit(model, folders.Chest, torso)
