@@ -9,6 +9,10 @@
 --   bases    prompts of other players' plots are hidden; the charger prompt
 --            shows the next upgrade's cost
 --   beacons  "ScrapyardBlink" lights blink
+--   camfade  map props right at / around the camera fade out locally (the
+--            base locker / station sit behind the pad, so standing on the
+--            drop zone facing the yard put the camera inside the locker and
+--            its doors filled the bottom of the screen)
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -164,6 +168,53 @@ local function setupPrompts()
 	end)
 end
 
+------------------------------------------------------------------ camera fade
+
+local FADE_RANGE = 3 -- studs from the camera to a part's box where it starts fading
+local FADE_MAX = 0.85 -- LocalTransparencyModifier just outside the touch range (touching / inside = fully hidden)
+local faded: { [BasePart]: boolean } = {}
+local fadeParams = OverlapParams.new()
+fadeParams.FilterType = Enum.RaycastFilterType.Include
+fadeParams.MaxParts = 64
+
+local function boxDistance(part: BasePart, pos: Vector3): number
+	local rel = part.CFrame:PointToObjectSpace(pos)
+	local h = part.Size / 2
+	local dx = math.max(math.abs(rel.X) - h.X, 0)
+	local dy = math.max(math.abs(rel.Y) - h.Y, 0)
+	local dz = math.max(math.abs(rel.Z) - h.Z, 0)
+	return math.sqrt(dx * dx + dy * dy + dz * dz)
+end
+
+local function fadeNearCamera()
+	local yard = workspace:FindFirstChild("Scrapyard")
+	local cam = workspace.CurrentCamera
+	if not (yard and cam) then
+		return
+	end
+	local pos = cam.CFrame.Position
+	fadeParams.FilterDescendantsInstances = { yard }
+	local seen: { [BasePart]: boolean } = {}
+	for _, part in workspace:GetPartBoundsInRadius(pos, FADE_RANGE, fadeParams) do
+		-- ground-level slabs (floor, pads, edges) never block the view
+		if part.Transparency >= 1 or part.Position.Y + part.Size.Magnitude / 2 < 1.5 or part.Size.Y < 0.6 and part.Position.Y < 1 then
+			continue
+		end
+		local d = boxDistance(part, pos)
+		if d < FADE_RANGE then
+			seen[part] = true
+			faded[part] = true
+			part.LocalTransparencyModifier = if d <= 0.6 then 1 else FADE_MAX * math.clamp(1 - (d - 0.6) / (FADE_RANGE - 0.6), 0, 1)
+		end
+	end
+	for part in faded do
+		if not seen[part] then
+			part.LocalTransparencyModifier = 0
+			faded[part] = nil
+		end
+	end
+end
+
 ------------------------------------------------------------------ frame
 
 local function step(dt: number)
@@ -173,6 +224,7 @@ local function step(dt: number)
 	local rp = char and char:FindFirstChild("HumanoidRootPart") :: BasePart?
 	local scan = (player:GetAttribute("ScanRange") :: number?) or 0
 	local see = math.max(40, scan)
+	fadeNearCamera()
 	for model, v in loots do
 		if not model.Parent then
 			removeLoot(model)
