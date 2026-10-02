@@ -1,0 +1,397 @@
+{
+  "units": "studs (1 glTF unit = 1 stud)",
+  "up": "+Y",
+  "front": "-Z",
+  "mech_right": "+X",
+  "height": 20.0,
+  "source_scale": 10.60316654369566,
+  "parts": {
+    "Head": {
+      "tris": 4112,
+      "core_tris": 3421,
+      "overlap_tris": 677,
+      "cap_tris": 14,
+      "bbox_min": [
+        -2.007,
+        17.734,
+        -2.42
+      ],
+      "bbox_max": [
+        1.939,
+        20.0,
+        3.586
+      ]
+    },
+    "Torso": {
+      "tris": 15209,
+      "core_tris": 13286,
+      "overlap_tris": 1903,
+      "cap_tris": 20,
+      "bbox_min": [
+        -4.96,
+        13.659,
+        -3.449
+      ],
+      "bbox_max": [
+        5.018,
+        18.07,
+        3.724
+      ]
+    },
+    "Pelvis": {
+      "tris": 7297,
+      "core_tris": 5911,
+      "overlap_tris": 1356,
+      "cap_tris": 30,
+      "bbox_min": [
+        -2.96,
+        9.124,
+        -2.836
+      ],
+      "bbox_max": [
+        2.987,
+        14.066,
+        2.798
+      ]
+    },
+    "ShoulderPad_L": {
+      "tris": 3167,
+      "core_tris": 2717,
+      "overlap_tris": 450,
+      "cap_tris": 0,
+      "bbox_min": [
+        -5.288,
+        17.27,
+        -2.433
+      ],
+      "bbox_max": [
+        -1.514,
+        19.923,
+        3.685
+      ]
+    },
+    "ShoulderPad_R": {
+      "tris": 3022,
+      "core_tris": 2587,
+      "overlap_tris": 435,
+      "cap_tris": 0,
+      "bbox_min": [
+        1.548,
+        17.181,
+        -2.433
+      ],
+      "bbox_max": [
+        5.294,
+        19.913,
+        3.667
+      ]
+    },
+    "UpperArm_L": {
+      "tris": 3285,
+      "core_tris": 2615,
+      "overlap_tris": 653,
+      "cap_tris": 17,
+      "bbox_min": [
+        -7.5,
+        13.709,
+        -1.847
+      ],
+      "bbox_max": [
+        -3.71,
+        18.111,
+        2.537
+      ]
+    },
+    "UpperArm_R": {
+      "tris": 3129,
+      "core_tris": 2500,
+      "overlap_tris": 611,
+      "cap_tris": 18,
+      "bbox_min": [
+        3.767,
+        13.696,
+        -1.841
+      ],
+      "bbox_max": [
+        7.529,
+        18.111,
+        2.55
+      ]
+    },
+    "Forearm_L": {
+      "tris": 3280,
+      "core_tris": 2806,
+      "overlap_tris": 442,
+      "cap_tris": 32,
+      "bbox_min": [
+        -7.962,
+        9.865,
+        -1.447
+      ],
+      "bbox_max": [
+        -4.308,
+        14.097,
+        2.118
+      ]
+    },
+    "Forearm_R": {
+      "tris": 3234,
+      "core_tris": 2739,
+      "overlap_tris": 462,
+      "cap_tris": 33,
+      "bbox_min": [
+        4.367,
+        9.767,
+        -1.452
+      ],
+      "bbox_max": [
+        7.962,
+        14.104,
+        2.148
+      ]
+    },
+    "Hand_L": {
+      "tris": 2607,
+      "core_tris": 2411,
+      "overlap_tris": 173,
+      "cap_tris": 23,
+      "bbox_min": [
+        -7.694,
+        7.33,
+        -1.484
+      ],
+      "bbox_max": [
+        -5.409,
+        10.034,
+        1.039
+      ]
+    },
+    "Hand_R": {
+      "tris": 2626,
+      "core_tris": 2446,
+      "overlap_tris": 159,
+      "cap_tris": 21,
+      "bbox_min": [
+        5.415,
+        7.333,
+        -1.496
+      ],
+      "bbox_max": [
+        7.705,
+        10.052,
+        1.039
+      ]
+    },
+    "Thigh_L": {
+      "tris": 5225,
+      "core_tris": 4366,
+      "overlap_tris": 827,
+      "cap_tris": 32,
+      "bbox_min": [
+        -4.34,
+        7.486,
+        -2.516
+      ],
+      "bbox_max": [
+        -0.663,
+        12.962,
+        2.737
+      ]
+    },
+    "Thigh_R": {
+      "tris": 4909,
+      "core_tris": 4115,
+      "overlap_tris": 760,
+      "cap_tris": 34,
+      "bbox_min": [
+        0.683,
+        7.561,
+        -2.581
+      ],
+      "bbox_max": [
+        4.339,
+        12.983,
+        2.722
+      ]
+    },
+    "Shin_L": {
+      "tris": 4320,
+      "core_tris": 3590,
+      "overlap_tris": 691,
+      "cap_tris": 39,
+      "bbox_min": [
+        -5.131,
+        1.685,
+        -2.318
+      ],
+      "bbox_max": [
+        -0.997,
+        7.877,
+        2.849
+      ]
+    },
+    "Shin_R": {
+      "tris": 4431,
+      "core_tris": 3665,
+      "overlap_tris": 726,
+      "cap_tris": 40,
+      "bbox_min": [
+        1.004,
+        1.676,
+        -2.321
+      ],
+      "bbox_max": [
+        5.139,
+        7.845,
+        2.848
+      ]
+    },
+    "Foot_L": {
+      "tris": 3595,
+      "core_tris": 3276,
+      "overlap_tris": 297,
+      "cap_tris": 22,
+      "bbox_min": [
+        -5.885,
+        0.0,
+        -3.724
+      ],
+      "bbox_max": [
+        -1.625,
+        2.007,
+        3.248
+      ]
+    },
+    "Foot_R": {
+      "tris": 3635,
+      "core_tris": 3313,
+      "overlap_tris": 308,
+      "cap_tris": 14,
+      "bbox_min": [
+        1.633,
+        0.001,
+        -3.72
+      ],
+      "bbox_max": [
+        5.868,
+        2.024,
+        3.248
+      ]
+    }
+  },
+  "pivots": {
+    "Neck": [
+      0.0,
+      17.9,
+      0.542
+    ],
+    "Waist": [
+      0.0,
+      13.9,
+      -0.101
+    ],
+    "Shoulder_R": [
+      4.45,
+      16.8,
+      0.351
+    ],
+    "ShoulderPad_R": [
+      2.0,
+      18.1,
+      0.617
+    ],
+    "Elbow_R": [
+      6.066,
+      13.85,
+      0.367
+    ],
+    "Wrist_R": [
+      6.903,
+      9.95,
+      0.048
+    ],
+    "Hip_R": [
+      2.334,
+      12.2,
+      0.07
+    ],
+    "Knee_R": [
+      2.581,
+      8.0,
+      0.1
+    ],
+    "Ankle_R": [
+      3.601,
+      1.95,
+      0.308
+    ],
+    "Shoulder_L": [
+      -4.45,
+      16.8,
+      0.345
+    ],
+    "ShoulderPad_L": [
+      -2.0,
+      18.1,
+      0.625
+    ],
+    "Elbow_L": [
+      -6.027,
+      13.85,
+      0.34
+    ],
+    "Wrist_L": [
+      -6.886,
+      9.95,
+      0.059
+    ],
+    "Hip_L": [
+      -2.314,
+      12.2,
+      0.111
+    ],
+    "Knee_L": [
+      -2.522,
+      8.0,
+      0.122
+    ],
+    "Ankle_L": [
+      -3.621,
+      1.95,
+      0.307
+    ]
+  },
+  "blade": {
+    "file": "Crimson_Blade.glb",
+    "length": 10.0,
+    "grip_origin": [
+      0,
+      0,
+      0
+    ],
+    "blade_axis": "+Y",
+    "spine_side": "+X",
+    "edge_side": "-X",
+    "bbox_min": [
+      -1.261,
+      -1.468,
+      -0.289
+    ],
+    "bbox_max": [
+      0.674,
+      8.532,
+      0.289
+    ],
+    "tris": 7961,
+    "suggested_grip_in_mech_space_R": [
+      6.56,
+      8.616,
+      -0.229
+    ],
+    "suggested_grip_in_mech_space_L": [
+      -6.56,
+      8.616,
+      -0.229
+    ]
+  }
+}
