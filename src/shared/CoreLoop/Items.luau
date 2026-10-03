@@ -1,9 +1,9 @@
 --!strict
 -- Item records for the core loop (shared so the HUD / locker UI can name and
 -- describe them). Items are plain tables sent over remotes:
---   Part:    { uid, kind = "Part", slot = "Legs"|"Arms"|"Chest"|"Head", tier = 1..5, variant = palette id }
+--   Part:    { uid, kind = "Part", slot = "Legs"|"Arms"|"Chest", tier = 1..20 }
 --   Cell:    { uid, kind = "Cell", cell = "Power"|"Coil" }   (battery upgrade cargo)
---   Weapon:  { uid, kind = "Weapon", weapon = "Blade"|"Hammer"|"Rivet" }
+--   Weapon:  { uid, kind = "Weapon", weapon = "M01".."M10" | "R01".."R10" }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -28,14 +28,11 @@ function Items.uid(): string
 	return string.format("i%d_%d", nextId, math.random(1000, 9999))
 end
 
-Items.Variants = { "Olive", "Desert", "Arctic", "Navy", "Crimson" }
--- BRZ-01 palettes (TitanConfig variant ids)
-Items.TitanVariants = { "Desert", "Navy", "Olive" }
-
 function Items.part(slot: string, tier: number, variant: string?): Item
-	local t = math.clamp(tier, 1, 5)
-	local pool = if t == 5 then Items.TitanVariants else Items.Variants
-	return { uid = Items.uid(), kind = "Part", slot = slot, tier = t, variant = variant or pool[math.random(1, #pool)] }
+	if slot == "Head" then
+		slot = "Chest" -- the helmet is part of the chest piece now
+	end
+	return { uid = Items.uid(), kind = "Part", slot = slot, tier = math.clamp(math.floor(tier), 1, CoreLoopConfig.MaxTier), variant = variant }
 end
 
 function Items.cell(which: string): Item
@@ -47,14 +44,14 @@ function Items.weapon(id: string): Item
 end
 
 function Items.tierInfo(tier: number): CoreLoopConfig.Tier
-	return CoreLoopConfig.Tiers[math.clamp(tier, 1, 5)]
+	return CoreLoopConfig.Tiers[math.clamp(math.floor(tier), 1, CoreLoopConfig.MaxTier)]
 end
 
--- "VK-01 Military Arms"
+-- "Clockwork Arms"
 function Items.name(item: Item): string
 	if item.kind == "Part" then
 		local t = Items.tierInfo(item.tier or 1)
-		return string.format("%s %s %s", CoreLoopConfig.FamilyNames[t.family] or t.family, t.name, item.slot or "?")
+		return string.format("%s %s", t.name, item.slot or "?")
 	elseif item.kind == "Cell" then
 		return if item.cell == "Coil" then "Charge Coil" else "Power Cell"
 	elseif item.kind == "Weapon" then
@@ -86,9 +83,7 @@ function Items.bonusText(item: Item): string
 		elseif item.slot == "Arms" then
 			return string.format("+%d%% damage", math.round(B.ArmsDamage * t * 100))
 		elseif item.slot == "Chest" then
-			return string.format("+%d battery  -%d%% drain", B.ChestBattery * t, math.round(B.ChestDrain * t * 100))
-		elseif item.slot == "Head" then
-			return string.format("+%d%% loot  scanner %dm", math.round(B.HeadLuck * t * 100), B.HeadScanBase + B.HeadScanRange * t)
+			return string.format("+%d bat  -%d%% drain  +%d%% loot", B.ChestBattery * t, math.round(B.ChestDrain * t * 100), math.round(B.ChestLuck * t * 100))
 		end
 	elseif item.kind == "Cell" then
 		local Bt = CoreLoopConfig.Battery

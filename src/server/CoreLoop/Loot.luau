@@ -21,6 +21,7 @@ local CoreLoopConfig = require(Shared:WaitForChild("CoreLoopConfig"))
 local CoreShared = Shared:WaitForChild("CoreLoop")
 local Items = require(CoreShared:WaitForChild("Items"))
 local PartBuilder = require(CoreShared:WaitForChild("PartBuilder"))
+local ArmorBuilder = require(CoreShared:WaitForChild("ArmorBuilder"))
 local Remotes = require(script.Parent.Remotes)
 local State = require(script.Parent.State)
 
@@ -39,13 +40,13 @@ end
 
 local function buildModel(item: Items.Item): Model
 	if item.kind == "Part" then
-		local m = PartBuilder.display(item)
+		local m = ArmorBuilder.display(item)
 		m:ScaleTo(1.25)
 		return m
 	elseif item.kind == "Cell" then
 		return PartBuilder.cell(item.cell or "Power")
 	else
-		local m = PartBuilder.weapon(item.weapon or "Blade")
+		local m = ArmorBuilder.weaponDisplay(item.weapon or "M01")
 		m:ScaleTo(1.4)
 		return m
 	end
@@ -191,7 +192,7 @@ local function tryPickup(player: Player, d: Drop)
 		return
 	end
 	if d.item.kind == "Weapon" then
-		local id = d.item.weapon or "Blade"
+		local id = d.item.weapon or "M01"
 		drops[d.model] = nil
 		local pos = (d.model.PrimaryPart :: BasePart).Position
 		d.model:Destroy()
@@ -297,7 +298,7 @@ function Loot.start()
 	end)
 end
 
--- Rolls a part tier from weights {T1..T5}.
+-- Rolls a tier from weights {T1, T2, ...}.
 function Loot.rollTier(weights: { number }): number
 	local total = 0
 	for _, w in weights do
@@ -317,9 +318,23 @@ function Loot.randomSlot(): string
 	return CoreLoopConfig.Slots[math.random(1, #CoreLoopConfig.Slots)]
 end
 
+-- A weapon for a rolled tier: the best melee or ranged weapon (coin flip)
+-- whose own tier is at or below it.
+function Loot.weaponForTier(tier: number): string
+	local best: { [boolean]: string } = {}
+	local bestTier: { [boolean]: number } = { [true] = -1, [false] = -1 }
+	for id, w in CoreLoopConfig.Weapons do
+		local r = w.ranged == true
+		if id ~= "Fists" and w.tier <= tier and w.tier > bestTier[r] then
+			best[r], bestTier[r] = id, w.tier
+		end
+	end
+	local pick = best[math.random() < 0.5]
+	return pick or best[true] or best[false] or "M01"
+end
+
 function Loot.randomWeapon(): string
-	local ids = { "Blade", "Hammer", "Rivet" }
-	return ids[math.random(1, #ids)]
+	return Loot.weaponForTier(Loot.rollTier(CoreLoopConfig.Junk.Kinds[1].tiers))
 end
 
 return Loot

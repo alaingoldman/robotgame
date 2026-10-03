@@ -150,7 +150,7 @@ local function rollLoot(): Items.Item
 	if r < W.Part then
 		return Items.part(Loot.randomSlot(), Loot.rollTier(CR.TierWeights))
 	elseif r < W.Part + W.Weapon then
-		return Items.weapon(Loot.randomWeapon())
+		return Items.weapon(Loot.weaponForTier(Loot.rollTier(CR.TierWeights)))
 	end
 	return Items.cell(if rng:NextNumber() < 0.6 then "Power" else "Coil")
 end

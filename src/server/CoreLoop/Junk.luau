@@ -162,10 +162,10 @@ local function onBreak(index: number, kind: CoreLoopConfig.JunkKind)
 		end
 		-- drops
 		if rng:NextNumber() < dropChance(kind.drop, killer) then
-			local tier = Loot.rollTier(J.TierWeights)
+			local tier = Loot.rollTier(kind.tiers)
 			Loot.drop(Items.part(Loot.randomSlot(), tier), ground)
 		elseif rng:NextNumber() < dropChance(kind.weaponDrop, killer) then
-			Loot.drop(Items.weapon(Loot.randomWeapon()), ground)
+			Loot.drop(Items.weapon(Loot.weaponForTier(Loot.rollTier(kind.tiers))), ground)
 		elseif rng:NextNumber() < dropChance(kind.cellDrop, killer) then
 			Loot.drop(Items.cell(if rng:NextNumber() < 0.6 then "Power" else "Coil"), ground)
 		end
