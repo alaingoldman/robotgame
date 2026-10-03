@@ -74,7 +74,7 @@ function State.recompute(player: Player)
 	if not st then
 		return
 	end
-	local legs, arms, chest, head = tierOf(st, "Legs"), tierOf(st, "Arms"), tierOf(st, "Chest"), tierOf(st, "Head")
+	local legs, arms, chest = tierOf(st, "Legs"), tierOf(st, "Arms"), tierOf(st, "Chest")
 	local max = State.batteryMax(st)
 	st.battery = math.min(st.battery, max)
 	player:SetAttribute("BatteryMax", max)
@@ -84,8 +84,9 @@ function State.recompute(player: Player)
 	player:SetAttribute("DamageMul", 1 + BON.ArmsDamage * arms)
 	player:SetAttribute("DrainMul", 1 - BON.ChestDrain * chest)
 	player:SetAttribute("RegenMul", 1 + st.coils * BAT.CoilBonus)
-	player:SetAttribute("Luck", 1 + BON.HeadLuck * head)
-	player:SetAttribute("ScanRange", if head > 0 then BON.HeadScanBase + BON.HeadScanRange * head else 0)
+	-- the chest's helmet carries the old head bonuses (loot luck + scanner)
+	player:SetAttribute("Luck", 1 + BON.ChestLuck * chest)
+	player:SetAttribute("ScanRange", if chest > 0 then BON.ChestScanBase + BON.ChestScanRange * chest else 0)
 	player:SetAttribute("Weapon", st.weapon)
 	player:SetAttribute("ShopLevel", st.shopLevel)
 	player:SetAttribute("Cells", st.cells)
@@ -338,6 +339,36 @@ function State.giveWeapon(player: Player, id: string): boolean
 	st.weapon = id
 	State.changed(player, true)
 	return fresh
+end
+
+-- Debug / admin: equip a full tier set (legs, arms, chest) and that tier's
+-- best weapon (the highest-tier weapon at or below it, melee unless
+-- `ranged`). Anything it replaces goes to the locker (overflow is dropped).
+function State.giveSet(player: Player, tier: number, ranged: boolean?)
+	local st = states[player]
+	if not st then
+		return
+	end
+	tier = math.clamp(math.floor(tier), 1, CoreLoopConfig.MaxTier)
+	for _, slot in CoreLoopConfig.Slots do
+		local old = st.equipped[slot]
+		if old and #st.locker < CoreLoopConfig.Loot.LockerSize then
+			table.insert(st.locker, old)
+		end
+		st.equipped[slot] = Items.part(slot, tier)
+	end
+	local best, bestTier = nil :: string?, -1
+	for id, w in CoreLoopConfig.Weapons do
+		if id ~= "Fists" and (w.ranged == true) == (ranged == true) and w.tier <= tier and w.tier > bestTier then
+			best, bestTier = id, w.tier
+		end
+	end
+	if best then
+		st.weapons[best] = true
+		st.weapon = best
+	end
+	State.changed(player, true)
+	Remotes.toast(player, string.format("DEBUG: full T%d %s set", tier, string.upper(CoreLoopConfig.Tiers[tier].name)), CoreLoopConfig.Tiers[tier].color)
 end
 
 function State.setWeapon(player: Player, id: string)

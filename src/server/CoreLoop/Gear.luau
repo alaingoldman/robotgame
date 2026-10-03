@@ -1,19 +1,33 @@
 --!strict
--- Equipped parts + the held weapon, built on the server inside the
+-- Equipped ARMOUR + the held weapon, built on the server inside the
 -- character (Model "CoreGear") so everyone sees them; welded, massless,
--- non-colliding (PartBuilder). Rebuilt on respawn, on every equip change and
--- when the avatar's body parts are swapped.
+-- non-colliding (ArmorBuilder). Each armour slot REPLACES the limbs it
+-- covers: those body parts (plus the face, the accessories on them and the
+-- EXO-1 pieces on them) are hidden here, on the server, and restored on
+-- unequip / death. Rebuilt on respawn, on every equip change, when the
+-- avatar's body parts / accessories / the exo are swapped, and when a gear
+-- mesh asset finishes loading (GearMeshes).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
-local PartBuilder = require(Shared:WaitForChild("CoreLoop"):WaitForChild("PartBuilder"))
+local CoreShared = Shared:WaitForChild("CoreLoop")
+local ArmorBuilder = require(CoreShared:WaitForChild("ArmorBuilder"))
+local GearMeshes = require(CoreShared:WaitForChild("GearMeshes"))
 local State = require(script.Parent.State)
 
 local Gear = {}
 
 local pending: { [Player]: boolean } = {}
+
+local function clear(char: Model)
+	local old = char:FindFirstChild("CoreGear")
+	if old then
+		old:Destroy()
+	end
+	ArmorBuilder.restore(char)
+end
 
 function Gear.rebuild(player: Player)
 	local char = player.Character
@@ -21,65 +35,65 @@ function Gear.rebuild(player: Player)
 	if not (char and st and char.Parent) then
 		return
 	end
-	local old = char:FindFirstChild("CoreGear")
-	if old then
-		old:Destroy()
-	end
+	clear(char)
 	local hum = char:FindFirstChildOfClass("Humanoid")
 	if not hum or hum.Health <= 0 then
 		return
 	end
-	local body = PartBuilder.readBody(char)
-	if not body then
-		return
-	end
 	local model = Instance.new("Model")
 	model.Name = "CoreGear"
-	for _, slot in { "Legs", "Arms", "Chest", "Head" } do
+	local covered: { BasePart } = {}
+	for _, slot in { "Legs", "Arms", "Chest" } do
 		local it = st.equipped[slot]
 		if it then
-			local ok, err = pcall(PartBuilder.attach, body, it, model)
-			if not ok then
-				warn("[CoreLoop] gear build failed", slot, err)
+			local ok, res, hide = pcall(ArmorBuilder.attach, char, it, model)
+			if ok then
+				for _, p in hide do
+					table.insert(covered, p)
+				end
+			else
+				warn("[CoreLoop] gear build failed", slot, res)
 			end
 		end
 	end
 	if st.weapon ~= "Fists" then
 		local hand = char:FindFirstChild("RightHand") or char:FindFirstChild("Right Arm")
 		if hand and hand:IsA("BasePart") then
-			local w = PartBuilder.weapon(st.weapon)
-			local handle = w.PrimaryPart :: BasePart
-			local off = PartBuilder.gripOffset
-			if hand.Name == "Right Arm" then
-				off = CFrame.new(0, -hand.Size.Y / 2 + 0.2, 0) * off
-			end
-			for _, d in w:GetDescendants() do
-				if d:IsA("BasePart") then
-					d.Massless = true
-					d.CanCollide = false
-					d.CanQuery = false
-					d.CanTouch = false
-					d.Anchored = false
+			local ok, w, c0 = pcall(ArmorBuilder.weapon, st.weapon, hand)
+			if ok then
+				local handle = w.PrimaryPart :: BasePart
+				for _, d in w:GetDescendants() do
+					if d:IsA("BasePart") then
+						d.Massless = true
+						d.CanCollide = false
+						d.CanQuery = false
+						d.CanTouch = false
+						d.Anchored = false
+					end
 				end
-			end
-			handle.CFrame = hand.CFrame * off
-			local weld = Instance.new("Weld")
-			weld.Name = "Grip"
-			weld.Part0 = hand
-			weld.Part1 = handle
-			weld.C0 = off
-			weld.Parent = handle
-			-- re-place the welded pieces relative to the moved handle
-			for _, d in w:GetDescendants() do
-				if d:IsA("Weld") and d ~= weld and d.Part0 == handle and d.Part1 then
-					d.Part1.CFrame = handle.CFrame * d.C0
+				handle.CFrame = hand.CFrame * c0
+				local weld = Instance.new("Weld")
+				weld.Name = "Grip"
+				weld.Part0 = hand
+				weld.Part1 = handle
+				weld.C0 = c0
+				weld.Parent = handle
+				-- re-place the welded pieces relative to the moved handle
+				for _, d in w:GetDescendants() do
+					if d:IsA("Weld") and d ~= weld and d.Part0 == handle and d.Part1 then
+						d.Part1.CFrame = handle.CFrame * d.C0
+					end
 				end
+				w.Name = "Weapon"
+				w:SetAttribute("Id", st.weapon)
+				w.Parent = model
+			else
+				warn("[CoreLoop] weapon build failed", st.weapon, w)
 			end
-			w.Name = "Weapon"
-			w.Parent = model
 		end
 	end
 	model.Parent = char
+	ArmorBuilder.hide(char, covered)
 end
 
 local function schedule(player: Player, delay: number?)
@@ -96,7 +110,7 @@ local function schedule(player: Player, delay: number?)
 end
 
 local function onCharacter(player: Player, char: Model)
-	local hum = char:WaitForChild("Humanoid", 10)
+	local hum = char:WaitForChild("Humanoid", 10) :: Humanoid?
 	if not hum then
 		return
 	end
@@ -111,9 +125,14 @@ local function onCharacter(player: Player, char: Model)
 		return
 	end
 	char.ChildAdded:Connect(function(c)
-		if c:IsA("BasePart") then
+		-- swapped body parts, a new hat / hair, a rebuilt EXO-1
+		if c:IsA("BasePart") or c:IsA("Accessory") or c.Name == "Exoskeleton" then
 			schedule(player, 0.4)
 		end
+	end)
+	hum.Died:Connect(function()
+		-- the corpse gets its own limbs back (the armour comes off)
+		clear(char)
 	end)
 	Gear.rebuild(player)
 end
@@ -122,6 +141,13 @@ function Gear.start()
 	State.onGearChanged(function(player)
 		schedule(player, 0)
 	end)
+	-- a gear mesh finished loading: rebuild everyone (placeholder -> mesh)
+	GearMeshes.onLoaded(function()
+		for _, p in Players:GetPlayers() do
+			schedule(p, 0.1)
+		end
+	end)
+	GearMeshes.preloadAll()
 	local function watch(player: Player)
 		player.CharacterAdded:Connect(function(char)
 			onCharacter(player, char)

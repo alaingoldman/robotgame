@@ -28,8 +28,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
-local MechConfig = require(Shared:WaitForChild("MechConfig"))
-local TitanConfig = require(Shared:WaitForChild("TitanConfig"))
 local CoreLoopConfig = require(Shared:WaitForChild("CoreLoopConfig"))
 
 local PartBuilder = {}
@@ -132,25 +130,24 @@ end
 
 ------------------------------------------------------------------ style
 
+-- The placeholder look of a tier (1..20): its family's shapes
+-- (CoreLoopConfig.Tiers[n].family), recoloured with the tier's ramp colour
+-- (rust -> gold) and its signature glow.
 local function style(item: any): Style
-	local tier = math.clamp(item.tier or 1, 1, 5)
-	local family = CoreLoopConfig.Tiers[tier].family
-	if family == "Titan" then
-		local v = TitanConfig.getVariant(item.variant or "Desert")
-		local p = v.palette :: any
-		return { family = family, main = p.main, panel = p.hi, dark = p.dark, accent = p.trim, glow = p.glow, trim = p.trim, heavy = 1.15 }
-	end
-	local p = MechConfig.getVariant(item.variant or "Olive").palette
-	local glow = if family == "Type99" then Color3.fromRGB(70, 235, 120) elseif family == "Knight" then Color3.fromRGB(255, 196, 70) elseif family == "Gunner" then Color3.fromRGB(255, 150, 50) else p.light
+	local tier = math.clamp(item.tier or 1, 1, CoreLoopConfig.MaxTier)
+	local info = CoreLoopConfig.Tiers[tier]
+	local family = info.family
+	local c = info.color
+	local black = Color3.new(0, 0, 0)
 	return {
 		family = family,
-		main = p.main,
-		panel = p.panel,
-		dark = p.dark,
-		accent = p.accent,
-		glow = glow,
-		trim = Color3.fromRGB(150, 155, 160),
-		heavy = if family == "Gunner" then 1.3 elseif family == "HWM" then 1.05 else 1,
+		main = c:Lerp(black, 0.18),
+		panel = c:Lerp(Color3.new(1, 1, 1), 0.12),
+		dark = c:Lerp(black, 0.62),
+		accent = info.glow:Lerp(c, 0.4),
+		glow = info.glow,
+		trim = if tier >= 14 then Color3.fromRGB(255, 214, 90) elseif tier >= 6 then Color3.fromRGB(200, 160, 80) else Color3.fromRGB(140, 130, 120),
+		heavy = if family == "Gunner" then 1.3 elseif family == "Titan" then 1.15 elseif family == "HWM" then 1.05 else 1,
 	}
 end
 
@@ -462,7 +459,16 @@ local function buildHead(ctx: Ctx, body: Body)
 	end
 end
 
-local BUILDERS = { Legs = buildLegs, Arms = buildArms, Chest = buildChest, Head = buildHead }
+-- CHEST is chest + helmet in one piece (the old HEAD slot folded into it)
+local BUILDERS = {
+	Legs = buildLegs,
+	Arms = buildArms,
+	Chest = function(ctx: Ctx, body: Body)
+		buildChest(ctx, body)
+		buildHead(ctx, body)
+	end,
+	Head = buildHead,
+}
 
 -- Welds the item's pieces onto a body; returns the model (parented to `parent`).
 function PartBuilder.attach(body: Body, item: any, parent: Instance): Model
@@ -523,7 +529,7 @@ local function proxyBody(model: Model, root: BasePart): Body
 end
 
 -- The slot's pieces centred on the model's Handle (anchor it to place it).
-local DISPLAY_CENTRE = { Legs = Vector3.new(0, -1.1, 0), Arms = Vector3.new(0, 0.5, 0), Chest = Vector3.new(0, 1.2, 0), Head = Vector3.new(0, 2.75, 0) }
+local DISPLAY_CENTRE = { Legs = Vector3.new(0, -1.1, 0), Arms = Vector3.new(0, 0.5, 0), Chest = Vector3.new(0, 1.7, 0), Head = Vector3.new(0, 2.75, 0) }
 function PartBuilder.display(item: any): Model
 	local model = Instance.new("Model")
 	model.Name = "Loot_" .. tostring(item.slot)

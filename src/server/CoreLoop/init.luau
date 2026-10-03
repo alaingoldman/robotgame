@@ -14,7 +14,10 @@
 --   local CL = require(game.ServerScriptService.Server.CoreLoop)
 --   CL.debug.dropPart(player, "Legs", 3)  -- at the player's feet
 --   CL.debug.crate()                      -- spawn a supply crate now
---   CL.debug.give(player, "Hammer")       -- weapon
+--   CL.debug.give(player, "M03")          -- weapon (M01..M10 melee, R01..R10 ranged)
+--   CL.debug.giveSet(player, 7)           -- full T7 armour set + its best melee weapon
+--   CL.debug.giveSet(player, 7, true)     -- ... with its best ranged weapon instead
+--   CL.debug.unequipAll(player)
 --   player:SetAttribute("CoreDropBoost", 20)
 
 local Players = game:GetService("Players")
@@ -72,6 +75,19 @@ CoreLoop.debug = {
 	end,
 	give = function(player: Player, id: string)
 		State.giveWeapon(player, id)
+	end,
+	giveSet = function(player: Player, tier: number, ranged: boolean?)
+		State.giveSet(player, tier, ranged)
+	end,
+	unequipAll = function(player: Player)
+		local st = State.get(player)
+		if st then
+			for _, slot in { "Chest", "Arms", "Legs" } do
+				st.equipped[slot] = nil
+			end
+			st.weapon = "Fists"
+			State.changed(player, true)
+		end
 	end,
 	state = function(player: Player)
 		return State.get(player)
