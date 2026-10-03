@@ -13,12 +13,14 @@
 --     Fx(kind, data)                     Break / Spawn / Snap / Deliver / Expire / CrateDrop /
 --                                        CrateOpen / CrateFail / Scrap / Install
 --     OpenLocker()                       the base's equip station / locker prompt
+--   client -> server (owner / Studio only, see Picker)
+--     GearPick(action, a, b)             "Piece" slot tier | "Weapon" id | "Set" tier | "UnequipAll"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Remotes = {}
 
-local NAMES = { "Attack", "Sprint", "Locker", "State", "Toast", "Swing", "Hit", "Fx", "OpenLocker" }
+local NAMES = { "Attack", "Sprint", "Locker", "State", "Toast", "Swing", "Hit", "Fx", "OpenLocker", "GearPick" }
 local folder: Folder? = nil
 local events: { [string]: RemoteEvent } = {}
 

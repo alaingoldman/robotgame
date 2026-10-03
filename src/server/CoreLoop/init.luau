@@ -36,6 +36,7 @@ local Loot = require(script.Loot)
 local Junk = require(script.Junk)
 local Crates = require(script.Crates)
 local Bases = require(script.Bases)
+local Picker = require(script.Picker)
 
 local CoreLoop = {}
 
@@ -56,6 +57,7 @@ function CoreLoop.start()
 	Bases.start(yard)
 	Junk.start(yard)
 	Crates.start(yard)
+	Picker.start()
 end
 
 CoreLoop.debug = {
