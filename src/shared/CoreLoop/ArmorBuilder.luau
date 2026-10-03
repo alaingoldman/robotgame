@@ -23,7 +23,7 @@
 --   ArmorBuilder.attach(char, item, parent)   -> (Model, { BasePart } covered)
 --   ArmorBuilder.hide(char, covered)          hide covered parts + their extras
 --   ArmorBuilder.restore(char)                undo every hide
---   ArmorBuilder.weapon(id, hand)             -> (Model, C0 in hand space)
+--   ArmorBuilder.weapon(id, hand, fist?)      -> (Model, C0 in hand space)
 --   ArmorBuilder.display(item)                -> loot / preview Model (PrimaryPart Handle)
 --   ArmorBuilder.weaponDisplay(id)            -> loot Model (PrimaryPart Handle)
 
@@ -131,6 +131,8 @@ function ArmorBuilder.covers(char: Model, slot: string, hasLower: boolean?): ({ 
 			else
 				add(upper, "Torso_Upper", nil, nil, "Y", "NeckRigAttachment", "neck")
 				add(lower, "Torso_Lower", nil, nil, "Y", "WaistRigAttachment", "waist")
+				-- a belt modelled as a front plate only: its turned copy closes the back
+				add(lower, "Torso_LowerBack", nil, nil, "Y", "WaistRigAttachment", "waist")
 			end
 			hidePart(upper)
 			hidePart(lower)
@@ -350,6 +352,21 @@ local function dominant(v: Vector3): number
 	return if ax >= ay and ax >= az then 1 elseif ay >= az then 2 else 3
 end
 
+-- Rotation turning direction a onto b (at most MAX_ALIGN; identity if degenerate).
+local MAX_ALIGN = math.rad(40)
+local function fromTo(a: Vector3, b: Vector3): CFrame
+	if a.Magnitude < 1e-4 or b.Magnitude < 1e-4 then
+		return CFrame.identity
+	end
+	a, b = a.Unit, b.Unit
+	local axis = a:Cross(b)
+	local sn = axis.Magnitude
+	if sn < 1e-4 then
+		return CFrame.identity
+	end
+	return CFrame.fromAxisAngle(axis / sn, math.min(math.atan2(sn, a:Dot(b)), MAX_ALIGN))
+end
+
 local function prepClone(t: BasePart): BasePart
 	local c = t:Clone()
 	for _, d in c:GetDescendants() do
@@ -400,6 +417,82 @@ local function attPosIn(part: Instance?, name: string): Vector3?
 	return if a and a:IsA("Attachment") then a.Position else nil
 end
 
+-- Some tiers' leg pieces were generated facing backwards (toes / knee plates
+-- behind the leg). Such a piece is worn turned 180 deg about Y, each side
+-- using the OTHER side's node (the mirror of a mirror = the piece reflected
+-- front to back, so inner / outer stay right). Boots are detected from
+-- GearMeta (the boot's bulk behind the ankle = toes backwards); thighs and
+-- shins are kept as modelled. Override per tier with GearAssets.LegsReversed
+-- [tier] = { Upper = .., Lower = .., Foot = .. } (or one boolean for all three).
+local FLIP_Y = CFrame.Angles(0, math.pi, 0)
+local bootCache: { [number]: boolean } = {}
+local function bootReversed(tier: number): boolean
+	local r = bootCache[tier]
+	if r == nil then
+		local meta = GearMeta.Tiers[tier]
+		r = false
+		if meta and meta.centres.LegR_Foot and meta.pivots.ankle_R then
+			-- source front is -Z: a boot whose centre is behind the ankle points back
+			r = meta.centres.LegR_Foot.Z - meta.pivots.ankle_R.Z > 0.05
+		end
+		bootCache[tier] = r
+	end
+	return r
+end
+
+-- seg: "Upper" / "Lower" / "Foot"
+function ArmorBuilder.legReversed(tier: number, seg: string): boolean
+	local o = GearAssets.LegsReversed[tier]
+	if type(o) == "boolean" then
+		return o
+	elseif type(o) == "table" and o[seg] ~= nil then
+		return o[seg] == true
+	end
+	-- only the boots were generated backwards: thighs / shins keep their
+	-- modelled front (knee caps, emblems face forward as in the renders)
+	return seg == "Foot" and bootReversed(tier)
+end
+
+local function otherSide(name: string): string
+	return (string.gsub(name, "([RL])(_?)", function(c, u)
+		return (if c == "R" then "L" else "R") .. u
+	end, 1))
+end
+
+-- A Torso_Lower that is only a front plate (nothing behind the waist):
+-- the back of the pelvis would show a hole between the chest and the legs.
+function ArmorBuilder.beltFrontOnly(tier: number): boolean
+	local meta = GearMeta.Tiers[tier]
+	local c = meta and meta.centres.Torso_Lower
+	local ext = meta and meta.extents and meta.extents.Torso_Lower
+	if not (c and ext) then
+		return false
+	end
+	return c.Z + ext.Z / 2 - meta.pivots.waist.Z < 0.2
+end
+
+-- The source node worn for `node` (legs of a reversed tier: the other side's;
+-- the belt's back copy: the belt) and whether it is worn turned 180 deg.
+function ArmorBuilder.sourceNode(tier: number, node: string): (string, boolean)
+	if string.sub(node, 1, 3) == "Leg" and ArmorBuilder.legReversed(tier, string.sub(node, 6)) then
+		return "Leg" .. otherSide(string.sub(node, 4)), true
+	elseif node == "Torso_LowerBack" then
+		return "Torso_Lower", true
+	end
+	return node, false
+end
+
+-- meta pivot `name` (hip_R, knee_L, neck ...) in the frame the piece is worn
+-- in (`flip`: the piece is worn turned; leg pivots then come from the other side)
+local function pivotOf(meta: any, tier: number, name: string, flip: boolean?): Vector3?
+	if not flip then
+		return meta.pivots[name]
+	end
+	local leg = string.match(name, "^(%a+)_[RL]$")
+	local v = meta.pivots[if leg == "hip" or leg == "knee" or leg == "ankle" then otherSide(name) else name]
+	return v and FLIP_Y * v
+end
+
 -- Per-group uniform scale of the tier's rig on this R15 body (nil: no rig fit).
 function ArmorBuilder.rigScale(char: Model, tier: number): RigScale?
 	local meta = GearMeta.Tiers[tier]
@@ -445,7 +538,7 @@ function ArmorBuilder.rigScale(char: Model, tier: number): RigScale?
 			rig.shift["Arm" .. S] = Vector3.new(d.X, math.clamp(d.Y, -0.3, 0.3), d.Z)
 		end
 		local hpT = attPosIn(lt, W .. "HipRigAttachment")
-		local pH = P["hip_" .. S]
+		local pH = pivotOf(meta, tier, "hip_" .. S, ArmorBuilder.legReversed(tier, "Upper"))
 		if hpT and wl and pH then
 			local lu = math.min(rig.Chest, 1)
 			local target = (wl :: Vector3) + (pH - P.waist) * lu
@@ -469,6 +562,11 @@ local SPANS: { [string]: { att: string?, pivot: string? } } = {
 
 local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier: number, rig: RigScale?): BasePart
 	local rot = GearMeshes.importRotation(h) * t.CFrame.Rotation
+	local src, flip = ArmorBuilder.sourceNode(tier, cv.node)
+	local node = if cv.node == "Torso_LowerBack" then "Torso_Lower" else cv.node -- fit rules
+	if flip then
+		rot = FLIP_Y * rot
+	end
 	local turned = false
 	-- an arm modelled in a T-pose (long along X): swing it down along the side
 	if string.sub(cv.node, 1, 3) == "Arm" then
@@ -481,24 +579,27 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 	end
 	local ext = extents(rot, t.Size)
 	local meta = GearMeta.Tiers[tier]
-	local centre = meta and meta.centres[cv.node]
-	local piv = meta and cv.pivot and meta.pivots[cv.pivot]
+	local centre = meta and meta.centres[src]
+	if centre and flip then
+		centre = FLIP_Y * centre
+	end
+	local piv = meta and cv.pivot and pivotOf(meta, tier, cv.pivot, flip)
 	local att = cv.joint and cv.part:FindFirstChild(cv.joint)
 	local scale: Vector3
 	local place = cv.box
+	local jointBall: { pos: Vector3, d: number }? = nil
 	local group = if string.sub(cv.node, 1, 3) == "Arm" then "Arms" elseif string.sub(cv.node, 1, 3) == "Leg" then "Legs" else "Chest"
 	if rig and centre and piv and att and att:IsA("Attachment") and not turned then
 		local u = (rig :: any)[group] :: number
-		if cv.node == "Torso_Lower" then
+		local align = CFrame.identity
+		local top = Vector3.zero -- the piece's top joint moved off the rig joint (thighs)
+		if node == "Torso_Lower" then
 			u = math.min(u, 1) -- the belt / pelvis never grows past its authored size
 		elseif string.sub(cv.node, 5) == "_Hand" then
-			-- hands: about the avatar's own hand (never blown up), a bit
-			-- smaller on the weapon hand so the grip sits in the fist
-			local hs = cv.part.Size
-			u = math.min(u, hs.Y * 1.25 / ext.Y, math.max(hs.X, hs.Z) * 1.45 / math.max(ext.X, ext.Z))
-			if cv.holding and string.sub(cv.node, 4, 4) == "R" then
-				u *= 0.85
-			end
+			-- hands: an armoured gauntlet fist at the set's own scale (the
+			-- authored hand is about as wide as the forearm cuff), never sized
+			-- from the avatar's small bare hand
+			u *= GearAssets.HandScale
 		end
 		-- small capped growth per axis where the body part pokes out
 		local target = cv.size * 1.04
@@ -509,7 +610,7 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 			math.clamp(target.Z / (ext.Z * u), 1, grow)
 		)
 		scale = g * u
-		if cv.node == "Torso_Lower" then
+		if node == "Torso_Lower" then
 			-- bridge the waist (chest bottom) down past the hips (thigh tops):
 			-- no dark band between chest and legs
 			local hipA = cv.part:FindFirstChild("RightHipRigAttachment")
@@ -534,19 +635,51 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 			local sideL = string.sub(cv.node, 4, 4)
 			local sideW = if sideL == "R" then "Right" else "Left"
 			local aTop = (att :: Attachment).Position
-			local bottomAvatar: number
-			if span.att then
-				local b = cv.part:FindFirstChild(sideW .. span.att)
-				bottomAvatar = if b and b:IsA("Attachment") then b.Position.Y else -cv.part.Size.Y / 2
+			local bottomAvatar: Vector3
+			local b = span.att and cv.part:FindFirstChild(sideW .. span.att)
+			if b and b:IsA("Attachment") then
+				bottomAvatar = b.Position
 			else
-				bottomAvatar = -cv.part.Size.Y / 2
+				bottomAvatar = Vector3.new(aTop.X, -cv.part.Size.Y / 2, aTop.Z)
 			end
-			local bottomMeta = if span.pivot then meta.pivots[span.pivot .. "_" .. sideL].Y else centre.Y - ext.Y / 2
-			local spanA = aTop.Y - bottomAvatar
-			local spanM = piv.Y - bottomMeta
+			local bottomMeta: Vector3 = if span.pivot
+				then pivotOf(meta, tier, span.pivot .. "_" .. sideL, flip) :: Vector3
+				else Vector3.new(piv.X, centre.Y - ext.Y / 2, piv.Z)
+			local spanA = (aTop - bottomAvatar).Magnitude
+			if node == "Leg_Upper" or string.match(node, "^Leg[RL]_Upper$") then
+				-- the thigh reaches up to the top of the avatar's thigh part (it
+				-- pokes up past the hip joint into the pelvis on most bodies):
+				-- the hips are covered instead of showing a hole under the chest
+				local up = math.clamp(cv.part.Size.Y / 2 - 0.08 - aTop.Y, 0, spanA * 0.5)
+				if up > 0.02 and spanA > 0.05 then
+					local dir = (aTop - bottomAvatar).Unit
+					top = dir * up
+					spanA += up
+				end
+			end
+			local spanM = (piv - bottomMeta).Magnitude
 			if spanA > 0.05 and spanM > 0.05 then
 				local sy = math.clamp(spanA / spanM, u * 0.7, u * 1.8)
 				scale = Vector3.new(scale.X, math.max(sy, scale.Y * 0.98), scale.Z)
+			end
+			-- limb segments run joint to joint: an avatar whose rest pose is
+			-- angled (A-pose bodies, the elbow out from the shoulder) gets the
+			-- piece turned about its top joint onto that line
+			if span.att then
+				align = fromTo((bottomMeta - piv) * scale, bottomAvatar - aTop)
+			end
+		elseif string.sub(cv.node, 5) == "_Hand" then
+			-- the fist continues the forearm's line (same turn as the forearm)
+			local sideL = string.sub(cv.node, 4, 4)
+			local sideW = if sideL == "R" then "Right" else "Left"
+			local lower = cv.part.Parent and cv.part.Parent:FindFirstChild(sideW .. "LowerArm")
+			local e = lower and lower:FindFirstChild(sideW .. "ElbowRigAttachment")
+			local wl = lower and lower:FindFirstChild(sideW .. "WristRigAttachment")
+			if e and wl and e:IsA("Attachment") and wl:IsA("Attachment") then
+				-- the hand's rest placement in the forearm's space
+				local handInLower = wl.CFrame * (att :: Attachment).CFrame:Inverse()
+				local dA = handInLower:VectorToObjectSpace(wl.Position - e.Position)
+				align = fromTo(meta.pivots["wrist_" .. sideL] - meta.pivots["elbow_" .. sideL], dA)
 			end
 		elseif cv.node == "Torso_Upper" then
 			local w = cv.part:FindFirstChild("WaistRigAttachment")
@@ -560,7 +693,14 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 		end
 		local o = (piv - centre) * scale
 		local shift = (rig :: RigScale).shift[string.sub(cv.node, 1, 4)] or Vector3.zero
-		place = CFrame.new(att.Position - o + shift)
+		place = CFrame.new(att.Position + shift + top) * align * CFrame.new(-o)
+		local seg = string.sub(cv.node, 5)
+		if seg == "_Lower" then
+			-- a dark bearing in the elbow / knee: a bent joint would otherwise
+			-- show the open (flat dark capped) top of the forearm / shin piece
+			local e = ext * scale
+			jointBall = { pos = att.Position + shift + top, d = math.min(e.X, e.Z) * 0.5 }
+		end
 		if cv.node == "LegR_Foot" and rig then
 			-- how far the boot's sole sits below the foot's own bottom
 			local sole = att.Position.Y - (piv.Y - 0) * scale.Y
@@ -587,6 +727,24 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 	c.Size = Vector3.new(sz.X * comp(scale, dominant(cols[1])), sz.Y * comp(scale, dominant(cols[2])), sz.Z * comp(scale, dominant(cols[3])))
 	CollectionService:AddTag(c, ArmorBuilder.PieceTag)
 	weldTo(cv.part, c, place * rot, parent)
+	if jointBall then
+		local b = Instance.new("Part")
+		b.Name = cv.node .. "_Joint"
+		b.Shape = Enum.PartType.Ball
+		b.Size = Vector3.one * jointBall.d
+		b.Material = Enum.Material.Metal
+		-- the tier's metal, darkened: reads as part of the suit, not a black ball
+		local info = CoreLoopConfig.Tiers[tier]
+		b.Color = if info then info.color:Lerp(Color3.new(0, 0, 0), 0.55) else Color3.fromRGB(40, 38, 36)
+		b.TopSurface = Enum.SurfaceType.Smooth
+		b.BottomSurface = Enum.SurfaceType.Smooth
+		b.CanCollide = false
+		b.CanQuery = false
+		b.CanTouch = false
+		b.Massless = true
+		CollectionService:AddTag(b, ArmorBuilder.PieceTag)
+		weldTo(cv.part, b, CFrame.new(jointBall.pos), parent)
+	end
 	return c
 end
 
@@ -663,7 +821,10 @@ function ArmorBuilder.attach(char: Model, item: any, parent: Instance): (Model, 
 	if h then
 		local rig = ArmorBuilder.rigScale(char, tier)
 		for _, cv in covers do
-			local t = GearMeshes.node(h, cv.node)
+			local t = GearMeshes.node(h, (ArmorBuilder.sourceNode(tier, cv.node)))
+			if cv.node == "Torso_LowerBack" and not ArmorBuilder.beltFrontOnly(tier) then
+				continue
+			end
 			if t then
 				local ok, err = pcall(fitPiece, h, t, cv, model, tier, rig)
 				if ok then
@@ -813,11 +974,30 @@ end
 
 -- The weapon model (PrimaryPart "Handle" = the grip) and the Weld C0 that
 -- puts it in `hand`. Mesh when loaded, else PartBuilder's placeholder.
-function ArmorBuilder.weapon(id: string, hand: BasePart): (Model, CFrame)
+-- `fist` (optional): the armoured hand piece on `hand`; the grip then sits in
+-- its centre (the armour arm is moved out to the chest piece's shoulders, so
+-- the bare hand's grip would leave the weapon floating beside the gauntlet).
+function ArmorBuilder.weapon(id: string, hand: BasePart, fist: BasePart?): (Model, CFrame)
 	local w = CoreLoopConfig.Weapons[id] or CoreLoopConfig.Weapons.Fists
-	local grip = CFrame.new(handGrip(hand))
+	local gripPos = handGrip(hand)
+	if fist then
+		local wld = fist:FindFirstChild("ArmorWeld")
+		if wld and wld:IsA("Weld") and wld.Part0 == hand then
+			gripPos = wld.C0.Position + Vector3.new(0, -0.05, 0)
+		end
+	end
+	local grip = CFrame.new(gripPos)
 	local okMesh, p, off = pcall(meshWeapon, id, w)
 	if okMesh and p and off then
+		if w.ranged then
+			-- the gun's grip point sits at the top of its pistol grip: raise the
+			-- gun (hand -Z = up in the ready pose) so the handle is in the fist
+			-- (GunGrip[id]: the pistol grip sits that far (x length) ahead of
+			-- the file's grip point: slide the gun back so the fist is on it)
+			local len = weaponLength(w)
+			local fwd = GearAssets.GunGrip[id] or 0
+			grip = CFrame.new(gripPos + Vector3.new(0, fwd * len, -GearAssets.RangedGripLift * len))
+		end
 		local model = Instance.new("Model")
 		model.Name = "Weapon_" .. id
 		local handle = Instance.new("Part")
@@ -885,10 +1065,12 @@ function ArmorBuilder.display(item: any): Model
 		local flip = GearMeshes.importRotation(h)
 		local parts: { BasePart } = {}
 		for _, n in nodes do
-			local t = GearMeshes.node(h, n)
+			-- reversed legs: the other side's node turned around (see sourceNode)
+			local src, turn = ArmorBuilder.sourceNode(tier, n)
+			local t = GearMeshes.node(h, src)
 			if t then
 				local c = prepClone(t)
-				c.CFrame = flip * t.CFrame
+				c.CFrame = (if turn then FLIP_Y else CFrame.identity) * flip * t.CFrame
 				table.insert(parts, c)
 			end
 		end

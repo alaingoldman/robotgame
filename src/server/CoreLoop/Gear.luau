@@ -68,7 +68,9 @@ function Gear.rebuild(player: Player)
 	if st.weapon ~= "Fists" then
 		local hand = char:FindFirstChild("RightHand") or char:FindFirstChild("Right Arm")
 		if hand and hand:IsA("BasePart") then
-			local ok, w, c0 = pcall(ArmorBuilder.weapon, st.weapon, hand)
+			local arms = model:FindFirstChild("Gear_Arms")
+			local fist = arms and arms:FindFirstChild(if hand.Name == "RightHand" then "ArmR_Hand" else "")
+			local ok, w, c0 = pcall(ArmorBuilder.weapon, st.weapon, hand, if fist and fist:IsA("BasePart") then fist else nil)
 			if ok then
 				local handle = w.PrimaryPart :: BasePart
 				for _, d in w:GetDescendants() do

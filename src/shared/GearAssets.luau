@@ -46,9 +46,26 @@ GearAssets.Weapons = 86709172385225 :: number?
 -- proportions (so a chunky pauldron stays chunky instead of being squashed).
 GearAssets.Margin = 1.12
 GearAssets.KeepAspect = 0.85
+-- Leg pieces generated facing backwards are worn turned around (ArmorBuilder
+-- .legReversed: boots detected from GearMeta, thighs / shins kept as modelled
+-- unless set here). [tier] = true / false for the whole leg, or per piece
+-- { Upper = bool, Lower = bool, Foot = bool }.
+GearAssets.LegsReversed = {} :: { [number]: any }
+-- Armoured hands (gauntlet fists) relative to the set's uniform scale.
+GearAssets.HandScale = 1.0
 -- Weapon length (studs, longest side) by kind; a little longer per tier.
 GearAssets.MeleeLength = 3.8
 GearAssets.RangedLength = 2.6
 GearAssets.LengthPerTier = 0.04
+-- Guns: how far (x weapon length) the gun sits above the grip point, so the
+-- fist closes on the pistol grip instead of resting on the receiver.
+GearAssets.RangedGripLift = 0.12
+-- Guns whose grip point (Weapons.glb origin) sits at the back of the gun
+-- instead of on the pistol grip: how far ahead (x length) the pistol grip is.
+GearAssets.GunGrip = {
+	R05 = 0.22, -- Coal Mortar Hand-Cannon
+	R08 = 0.15, -- Tesla Coil Rifle
+	R09 = 0.21, -- Aether Ray Blaster
+} :: { [string]: number }
 
 return GearAssets
