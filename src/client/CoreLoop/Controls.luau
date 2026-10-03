@@ -126,7 +126,7 @@ end
 
 local function tryAttack()
 	local char, hum, root = onFoot()
-	if not (char and hum and root) or blocked() then
+	if not (char and hum and root) or blocked() or player:GetAttribute("BatteryDead") == true then
 		return
 	end
 	local w = weapon()
@@ -196,6 +196,8 @@ local function movement()
 	end
 	local battery = (player:GetAttribute("Battery") :: number?) or 0
 	local empty = battery <= 0.05
+	-- dead battery away from base: frozen until RETURN (HUD) + recharge
+	local dead = player:GetAttribute("BatteryDead") == true
 	local carrying = player:GetAttribute("CarryKind") ~= nil
 	local sprinting = sprintHeld and not empty and hum.MoveDirection.Magnitude > 0.1
 	if sprinting ~= sprintSent then
@@ -206,7 +208,9 @@ local function movement()
 	if carrying then
 		speed *= CoreLoopConfig.CarryMultiplier
 	end
-	if empty then
+	if dead then
+		speed = 0
+	elseif empty then
 		speed *= CoreLoopConfig.EmptyMultiplier
 	elseif sprinting then
 		speed *= CoreLoopConfig.SprintMultiplier
@@ -215,7 +219,9 @@ local function movement()
 		hum.WalkSpeed = speed
 	end
 	local jm = (player:GetAttribute("JumpMul") :: number?) or 1
-	if empty then
+	if dead then
+		jm = 0
+	elseif empty then
 		jm *= 0.8
 	end
 	local jp, jh = baseJump(hum)

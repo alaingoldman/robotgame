@@ -40,6 +40,7 @@ export type PlayerState = {
 	combo: number,
 	inBase: boolean,
 	toastAt: { [string]: number },
+	dead: boolean, -- battery ran out away from base: frozen until RETURN + recharge
 }
 
 local states: { [Player]: PlayerState } = {}
@@ -430,10 +431,23 @@ local function tick(dt: number)
 		elseif drain > 0 then
 			b -= drain * drainMul * dt
 			st.lastDrain = now
-		elseif now - st.lastDrain > BAT.IdleDelay and now - st.lastAttack > BAT.IdleDelay then
+		elseif not st.dead and now - st.lastDrain > BAT.IdleDelay and now - st.lastAttack > BAT.IdleDelay then
+			-- no crawling home: a dead battery only recharges on the pad
 			b += BAT.IdleRegen * regenMul * dt
 		end
 		b = math.clamp(b, 0, max)
+		-- empty away from base = frozen (client: no walking / jumping / attacks)
+		-- until RETURN takes you to your pad and it charges past ReviveAt
+		local dead = st.dead
+		if b <= 0 and not st.inBase then
+			dead = true
+		elseif dead and b >= BAT.ReviveAt then
+			dead = false
+		end
+		if dead ~= st.dead then
+			st.dead = dead
+			player:SetAttribute("BatteryDead", dead)
+		end
 		if math.abs(b - st.battery) > 1e-4 then
 			local before = st.battery
 			st.battery = b
@@ -464,6 +478,7 @@ local function add(player: Player)
 		combo = 0,
 		inBase = false,
 		toastAt = {},
+		dead = false,
 	}
 	states[player] = st
 	local ls = player:FindFirstChild("leaderstats")

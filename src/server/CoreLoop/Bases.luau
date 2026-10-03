@@ -205,6 +205,32 @@ function Bases.start(yard: Folder)
 	end
 	Players.PlayerRemoving:Connect(release)
 	RunService.Heartbeat:Connect(step)
+	-- RETURN (dead battery): straight to your own pad, where it charges fast;
+	-- carried cargo still on its timer is delivered there by step()
+	Remotes.get("Locker").OnServerEvent:Connect(function(player, action)
+		if action ~= "Return" or player:GetAttribute("BatteryDead") ~= true then
+			return
+		end
+		Bases.returnHome(player)
+	end)
+end
+
+function Bases.returnHome(player: Player): boolean
+	local plot = byPlayer[player]
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not (plot and char and hum and hum.Health > 0) then
+		return false
+	end
+	local sp = plot.model:FindFirstChild("SpawnPoint")
+	local cf = if sp and sp:IsA("BasePart") then sp.CFrame else plot.pad.CFrame + Vector3.new(0, 3, 0)
+	if hum.SeatPart then
+		hum.Sit = false
+	end
+	char:PivotTo(cf + Vector3.new(math.random(-3, 3), 0, math.random(-2, 2)))
+	Remotes.fx(player, "Install", {})
+	Remotes.toast(player, "RETURNED TO BASE - recharging...", Color3.fromRGB(90, 255, 140))
+	return true
 end
 
 return Bases

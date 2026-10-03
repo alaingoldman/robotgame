@@ -61,6 +61,10 @@ CoreLoopConfig.Battery = {
 	CellBonus = 25, -- "Power Cell": +max
 	CoilBonus = 0.35, -- "Charge Coil": +35 % recharge (idle + base)
 	Low = 25, -- HUD warning below this %
+	-- at 0 away from base you are FROZEN (no move / jump / attacks, no idle
+	-- recharge) until you press RETURN (teleport to your pad) and the pad
+	-- charges you past ReviveAt
+	ReviveAt = 20,
 }
 
 ---------------------------------------------------------------- combat
@@ -153,7 +157,7 @@ local weapons: { [string]: Weapon } = {
 		anim = "Fists",
 		damage = 1,
 		cooldown = 0.26,
-		cost = 2,
+		cost = 0,
 		range = 7.5,
 		shake = 0.35,
 		color = Color3.fromRGB(200, 200, 200),
@@ -183,7 +187,7 @@ for _, e in WEAPON_LIST do
 			ranged = true,
 			damage = base * mul,
 			cooldown = cd,
-			cost = cost,
+			cost = 0, -- attacks are free (the battery is for moving)
 			range = 38 + 2.2 * t + (if style == "heavy" then 10 else 0),
 			shake = if style == "heavy" then 0.6 else 0.25,
 			color = CoreLoopConfig.tierColor(t),
@@ -207,7 +211,7 @@ for _, e in WEAPON_LIST do
 			aoe = aoe,
 			damage = base * mul,
 			cooldown = cd,
-			cost = cost,
+			cost = 0,
 			range = 8.5 + 0.08 * t + (if style == "heavy" then 0.5 else 0),
 			shake = if anim == "Hammer" then 1 else 0.4,
 			color = CoreLoopConfig.tierColor(t),

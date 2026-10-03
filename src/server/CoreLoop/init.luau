@@ -81,6 +81,14 @@ CoreLoop.debug = {
 	giveSet = function(player: Player, tier: number, ranged: boolean?)
 		State.giveSet(player, tier, ranged)
 	end,
+	-- battery to 0 (away from base this freezes you: test the RETURN flow)
+	drain = function(player: Player)
+		local st = State.get(player)
+		if st then
+			st.battery = 0
+			player:SetAttribute("Battery", 0)
+		end
+	end,
 	unequipAll = function(player: Player)
 		local st = State.get(player)
 		if st then
