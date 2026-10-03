@@ -1,7 +1,7 @@
 {
  "model": "gpt_image_2_5",
  "aspect_ratio": "16:9",
- "note": "Keys are '<index>_<slot>' because tier 10/20 armor indices (1001-1003, 2001-2003) collide with weapon indices (1001-1010 melee, 2001-2010 ranged).",
+ "note": "Keys are '<index>_<slot>' because tier 10/20 armor indices (1001-1003, 2001-2003) collide with weapon indices (1001-1010 melee, 2001-2010 ranged). Entries with 'previous' were regenerated once (weak first pass); the old image is kept as *_old.png.",
  "jobs": {
   "101_arm": {
    "index": 101,
@@ -245,9 +245,14 @@
   "1002_melee": {
    "index": 1002,
    "slot": "melee",
-   "job_id": "e7383226-b84b-4dd1-b5be-ae0b915614cc",
+   "job_id": "abb16cf7-8112-4a36-8cc2-967f04918e75",
    "file": "1002_melee_chain_cleaver.png",
-   "prompt": "Game weapon concept sheet. Junkyard Chain Cleaver. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+   "prompt": "Game weapon concept sheet. Junkyard Chain Cleaver: a giant heavy BUTCHER'S CLEAVER, one wide flat rectangular rusted iron blade with a single sharpened straight edge (NOT a chainsaw: no saw teeth, no chain on the blade, no motor), with a short handle tightly wrapped in heavy rusty chain links, bolted mismatched iron plates and patched welds on the blade. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person.",
+   "previous": {
+    "job_id": "e7383226-b84b-4dd1-b5be-ae0b915614cc",
+    "file": "1002_melee_chain_cleaver_old.png",
+    "prompt": "Game weapon concept sheet. Junkyard Chain Cleaver. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+   }
   },
   "1003_chest": {
    "index": 1003,
@@ -309,9 +314,14 @@
   "1010_melee": {
    "index": 1010,
    "slot": "melee",
-   "job_id": "82d25e96-0c63-493b-ab0e-b68a03a49051",
+   "job_id": "d75acaec-66eb-44cc-b7e2-34ab41601b38",
    "file": "1010_melee_clockwork_halberd.png",
-   "prompt": "Game weapon concept sheet. Emperor's Clockwork Halberd, gold and gemstones. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+   "prompt": "Game weapon concept sheet. Emperor's Clockwork Halberd, a proper HALBERD polearm: a very long straight pole (much longer than the head), topped with a long spear-point tip, a crescent axe blade on one side and a sharp curved back hook / spike on the opposite side, gold and platinum with gemstones and small clockwork gears at the head, jewelled pommel at the butt end. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person.",
+   "previous": {
+    "job_id": "82d25e96-0c63-493b-ab0e-b68a03a49051",
+    "file": "1010_melee_clockwork_halberd_old.png",
+    "prompt": "Game weapon concept sheet. Emperor's Clockwork Halberd, gold and gemstones. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+   }
   },
   "1101_arm": {
    "index": 1101,
@@ -365,25 +375,40 @@
    "index": 1301,
    "slot": "arm",
    "tier": 13,
-   "job_id": "0adf6753-e68a-4bf0-adf8-d2a41fa92d2e",
+   "job_id": "6cdfac26-05b6-44a3-913d-982681283d56",
    "file": "1301_arm_t13_dreadnought.png",
-   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 13 'Dreadnought' style, a huge high-tier upgrade: colossal battleship-gunmetal armor, thick layered dark steel slabs with polished brass trim, rows of protruding cannon barrels, turret-like rotating gun housings, red-hot glowing orange gun ports, massive rivets, imposing and powerful, light battle scars only. Shoulder pauldron is a cannon turret housing with two protruding barrels; forearm has a row of short gun barrels. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "0adf6753-e68a-4bf0-adf8-d2a41fa92d2e",
+    "file": "1301_arm_t13_dreadnought_old.png",
+    "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "1302_leg": {
    "index": 1302,
    "slot": "leg",
    "tier": 13,
-   "job_id": "68e2ded8-b746-48e4-8c99-e874f02ba74a",
+   "job_id": "c67690ab-888e-4a70-9372-d706d9d661c2",
    "file": "1302_leg_t13_dreadnought.png",
-   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 13 'Dreadnought' style, a huge high-tier upgrade: colossal battleship-gunmetal armor, thick layered dark steel slabs with polished brass trim, rows of protruding cannon barrels, turret-like rotating gun housings, red-hot glowing orange gun ports, massive rivets, imposing and powerful, light battle scars only. Hip plate is a turret housing with protruding cannon barrels; thigh and shin have rows of glowing gun ports. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "68e2ded8-b746-48e4-8c99-e874f02ba74a",
+    "file": "1302_leg_t13_dreadnought_old.png",
+    "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "1303_chest": {
    "index": 1303,
    "slot": "chest",
    "tier": 13,
-   "job_id": "9960e442-c472-44b1-8f0d-fbb8b7799cb0",
+   "job_id": "c94f3d96-ff66-4315-8a8f-9e318a8425d7",
    "file": "1303_chest_t13_dreadnought.png",
-   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Helmet: a massive slab helmet with a narrow armored slit visor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 13 'Dreadnought' style, a huge high-tier upgrade: colossal battleship-gunmetal armor, thick layered dark steel slabs with polished brass trim, rows of protruding cannon barrels, turret-like rotating gun housings, red-hot glowing orange gun ports, massive rivets, imposing and powerful, light battle scars only. Turret-like shoulder housings with rows of protruding cannon barrels, chest with glowing red-hot gun ports. Helmet: a massive gunmetal turret helmet with a narrow glowing visor slit and a short cannon crest. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "9960e442-c472-44b1-8f0d-fbb8b7799cb0",
+    "file": "1303_chest_t13_dreadnought_old.png",
+    "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Helmet: a massive slab helmet with a narrow armored slit visor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "1401_arm": {
    "index": 1401,
@@ -485,25 +510,40 @@
    "index": 1801,
    "slot": "arm",
    "tier": 18,
-   "job_id": "bfad3371-9955-4ea4-9d9b-4a6211189b51",
+   "job_id": "adf8849e-5f6f-499d-9154-bb23408c4bac",
    "file": "1801_arm_t18_sun_furnace.png",
-   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 18 'Sun Furnace' style: gleaming highly polished MIRROR-FINISH GOLD metal with strong specular reflections (real polished metal, NOT yellow paint, no rust), a blazing white-hot glowing reactor sun core, radiant sharp sunburst fins fanning outward, heat shimmer, a few small scorch marks. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "bfad3371-9955-4ea4-9d9b-4a6211189b51",
+    "file": "1801_arm_t18_sun_furnace_old.png",
+    "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "1802_leg": {
    "index": 1802,
    "slot": "leg",
    "tier": 18,
-   "job_id": "26d3617a-10cc-418b-846b-d0f7f71e364a",
+   "job_id": "92bf2c14-9266-4bea-b482-8c9046f40aba",
    "file": "1802_leg_t18_sun_furnace.png",
-   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 18 'Sun Furnace' style: gleaming highly polished MIRROR-FINISH GOLD metal with strong specular reflections (real polished metal, NOT yellow paint, no rust), a blazing white-hot glowing reactor sun core, radiant sharp sunburst fins fanning outward, heat shimmer, a few small scorch marks. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "26d3617a-10cc-418b-846b-d0f7f71e364a",
+    "file": "1802_leg_t18_sun_furnace_old.png",
+    "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "1803_chest": {
    "index": 1803,
    "slot": "chest",
    "tier": 18,
-   "job_id": "951a4017-8afc-4565-8f9e-2555277d21ee",
+   "job_id": "86c4ca37-8cb5-4cf3-963b-8191d455bd02",
    "file": "1803_chest_t18_sun_furnace.png",
-   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Helmet: a golden sunburst-crested helmet with white-hot glowing eyes. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 18 'Sun Furnace' style: gleaming highly polished MIRROR-FINISH GOLD metal with strong specular reflections (real polished metal, NOT yellow paint, no rust), a blazing white-hot glowing reactor sun core, radiant sharp sunburst fins fanning outward, heat shimmer, a few small scorch marks. Helmet: a mirror-gold sunburst-crested helmet with white-hot glowing eyes. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "951a4017-8afc-4565-8f9e-2555277d21ee",
+    "file": "1803_chest_t18_sun_furnace_old.png",
+    "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Helmet: a golden sunburst-crested helmet with white-hot glowing eyes. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "1901_arm": {
    "index": 1901,
@@ -548,9 +588,14 @@
    "index": 2002,
    "slot": "leg",
    "tier": 20,
-   "job_id": "daf80e8f-3f0a-44bc-8336-8f76d1a8f55c",
+   "job_id": "cd90c780-7675-45b5-9ff8-1efa5b34ebf4",
    "file": "2002_leg_t20_emperors_clockheart.png",
-   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 20 'Emperor's Clockheart' style: ultra-extravagant legendary armor, gold and platinum, huge glowing gemstone clockwork heart, halo of rotating gold gears, jewel-encrusted filigree, plumes of steam, battle-worn but magnificent. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 20 'Emperor's Clockheart' style: ultra-extravagant legendary armor, polished gold and platinum, jewel-encrusted filigree, small gold gears, plumes of steam, battle-worn but magnificent. The KNEE GUARD is a large jewelled kneecap: a glowing gemstone clockwork heart set in a gold gear ring right on the knee. The hip plate is plain gold filigree with NO gem and NO heart on the hip. Steampunk battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person.",
+   "previous": {
+    "job_id": "daf80e8f-3f0a-44bc-8336-8f76d1a8f55c",
+    "file": "2002_leg_t20_emperors_clockheart_old.png",
+    "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 20 'Emperor's Clockheart' style: ultra-extravagant legendary armor, gold and platinum, huge glowing gemstone clockwork heart, halo of rotating gold gears, jewel-encrusted filigree, plumes of steam, battle-worn but magnificent. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+   }
   },
   "2002_ranged": {
    "index": 2002,
