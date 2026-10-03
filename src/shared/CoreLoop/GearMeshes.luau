@@ -172,6 +172,24 @@ function GearMeshes.request(which: number | string)
 	end)
 end
 
+-- Like request, but yields until that load is done (edit-mode tools, tests).
+function GearMeshes.ensure(which: number | string): Model?
+	local key = keyOf(which)
+	local id = assetOf(key)
+	if not id then
+		return nil
+	end
+	if not holder(key) and not loading[key] then
+		loading[key] = true
+		load(key, id)
+		loading[key] = nil
+	end
+	while loading[key] do
+		task.wait(0.1)
+	end
+	return holder(key)
+end
+
 -- Loads every configured id (server start-up).
 function GearMeshes.preloadAll()
 	for n = 1, 20 do

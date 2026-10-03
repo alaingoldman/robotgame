@@ -33,6 +33,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local CoreLoopConfig = require(Shared:WaitForChild("CoreLoopConfig"))
 local GearAssets = require(Shared:WaitForChild("GearAssets"))
+local GearMeta = require(Shared:WaitForChild("GearMeta"))
 local GearMeshes = require(script.Parent:WaitForChild("GearMeshes"))
 local PartBuilder = require(script.Parent:WaitForChild("PartBuilder"))
 
@@ -48,6 +49,8 @@ type Cover = {
 	box: CFrame, -- the covered box, in the part's space
 	size: Vector3,
 	primary: string, -- "Y" / "Z" / "U" (uniform): the axis fitted exactly
+	joint: string?, -- rig attachment in `part` the node's pivot snaps to
+	pivot: string?, -- GearMeta pivot name (shoulder_R, knee_L, neck ...)
 }
 
 ------------------------------------------------------------------ body
@@ -93,11 +96,11 @@ local SIDES = { { "Right", "R" }, { "Left", "L" } }
 function ArmorBuilder.covers(char: Model, slot: string, hasLower: boolean?): ({ Cover }, { BasePart })
 	local covers: { Cover } = {}
 	local hide: { BasePart } = {}
-	local function add(p: BasePart?, node: string, box: CFrame?, size: Vector3?, primary: string?)
+	local function add(p: BasePart?, node: string, box: CFrame?, size: Vector3?, primary: string?, joint: string?, pivot: string?)
 		if not p then
 			return
 		end
-		table.insert(covers, { part = p, node = node, box = box or CFrame.identity, size = size or p.Size, primary = primary or "Y" })
+		table.insert(covers, { part = p, node = node, box = box or CFrame.identity, size = size or p.Size, primary = primary or "Y", joint = joint, pivot = pivot })
 	end
 	local function hidePart(p: BasePart?)
 		if p and not table.find(hide, p) then
@@ -108,13 +111,13 @@ function ArmorBuilder.covers(char: Model, slot: string, hasLower: boolean?): ({ 
 	if r15 then
 		if slot == "Arms" or slot == "Legs" then
 			local names = if slot == "Arms"
-				then { { "UpperArm", "_Upper", "Y" }, { "LowerArm", "_Lower", "Y" }, { "Hand", "_Hand", "Y" } }
-				else { { "UpperLeg", "_Upper", "Y" }, { "LowerLeg", "_Lower", "Y" }, { "Foot", "_Foot", "Z" } }
+				then { { "UpperArm", "_Upper", "Y", "Shoulder" }, { "LowerArm", "_Lower", "Y", "Elbow" }, { "Hand", "_Hand", "Y", "Wrist" } }
+				else { { "UpperLeg", "_Upper", "Y", "Hip" }, { "LowerLeg", "_Lower", "Y", "Knee" }, { "Foot", "_Foot", "Z", "Ankle" } }
 			local pre = if slot == "Arms" then "Arm" else "Leg"
 			for _, side in SIDES do
 				for _, n in names do
 					local p = bodyPart(char, side[1] .. n[1])
-					add(p, pre .. side[2] .. n[2], nil, nil, n[3])
+					add(p, pre .. side[2] .. n[2], nil, nil, n[3], side[1] .. n[4] .. "RigAttachment", string.lower(n[4]) .. "_" .. side[2])
 					hidePart(p)
 				end
 			end
@@ -125,14 +128,14 @@ function ArmorBuilder.covers(char: Model, slot: string, hasLower: boolean?): ({ 
 				local box, size = unionBox(upper, lower)
 				add(upper, "Torso_Upper", box, size)
 			else
-				add(upper, "Torso_Upper")
-				add(lower, "Torso_Lower")
+				add(upper, "Torso_Upper", nil, nil, "Y", "WaistRigAttachment", "waist")
+				add(lower, "Torso_Lower", nil, nil, "Y", "WaistRigAttachment", "waist")
 			end
 			hidePart(upper)
 			hidePart(lower)
 			local head = bodyPart(char, "Head")
 			if head then
-				add(head, "Head", nil, headSize(head), "U")
+				add(head, "Head", nil, headSize(head), "U", "NeckRigAttachment", "neck")
 				hidePart(head)
 			end
 		end
@@ -374,14 +377,16 @@ local function weldTo(body: BasePart, p: BasePart, c0: CFrame, parent: Instance)
 end
 
 -- A mesh node's piece fitted onto one cover.
-local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance): BasePart
+local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier: number): BasePart
 	local rot = GearMeshes.importRotation(h) * t.CFrame.Rotation
+	local turned = false
 	-- an arm modelled in a T-pose (long along X): swing it down along the side
 	if string.sub(cv.node, 1, 3) == "Arm" then
 		local e = extents(rot, t.Size)
 		if e.X > e.Y * 1.15 then
 			local right = string.sub(cv.node, 4, 4) == "R"
 			rot = CFrame.Angles(0, 0, if right then -math.pi / 2 else math.pi / 2) * rot
+			turned = true
 		end
 	end
 	local ext = extents(rot, t.Size)
@@ -413,7 +418,23 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance): Bas
 	c.Name = cv.node
 	c.Size = newSize
 	CollectionService:AddTag(c, ArmorBuilder.PieceTag)
-	weldTo(cv.part, c, cv.box * rot, parent)
+	-- place: snap the node's joint pivot (GearMeta) onto the body's rig
+	-- attachment (shoulder on shoulder, knee on knee ...), else centre it
+	local place = cv.box
+	local meta = GearMeta.Tiers[tier]
+	local centre = meta and meta.centres[cv.node]
+	local piv = meta and cv.pivot and meta.pivots[cv.pivot]
+	local att = cv.joint and cv.part:FindFirstChild(cv.joint)
+	if centre and piv and att and att:IsA("Attachment") and not turned then
+		-- source axes == body axes (the piece isn't turned), so scale per axis
+		local o = (piv - centre) * scale
+		local pos = att.Position - o
+		-- keep it from sliding off the part: at most a third of the part out of centre
+		local lim = cv.size / 3
+		pos = Vector3.new(math.clamp(pos.X, -lim.X, lim.X), math.clamp(pos.Y, -lim.Y * 1.5, lim.Y * 1.5), math.clamp(pos.Z, -lim.Z, lim.Z))
+		place = CFrame.new(pos)
+	end
+	weldTo(cv.part, c, place * rot, parent)
 	return c
 end
 
@@ -488,7 +509,7 @@ function ArmorBuilder.attach(char: Model, item: any, parent: Instance): (Model, 
 		for _, cv in covers do
 			local t = GearMeshes.node(h, cv.node)
 			if t then
-				local ok, err = pcall(fitPiece, h, t, cv, model)
+				local ok, err = pcall(fitPiece, h, t, cv, model, tier)
 				if ok then
 					meshed += 1
 				else
@@ -543,6 +564,10 @@ end
 
 -- Mesh weapon: the node's centre relative to the grip, in the source frame.
 local function gripCentre(h: Model, t: BasePart, srcRot: CFrame, ranged: boolean): Vector3
+	local known = GearMeta.WeaponCentres[t.Name]
+	if known then
+		return known -- meta.json: bbox centre relative to the grip
+	end
 	local flip = GearMeshes.importRotation(h)
 	local c = flip * (t.Position - h:GetPivot().Position)
 	local ext = extents(srcRot, t.Size)

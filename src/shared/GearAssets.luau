@@ -17,12 +17,12 @@
 local GearAssets = {}
 
 GearAssets.Tiers = {
-	[1] = nil, -- Scrap Tin
-	[2] = nil, -- Junkyard Iron
-	[3] = nil, -- Boilerplate
-	[4] = nil, -- Verdigris Copper
-	[5] = nil, -- Coalworks
-	[6] = nil, -- Brass Piston
+	[1] = 129774576203721, -- Scrap Tin
+	[2] = 87859246085735, -- Junkyard Iron
+	[3] = 121752361759430, -- Boilerplate
+	[4] = 79624060491943, -- Verdigris Copper
+	[5] = 132837181895917, -- Coalworks
+	[6] = 113641051314199, -- Brass Piston
 	[7] = nil, -- Clockwork
 	[8] = nil, -- Foundry
 	[9] = nil, -- Rail Baron
