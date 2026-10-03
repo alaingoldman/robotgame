@@ -49,6 +49,7 @@ type Cover = {
 	box: CFrame, -- the covered box, in the part's space
 	size: Vector3,
 	primary: string, -- "Y" / "Z" / "U" (uniform): the axis fitted exactly
+	holding: boolean?, -- the right hand holds a weapon
 	joint: string?, -- rig attachment in `part` the node's pivot snaps to
 	pivot: string?, -- GearMeta pivot name (shoulder_R, knee_L, neck ...)
 }
@@ -426,10 +427,9 @@ function ArmorBuilder.rigScale(char: Model, tier: number): RigScale?
 	local torsoM = P.neck.Y - P.waist.Y
 	local sa, sl, sc = arm / armM, leg / legM, torso / torsoM
 	local avg = (sa + sl + sc) / 3
-	local function near(x: number): number
-		return math.clamp(x, avg * 0.9, avg * 1.1)
-	end
-	local rig: RigScale = { Arms = near(sa), Legs = near(sl), Chest = near(sc), shift = {} }
+	-- ONE uniform scale for the whole set (the authored proportions);
+	-- lengths are matched per limb segment along the limb only (fitPiece)
+	local rig: RigScale = { Arms = avg, Legs = avg, Chest = avg, shift = {} }
 	-- the chest piece's own shoulders / hips (its scale: see fitPiece Torso_Upper)
 	local cy = math.clamp(torso / torsoM, rig.Chest * 0.8, rig.Chest * 1.3)
 	local lt = char:FindFirstChild("LowerTorso")
@@ -462,7 +462,6 @@ local STRETCH = 1.12
 local SPANS: { [string]: { att: string?, pivot: string? } } = {
 	Arm_Upper = { att = "ElbowRigAttachment", pivot = "elbow" },
 	Arm_Lower = { att = "WristRigAttachment", pivot = "wrist" },
-	Arm_Hand = {},
 	Leg_Upper = { att = "KneeRigAttachment", pivot = "knee" },
 	Leg_Lower = { att = "AnkleRigAttachment", pivot = "ankle" },
 	Leg_Foot = {},
@@ -492,16 +491,35 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 		local u = (rig :: any)[group] :: number
 		if cv.node == "Torso_Lower" then
 			u = math.min(u, 1) -- the belt / pelvis never grows past its authored size
+		elseif string.sub(cv.node, 5) == "_Hand" then
+			-- hands: about the avatar's own hand (never blown up), a bit
+			-- smaller on the weapon hand so the grip sits in the fist
+			local hs = cv.part.Size
+			u = math.min(u, hs.Y * 1.25 / ext.Y, math.max(hs.X, hs.Z) * 1.45 / math.max(ext.X, ext.Z))
+			if cv.holding and string.sub(cv.node, 4, 4) == "R" then
+				u *= 0.85
+			end
 		end
 		-- small capped growth per axis where the body part pokes out
 		local target = cv.size * 1.04
+		local grow = if string.sub(cv.node, 5) == "_Hand" then 1 else STRETCH
 		local g = Vector3.new(
-			math.clamp(target.X / (ext.X * u), 1, STRETCH),
-			math.clamp(target.Y / (ext.Y * u), 1, STRETCH),
-			math.clamp(target.Z / (ext.Z * u), 1, STRETCH)
+			math.clamp(target.X / (ext.X * u), 1, grow),
+			math.clamp(target.Y / (ext.Y * u), 1, grow),
+			math.clamp(target.Z / (ext.Z * u), 1, grow)
 		)
 		scale = g * u
 		if cv.node == "Torso_Lower" then
+			-- bridge the waist (chest bottom) down past the hips (thigh tops):
+			-- no dark band between chest and legs
+			local hipA = cv.part:FindFirstChild("RightHipRigAttachment")
+			if hipA and hipA:IsA("Attachment") then
+				local spanA = (att :: Attachment).Position.Y - hipA.Position.Y + 0.3
+				local spanM = piv.Y - (centre.Y - ext.Y / 2)
+				if spanM > 0.02 then
+					scale = Vector3.new(scale.X, math.clamp(spanA / spanM, scale.Y, scale.X * 4), scale.Z)
+				end
+			end
 			-- no bulging seat: depth at most 1.3x the pelvis
 			local maxZ = cv.size.Z * 1.3
 			if ext.Z * scale.Z > maxZ then
@@ -638,6 +656,9 @@ function ArmorBuilder.attach(char: Model, item: any, parent: Instance): (Model, 
 	end
 	local hasLower = h ~= nil and GearMeshes.node(h :: Model, "Torso_Lower") ~= nil
 	local covers, hide = ArmorBuilder.covers(char, slot, hasLower)
+	for _, cv in covers do
+		cv.holding = item.holding == true
+	end
 	local meshed = 0
 	if h then
 		local rig = ArmorBuilder.rigScale(char, tier)
@@ -730,11 +751,12 @@ end
 -- the forearm (hand -Y), its `up` faces the hand's front (-Z). Melee then
 -- points along the forearm; ranged points forward whenever the forearm does
 -- (aiming, and the ready pose the client holds).
-local function toHand(d: Vector3, up: Vector3): CFrame
+-- Rotation taking source direction d -> dT and up -> upT (hand space).
+local function toHand(d: Vector3, up: Vector3, dT: Vector3, upT: Vector3): CFrame
 	up = (up - d * up:Dot(d))
 	up = if up.Magnitude > 1e-3 then up.Unit else (if math.abs(d.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis)
 	local S = CFrame.fromMatrix(Vector3.zero, d:Cross(up), d, up)
-	local T = CFrame.fromMatrix(Vector3.zero, Vector3.xAxis, -Vector3.yAxis, -Vector3.zAxis)
+	local T = CFrame.fromMatrix(Vector3.zero, dT:Cross(upT), dT, upT)
 	return T * S:Inverse()
 end
 
@@ -780,7 +802,12 @@ local function meshWeapon(id: string, w: CoreLoopConfig.Weapon): (BasePart?, CFr
 	p.Name = if ranged then "Gun" else "Blade"
 	-- grip in the clone's own (scaled) space
 	local gripLocal = srcRot:Inverse():VectorToWorldSpace(-c) * k
-	local rotHand = toHand(d, up) * srcRot
+	-- ranged: barrel along the forearm (forward when aiming / in the ready
+	-- pose); melee: blade out of the top of the fist (hand -Z = up and a bit
+	-- forward in the ready pose, forward on a swing), heavy side leading
+	local rotHand = if ranged
+		then toHand(d, up, -Vector3.yAxis, -Vector3.zAxis) * srcRot
+		else toHand(d, up, -Vector3.zAxis, -Vector3.yAxis) * srcRot
 	return p, rotHand * CFrame.new(-gripLocal)
 end
 

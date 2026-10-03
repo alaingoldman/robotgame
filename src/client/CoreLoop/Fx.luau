@@ -505,12 +505,13 @@ function Fx.start()
 				pose(char, a, now)
 			end
 		end
-		-- ready pose with a ranged weapon: forearm (and so the barrel) forward
+		-- ready pose with a weapon: forearm forward, so a gun's barrel points
+		-- forward and a melee weapon stands up out of the fist
 		for _, p in Players:GetPlayers() do
 			local char = p.Character
 			local w = CoreLoopConfig.Weapons[(p:GetAttribute("Weapon") :: string?) or "Fists"]
-			if char and w and w.ranged and not anims[char] then
-				apply(motor(char, "RightLowerArm", "RightElbow"), CFrame.Angles(R(80), 0, 0))
+			if char and w and w.id ~= "Fists" and not anims[char] then
+				apply(motor(char, "RightLowerArm", "RightElbow"), CFrame.Angles(R(if w.ranged then 80 else 72), 0, 0))
 			end
 		end
 	end)

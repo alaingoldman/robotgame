@@ -54,7 +54,8 @@ function Gear.rebuild(player: Player)
 	for _, slot in { "Legs", "Arms", "Chest" } do
 		local it = st.equipped[slot]
 		if it then
-			local ok, res, hide = pcall(ArmorBuilder.attach, char, it, model)
+			local spec = { slot = it.slot, tier = it.tier, holding = st.weapon ~= "Fists" }
+			local ok, res, hide = pcall(ArmorBuilder.attach, char, spec, model)
 			if ok then
 				for _, p in hide do
 					table.insert(covered, p)

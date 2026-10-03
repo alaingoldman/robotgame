@@ -47,7 +47,7 @@ GearAssets.Weapons = 86709172385225 :: number?
 GearAssets.Margin = 1.12
 GearAssets.KeepAspect = 0.85
 -- Weapon length (studs, longest side) by kind; a little longer per tier.
-GearAssets.MeleeLength = 4.2
+GearAssets.MeleeLength = 3.8
 GearAssets.RangedLength = 2.6
 GearAssets.LengthPerTier = 0.04
 
