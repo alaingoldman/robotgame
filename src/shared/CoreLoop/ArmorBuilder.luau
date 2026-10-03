@@ -128,7 +128,7 @@ function ArmorBuilder.covers(char: Model, slot: string, hasLower: boolean?): ({ 
 				local box, size = unionBox(upper, lower)
 				add(upper, "Torso_Upper", box, size)
 			else
-				add(upper, "Torso_Upper", nil, nil, "Y", "WaistRigAttachment", "waist")
+				add(upper, "Torso_Upper", nil, nil, "Y", "NeckRigAttachment", "neck")
 				add(lower, "Torso_Lower", nil, nil, "Y", "WaistRigAttachment", "waist")
 			end
 			hidePart(upper)
@@ -377,7 +377,98 @@ local function weldTo(body: BasePart, p: BasePart, c0: CFrame, parent: Instance)
 end
 
 -- A mesh node's piece fitted onto one cover.
-local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier: number): BasePart
+-- Rig fit (meta available, R15): the tier is ONE rig at a uniform scale per
+-- limb group (arms / legs / chest, each kept within 10 % of the body-wide
+-- average so the authored proportions hold); every node is placed by its
+-- meta joint pivot on the matching R15 rig attachment (shoulder on shoulder,
+-- neck on neck, ankle on ankle ...). A small per-axis growth (<= Stretch)
+-- closes gaps where the avatar is chunkier than the armour.
+export type RigScale = {
+	Arms: number,
+	Legs: number,
+	Chest: number,
+	raise: number?,
+	-- per side ("R" / "L"): how far to move the whole arm / leg (in the limb
+	-- parts' rest frame = the torso's) so it meets the armour's own shoulder /
+	-- hip on the chest piece instead of the avatar's (narrower) joint
+	shift: { [string]: Vector3 },
+}
+
+local function attPosIn(part: Instance?, name: string): Vector3?
+	local a = part and part:FindFirstChild(name)
+	return if a and a:IsA("Attachment") then a.Position else nil
+end
+
+-- Per-group uniform scale of the tier's rig on this R15 body (nil: no rig fit).
+function ArmorBuilder.rigScale(char: Model, tier: number): RigScale?
+	local meta = GearMeta.Tiers[tier]
+	if not meta then
+		return nil
+	end
+	local P = meta.pivots
+	local ut = char:FindFirstChild("UpperTorso")
+	local ua, la = char:FindFirstChild("RightUpperArm"), char:FindFirstChild("RightLowerArm")
+	local ul, ll, ft = char:FindFirstChild("RightUpperLeg"), char:FindFirstChild("RightLowerLeg"), char:FindFirstChild("RightFoot")
+	local sh, el1 = attPosIn(ua, "RightShoulderRigAttachment"), attPosIn(ua, "RightElbowRigAttachment")
+	local el2, wr = attPosIn(la, "RightElbowRigAttachment"), attPosIn(la, "RightWristRigAttachment")
+	local hp, kn1 = attPosIn(ul, "RightHipRigAttachment"), attPosIn(ul, "RightKneeRigAttachment")
+	local kn2, an1 = attPosIn(ll, "RightKneeRigAttachment"), attPosIn(ll, "RightAnkleRigAttachment")
+	local an2 = attPosIn(ft, "RightAnkleRigAttachment")
+	local nk, ws = attPosIn(ut, "NeckRigAttachment"), attPosIn(ut, "WaistRigAttachment")
+	if not (sh and el1 and el2 and wr and hp and kn1 and kn2 and an1 and an2 and nk and ws and ft and ft:IsA("BasePart")) then
+		return nil
+	end
+	local arm = ((sh :: Vector3) - el1).Magnitude + ((el2 :: Vector3) - wr).Magnitude
+	local armM = (P.shoulder_R - P.elbow_R).Magnitude + (P.elbow_R - P.wrist_R).Magnitude
+	local leg = ((hp :: Vector3) - kn1).Magnitude + ((kn2 :: Vector3) - an1).Magnitude + ((an2 :: Vector3).Y + (ft :: BasePart).Size.Y / 2)
+	local legM = P.hip_R.Y -- sole at y = 0
+	local torso = (nk :: Vector3).Y - (ws :: Vector3).Y
+	local torsoM = P.neck.Y - P.waist.Y
+	local sa, sl, sc = arm / armM, leg / legM, torso / torsoM
+	local avg = (sa + sl + sc) / 3
+	local function near(x: number): number
+		return math.clamp(x, avg * 0.9, avg * 1.1)
+	end
+	local rig: RigScale = { Arms = near(sa), Legs = near(sl), Chest = near(sc), shift = {} }
+	-- the chest piece's own shoulders / hips (its scale: see fitPiece Torso_Upper)
+	local cy = math.clamp(torso / torsoM, rig.Chest * 0.8, rig.Chest * 1.3)
+	local lt = char:FindFirstChild("LowerTorso")
+	local wl = attPosIn(lt, "WaistRigAttachment")
+	for _, S in { "R", "L" } do
+		local W = if S == "R" then "Right" else "Left"
+		local shT = attPosIn(ut, W .. "ShoulderRigAttachment")
+		local pS = P["shoulder_" .. S]
+		if shT and pS then
+			local target = (nk :: Vector3) + (pS - P.neck) * Vector3.new(rig.Chest, cy, rig.Chest)
+			-- top of the arm piece vs the avatar's shoulder: keep the arm from riding up
+			local d = target - (shT :: Vector3)
+			rig.shift["Arm" .. S] = Vector3.new(d.X, math.clamp(d.Y, -0.3, 0.3), d.Z)
+		end
+		local hpT = attPosIn(lt, W .. "HipRigAttachment")
+		local pH = P["hip_" .. S]
+		if hpT and wl and pH then
+			local lu = math.min(rig.Chest, 1)
+			local target = (wl :: Vector3) + (pH - P.waist) * lu
+			local d = target - (hpT :: Vector3)
+			rig.shift["Leg" .. S] = Vector3.new(d.X, 0, d.Z) -- never lift / sink the legs
+		end
+	end
+	return rig
+end
+
+local STRETCH = 1.12
+-- node (side stripped) -> the joint at its lower end (attachment suffix in the
+-- same body part, meta pivot prefix); none = the part's / piece's bottom
+local SPANS: { [string]: { att: string?, pivot: string? } } = {
+	Arm_Upper = { att = "ElbowRigAttachment", pivot = "elbow" },
+	Arm_Lower = { att = "WristRigAttachment", pivot = "wrist" },
+	Arm_Hand = {},
+	Leg_Upper = { att = "KneeRigAttachment", pivot = "knee" },
+	Leg_Lower = { att = "AnkleRigAttachment", pivot = "ankle" },
+	Leg_Foot = {},
+}
+
+local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier: number, rig: RigScale?): BasePart
 	local rot = GearMeshes.importRotation(h) * t.CFrame.Rotation
 	local turned = false
 	-- an arm modelled in a T-pose (long along X): swing it down along the side
@@ -390,50 +481,93 @@ local function fitPiece(h: Model, t: BasePart, cv: Cover, parent: Instance, tier
 		end
 	end
 	local ext = extents(rot, t.Size)
-	local target = cv.size * GearAssets.Margin
-	local s = Vector3.new(target.X / math.max(ext.X, 1e-3), target.Y / math.max(ext.Y, 1e-3), target.Z / math.max(ext.Z, 1e-3))
+	local meta = GearMeta.Tiers[tier]
+	local centre = meta and meta.centres[cv.node]
+	local piv = meta and cv.pivot and meta.pivots[cv.pivot]
+	local att = cv.joint and cv.part:FindFirstChild(cv.joint)
 	local scale: Vector3
-	if cv.primary == "U" then
-		local u = math.max(s.X, s.Y, s.Z)
-		scale = Vector3.new(u, u, u)
+	local place = cv.box
+	local group = if string.sub(cv.node, 1, 3) == "Arm" then "Arms" elseif string.sub(cv.node, 1, 3) == "Leg" then "Legs" else "Chest"
+	if rig and centre and piv and att and att:IsA("Attachment") and not turned then
+		local u = (rig :: any)[group] :: number
+		if cv.node == "Torso_Lower" then
+			u = math.min(u, 1) -- the belt / pelvis never grows past its authored size
+		end
+		-- small capped growth per axis where the body part pokes out
+		local target = cv.size * 1.04
+		local g = Vector3.new(
+			math.clamp(target.X / (ext.X * u), 1, STRETCH),
+			math.clamp(target.Y / (ext.Y * u), 1, STRETCH),
+			math.clamp(target.Z / (ext.Z * u), 1, STRETCH)
+		)
+		scale = g * u
+		if cv.node == "Torso_Lower" then
+			-- no bulging seat: depth at most 1.3x the pelvis
+			local maxZ = cv.size.Z * 1.3
+			if ext.Z * scale.Z > maxZ then
+				scale = Vector3.new(scale.X, scale.Y, maxZ / ext.Z)
+			end
+		end
+		-- limb segments: stretch along the limb so the piece spans this
+		-- avatar's joint to joint (the armour's own upper / lower split
+		-- differs from R15's), within 0.7 .. 1.8 of the rig scale
+		local span = SPANS[string.gsub(cv.node, "^(%a%a%a)[RL]_", "%1_")]
+		if span then
+			local sideL = string.sub(cv.node, 4, 4)
+			local sideW = if sideL == "R" then "Right" else "Left"
+			local aTop = (att :: Attachment).Position
+			local bottomAvatar: number
+			if span.att then
+				local b = cv.part:FindFirstChild(sideW .. span.att)
+				bottomAvatar = if b and b:IsA("Attachment") then b.Position.Y else -cv.part.Size.Y / 2
+			else
+				bottomAvatar = -cv.part.Size.Y / 2
+			end
+			local bottomMeta = if span.pivot then meta.pivots[span.pivot .. "_" .. sideL].Y else centre.Y - ext.Y / 2
+			local spanA = aTop.Y - bottomAvatar
+			local spanM = piv.Y - bottomMeta
+			if spanA > 0.05 and spanM > 0.05 then
+				local sy = math.clamp(spanA / spanM, u * 0.7, u * 1.8)
+				scale = Vector3.new(scale.X, math.max(sy, scale.Y * 0.98), scale.Z)
+			end
+		elseif cv.node == "Torso_Upper" then
+			local w = cv.part:FindFirstChild("WaistRigAttachment")
+			if w and w:IsA("Attachment") then
+				local spanA = (att :: Attachment).Position.Y - w.Position.Y
+				local spanM = piv.Y - meta.pivots.waist.Y
+				if spanA > 0.05 and spanM > 0.05 then
+					scale = Vector3.new(scale.X, math.clamp(spanA / spanM, u * 0.8, u * 1.3), scale.Z)
+				end
+			end
+		end
+		local o = (piv - centre) * scale
+		local shift = (rig :: RigScale).shift[string.sub(cv.node, 1, 4)] or Vector3.zero
+		place = CFrame.new(att.Position - o + shift)
+		if cv.node == "LegR_Foot" and rig then
+			-- how far the boot's sole sits below the foot's own bottom
+			local sole = att.Position.Y - (piv.Y - 0) * scale.Y
+			rig.raise = math.max(rig.raise or 0, -cv.part.Size.Y / 2 - sole)
+		end
 	else
-		local p = if cv.primary == "Z" then s.Z else s.Y
-		local k = p * GearAssets.KeepAspect
-		scale = Vector3.new(math.max(s.X, k), math.max(s.Y, k), math.max(s.Z, k))
-		if cv.primary == "Z" then
-			scale = Vector3.new(scale.X, scale.Y, s.Z)
+		local target = cv.size * GearAssets.Margin
+		local s = Vector3.new(target.X / math.max(ext.X, 1e-3), target.Y / math.max(ext.Y, 1e-3), target.Z / math.max(ext.Z, 1e-3))
+		if cv.primary == "U" then
+			local m = math.max(s.X, s.Y, s.Z)
+			scale = Vector3.new(m, m, m)
 		else
-			scale = Vector3.new(scale.X, s.Y, scale.Z)
+			local p = if cv.primary == "Z" then s.Z else s.Y
+			local k = p * GearAssets.KeepAspect
+			scale = Vector3.new(math.max(s.X, k), math.max(s.Y, k), math.max(s.Z, k))
+			scale = if cv.primary == "Z" then Vector3.new(scale.X, scale.Y, s.Z) else Vector3.new(scale.X, s.Y, scale.Z)
 		end
 	end
 	-- local axis i lands on body axis dominant(rot column i)
 	local cols = { rot.XVector, rot.YVector, rot.ZVector }
 	local sz = t.Size
-	local newSize = Vector3.new(
-		sz.X * comp(scale, dominant(cols[1])),
-		sz.Y * comp(scale, dominant(cols[2])),
-		sz.Z * comp(scale, dominant(cols[3]))
-	)
 	local c = prepClone(t)
 	c.Name = cv.node
-	c.Size = newSize
+	c.Size = Vector3.new(sz.X * comp(scale, dominant(cols[1])), sz.Y * comp(scale, dominant(cols[2])), sz.Z * comp(scale, dominant(cols[3])))
 	CollectionService:AddTag(c, ArmorBuilder.PieceTag)
-	-- place: snap the node's joint pivot (GearMeta) onto the body's rig
-	-- attachment (shoulder on shoulder, knee on knee ...), else centre it
-	local place = cv.box
-	local meta = GearMeta.Tiers[tier]
-	local centre = meta and meta.centres[cv.node]
-	local piv = meta and cv.pivot and meta.pivots[cv.pivot]
-	local att = cv.joint and cv.part:FindFirstChild(cv.joint)
-	if centre and piv and att and att:IsA("Attachment") and not turned then
-		-- source axes == body axes (the piece isn't turned), so scale per axis
-		local o = (piv - centre) * scale
-		local pos = att.Position - o
-		-- keep it from sliding off the part: at most a third of the part out of centre
-		local lim = cv.size / 3
-		pos = Vector3.new(math.clamp(pos.X, -lim.X, lim.X), math.clamp(pos.Y, -lim.Y * 1.5, lim.Y * 1.5), math.clamp(pos.Z, -lim.Z, lim.Z))
-		place = CFrame.new(pos)
-	end
 	weldTo(cv.part, c, place * rot, parent)
 	return c
 end
@@ -506,10 +640,11 @@ function ArmorBuilder.attach(char: Model, item: any, parent: Instance): (Model, 
 	local covers, hide = ArmorBuilder.covers(char, slot, hasLower)
 	local meshed = 0
 	if h then
+		local rig = ArmorBuilder.rigScale(char, tier)
 		for _, cv in covers do
 			local t = GearMeshes.node(h, cv.node)
 			if t then
-				local ok, err = pcall(fitPiece, h, t, cv, model, tier)
+				local ok, err = pcall(fitPiece, h, t, cv, model, tier, rig)
 				if ok then
 					meshed += 1
 				else
@@ -521,6 +656,10 @@ function ArmorBuilder.attach(char: Model, item: any, parent: Instance): (Model, 
 			end
 		end
 		model:SetAttribute("Mesh", true)
+		-- boots taller than the feet: the character stands on them (Gear raises HipHeight)
+		if slot == "Legs" and rig and (rig.raise or 0) > 0.02 then
+			model:SetAttribute("HipRaise", rig.raise)
+		end
 	else
 		for _, cv in covers do
 			shell(cv, tier, model)

@@ -21,12 +21,20 @@ local Gear = {}
 
 local pending: { [Player]: boolean } = {}
 
+local HIP_ATTR = "GearBaseHip" -- HipHeight before the boots raised it
+
 local function clear(char: Model)
 	local old = char:FindFirstChild("CoreGear")
 	if old then
 		old:Destroy()
 	end
 	ArmorBuilder.restore(char)
+	local base = char:GetAttribute(HIP_ATTR)
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if typeof(base) == "number" and hum then
+		hum.HipHeight = base
+	end
+	char:SetAttribute(HIP_ATTR, nil)
 end
 
 function Gear.rebuild(player: Player)
@@ -94,6 +102,13 @@ function Gear.rebuild(player: Player)
 	end
 	model.Parent = char
 	ArmorBuilder.hide(char, covered)
+	-- boots taller than the avatar's feet: stand on them, not in the floor
+	local legs = model:FindFirstChild("Gear_Legs")
+	local raise = legs and legs:GetAttribute("HipRaise")
+	if typeof(raise) == "number" and raise > 0 then
+		char:SetAttribute(HIP_ATTR, hum.HipHeight)
+		hum.HipHeight += raise
+	end
 end
 
 local function schedule(player: Player, delay: number?)

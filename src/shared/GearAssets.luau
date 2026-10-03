@@ -23,23 +23,23 @@ GearAssets.Tiers = {
 	[4] = 79624060491943, -- Verdigris Copper
 	[5] = 132837181895917, -- Coalworks
 	[6] = 113641051314199, -- Brass Piston
-	[7] = nil, -- Clockwork
-	[8] = nil, -- Foundry
-	[9] = nil, -- Rail Baron
-	[10] = nil, -- Ironclad
-	[11] = nil, -- Tesla
-	[12] = nil, -- Aether Diver
-	[13] = nil, -- Dreadnought
-	[14] = nil, -- Gilded Engine
-	[15] = nil, -- Cog Royal
-	[16] = nil, -- Sky Admiral
-	[17] = nil, -- Arcanum
-	[18] = nil, -- Sun Furnace
-	[19] = nil, -- Celestial Orrery
-	[20] = nil, -- Emperor's Clockheart
+	[7] = 90744692383827, -- Clockwork
+	[8] = 122040914565326, -- Foundry
+	[9] = 77409949396528, -- Rail Baron
+	[10] = 103857608578144, -- Ironclad
+	[11] = 140531974927178, -- Tesla
+	[12] = 105584007995594, -- Aether Diver
+	[13] = 96656986422751, -- Dreadnought
+	[14] = 113476735068677, -- Gilded Engine
+	[15] = 82246726877255, -- Cog Royal
+	[16] = 93402423880671, -- Sky Admiral
+	[17] = 77006376041529, -- Arcanum
+	[18] = 93331467453406, -- Sun Furnace
+	[19] = 79720708208947, -- Celestial Orrery
+	[20] = 111692374791130, -- Emperor's Clockheart
 } :: { [number]: number? }
 
-GearAssets.Weapons = nil :: number?
+GearAssets.Weapons = 86709172385225 :: number?
 
 -- Fit tuning: an armour piece is scaled so it encloses the body part it
 -- covers times Margin (per axis), keeping at least KeepAspect of its own
