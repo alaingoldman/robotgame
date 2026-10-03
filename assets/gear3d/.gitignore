@@ -1,0 +1,4 @@
+# raw Tripo downloads (~46 MB each), caches, crops and presigned upload URLs (contain temporary credentials)
+work/*
+!work/ledger.json
+tools/__pycache__/
