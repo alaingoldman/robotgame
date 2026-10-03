@@ -22,7 +22,7 @@ local State = require(script.Parent.State)
 
 local Picker = {}
 
-Picker.ExtraUsers = { [1520431437] = true }
+Picker.ExtraUsers = {}
 
 local allowed: { [Player]: boolean } = {}
 
