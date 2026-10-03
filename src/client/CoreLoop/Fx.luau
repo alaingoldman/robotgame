@@ -15,6 +15,7 @@ local TweenService = game:GetService("TweenService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local MechConfig = require(Shared:WaitForChild("MechConfig"))
+local CoreLoopConfig = require(Shared:WaitForChild("CoreLoopConfig"))
 
 local Fx = {}
 
@@ -109,7 +110,8 @@ local anims: { [Model]: Anim } = {}
 
 local DUR = { Fists = 0.3, Blade = 0.3, Hammer = 0.62, Rivet = 0.16 }
 
-function Fx.swing(char: Model, combo: number, weapon: string)
+function Fx.swing(char: Model, combo: number, weaponId: string)
+	local weapon = CoreLoopConfig.weaponAnim(weaponId) -- swing style
 	local a = anims[char]
 	local now = os.clock()
 	if weapon == "Rivet" and a and a.weapon == "Rivet" then
@@ -155,7 +157,8 @@ function Fx.swing(char: Model, combo: number, weapon: string)
 end
 
 -- Test hook: hold a swing at phase p (0..1) for `seconds` (screenshots).
-function Fx.debugHold(char: Model, combo: number, weapon: string, p: number, seconds: number)
+function Fx.debugHold(char: Model, combo: number, weaponId: string, p: number, seconds: number)
+	local weapon = CoreLoopConfig.weaponAnim(weaponId)
 	local now = os.clock()
 	anims[char] = { t0 = now, dur = DUR[weapon] or 0.3, combo = combo, weapon = weapon, hold = now + seconds, freeze = p }
 end
@@ -500,6 +503,14 @@ function Fx.start()
 				anims[char] = nil
 			else
 				pose(char, a, now)
+			end
+		end
+		-- ready pose with a ranged weapon: forearm (and so the barrel) forward
+		for _, p in Players:GetPlayers() do
+			local char = p.Character
+			local w = CoreLoopConfig.Weapons[(p:GetAttribute("Weapon") :: string?) or "Fists"]
+			if char and w and w.ranged and not anims[char] then
+				apply(motor(char, "RightLowerArm", "RightElbow"), CFrame.Angles(R(80), 0, 0))
 			end
 		end
 	end)

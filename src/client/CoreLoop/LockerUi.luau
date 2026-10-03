@@ -15,7 +15,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local CoreLoopConfig = require(Shared:WaitForChild("CoreLoopConfig"))
 local CoreShared = Shared:WaitForChild("CoreLoop")
 local Items = require(CoreShared:WaitForChild("Items"))
-local PartBuilder = require(CoreShared:WaitForChild("PartBuilder"))
+local ArmorBuilder = require(CoreShared:WaitForChild("ArmorBuilder"))
 local Fx = require(script.Parent.Fx)
 
 local LockerUi = {}
@@ -102,7 +102,7 @@ local function preview(vp: ViewportFrame, item: any)
 			c:Destroy()
 		end
 	end
-	local ok, model = pcall(PartBuilder.display, item)
+	local ok, model = pcall(ArmorBuilder.display, item)
 	if not ok then
 		return
 	end
@@ -201,11 +201,12 @@ local function build()
 	weaponRow = Instance.new("Frame")
 	weaponRow.LayoutOrder = 11
 	weaponRow.BackgroundTransparency = 1
-	weaponRow.Size = UDim2.fromOffset(300, 30)
+	weaponRow.Size = UDim2.fromOffset(300, 150)
 	weaponRow.Parent = left
-	local wlay = Instance.new("UIListLayout")
-	wlay.FillDirection = Enum.FillDirection.Horizontal
-	wlay.Padding = UDim.new(0, 6)
+	local wlay = Instance.new("UIGridLayout")
+	wlay.CellSize = UDim2.fromOffset(71, 32)
+	wlay.CellPadding = UDim2.fromOffset(5, 5)
+	wlay.SortOrder = Enum.SortOrder.LayoutOrder
 	wlay.Parent = weaponRow
 
 	-- right: locker grid
@@ -237,7 +238,7 @@ local function build()
 		press(shopButton)
 		lockerRemote:FireServer("BuyBattery")
 	end)
-	hint = label(panel, "Click a part to equip it. Legs / arms / head any time - CHEST needs LEGS.", 11, COL.dim, Enum.Font.Gotham)
+	hint = label(panel, "Click a piece to equip it (it replaces that slot). ARMS cover both arms, LEGS both legs, CHEST = chest + helmet (needs LEGS).", 11, COL.dim, Enum.Font.Gotham)
 	hint.Position = UDim2.new(0, 24, 1, -26)
 	hint.Size = UDim2.fromOffset(700, 14)
 
@@ -269,10 +270,11 @@ local function card(item: any, order: number)
 	corner(vp, 4)
 	preview(vp, item)
 	local t = Items.tierInfo(item.tier or 1)
-	local tierTag = label(c, string.upper(t.name) .. "  " .. string.upper(item.slot or ""), 10, color, Enum.Font.GothamBlack)
+	local tierTag = label(c, string.format("T%d  %s", t.tier, string.upper(item.slot or "")), 10, color, Enum.Font.GothamBlack)
 	tierTag.Position = UDim2.fromOffset(8, 94)
 	tierTag.Size = UDim2.new(1, -16, 0, 12)
-	local n = label(c, CoreLoopConfig.FamilyNames[t.family] or t.family, 12, COL.text, Enum.Font.GothamBold)
+	local n = label(c, string.upper(t.name), 12, color, Enum.Font.GothamBold)
+	n.TextTruncate = Enum.TextTruncate.AtEnd
 	n.Position = UDim2.fromOffset(8, 107)
 	n.Size = UDim2.new(1, -16, 0, 14)
 	local b = label(c, if blocked then "needs LEGS first" else Items.bonusText(item), 10, if blocked then COL.red else COL.dim, Enum.Font.Gotham)
@@ -328,15 +330,23 @@ local function refresh()
 	for _, id in state.weapons or {} do
 		owned[id] = true
 	end
+	local ownedList = {}
 	for _, id in CoreLoopConfig.WeaponOrder do
 		if owned[id] then
+			table.insert(ownedList, id)
+		end
+	end
+	table.sort(ownedList, function(a, b)
+		return CoreLoopConfig.Weapons[a].tier > CoreLoopConfig.Weapons[b].tier
+	end)
+	for i, id in ownedList do
+		do
 			local w = CoreLoopConfig.Weapons[id]
-			local b = button(weaponRow, string.upper(if id == "Fists" then "FISTS" else w.name), UDim2.fromOffset(70, 28), if state.weapon == id then Color3.fromRGB(70, 64, 24) else COL.card)
-			b.TextSize = 9
+			local b = button(weaponRow, if id == "Fists" then "FISTS" else string.format("T%d %s", w.tier, string.upper(w.name)), UDim2.fromOffset(70, 28), if state.weapon == id then Color3.fromRGB(70, 64, 24) else COL.card)
+			b.LayoutOrder = i
+			b.TextSize = 8
 			b.TextWrapped = true
-			if state.weapon == id then
-				stroke(b, COL.accent, 1.5)
-			end
+			stroke(b, if state.weapon == id then COL.accent else w.color, if state.weapon == id then 2 else 1)
 			b.Activated:Connect(function()
 				press(b)
 				lockerRemote:FireServer("Weapon", id)

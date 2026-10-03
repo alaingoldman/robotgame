@@ -165,7 +165,7 @@ local function tryAttack()
 		end
 	end
 	Fx.swing(char, combo, w.id)
-	Fx.sound("Swing", if w.id == "Hammer" then 0.45 else 0.25, if w.id == "Hammer" then 1.05 else 1.5 + combo * 0.12)
+	Fx.sound("Swing", if w.anim == "Hammer" then 0.45 else 0.25, if w.anim == "Hammer" then 1.05 else 1.5 + combo * 0.12)
 	attackRemote:FireServer(aim, hint)
 end
 

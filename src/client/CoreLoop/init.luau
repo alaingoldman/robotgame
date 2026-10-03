@@ -53,7 +53,7 @@ function CoreLoop.start()
 		p.CFrame = CFrame.lookAt(from, from + aim) * CFrame.new(0, 0, -3)
 		p.Parent = workspace.Terrain
 		local TweenService = game:GetService("TweenService")
-		TweenService:Create(p, TweenInfo.new(0.12, Enum.EasingStyle.Linear), { CFrame = p.CFrame * CFrame.new(0, 0, -CoreLoopConfig.Weapons.Rivet.range + 6), Transparency = 0.6 }):Play()
+		TweenService:Create(p, TweenInfo.new(0.12, Enum.EasingStyle.Linear), { CFrame = p.CFrame * CFrame.new(0, 0, -((CoreLoopConfig.Weapons[(player:GetAttribute("Weapon") :: string?) or "R01"] or CoreLoopConfig.Weapons.R01).range) + 6), Transparency = 0.6 }):Play()
 		game:GetService("Debris"):AddItem(p, 0.13)
 		Fx.sparks(from + aim * 1.5, Color3.fromRGB(255, 220, 80), 5, 0.6)
 		Fx.sound("AirPop", 0.35, 1.6 + math.random() * 0.2)
@@ -90,7 +90,7 @@ function CoreLoop.start()
 	rem("Hit").OnClientEvent:Connect(function(info)
 		local mine = info.attacker == player
 		local W = CoreLoopConfig.Weapons[info.weapon] or CoreLoopConfig.Weapons.Fists
-		local heavy = info.crit or info.combo == 3 or info.weapon == "Hammer"
+		local heavy = info.crit or info.combo == 3 or CoreLoopConfig.weaponAnim(info.weapon) == "Hammer"
 		local color = if info.crit then Color3.fromRGB(255, 120, 60) else Color3.fromRGB(255, 210, 90)
 		Fx.impact(info.pos, color, heavy)
 		if info.target and info.target.Parent then
@@ -131,7 +131,7 @@ function CoreLoop.start()
 			Fx.ring(d.pos - Vector3.new(0, 1, 0), d.color, 10, 0.5)
 			Fx.sparks(d.pos, d.color, 24, 1.2)
 			Fx.sound("PowerUp", 0.35, 1.6, d.pos)
-			if (d.tier or 0) >= 3 then
+			if (d.tier or 0) >= 8 then
 				Fx.ring(d.pos, d.color, 18, 0.7)
 			end
 		elseif kind == "Pickup" then

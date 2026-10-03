@@ -232,14 +232,14 @@ local function build()
 	slotsFrame.Name = "Slots"
 	slotsFrame.AnchorPoint = Vector2.new(1, 0.5)
 	slotsFrame.Position = UDim2.new(1, -14, 0.5, 0)
-	slotsFrame.Size = UDim2.fromOffset(170, 5 * 52)
+	slotsFrame.Size = UDim2.fromOffset(170, 4 * 52)
 	slotsFrame.BackgroundTransparency = 1
 	slotsFrame.Parent = root
 	local layout = Instance.new("UIListLayout")
 	layout.Padding = UDim.new(0, 6)
 	layout.SortOrder = Enum.SortOrder.LayoutOrder
 	layout.Parent = slotsFrame
-	for i, slot in { "Legs", "Arms", "Chest", "Head", "Weapon" } do
+	for i, slot in { "Legs", "Arms", "Chest", "Weapon" } do
 		local f = Instance.new("Frame")
 		f.Name = slot
 		f.LayoutOrder = i
