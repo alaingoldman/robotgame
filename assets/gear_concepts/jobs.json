@@ -1,0 +1,627 @@
+{
+ "model": "gpt_image_2_5",
+ "aspect_ratio": "16:9",
+ "note": "Keys are '<index>_<slot>' because tier 10/20 armor indices (1001-1003, 2001-2003) collide with weapon indices (1001-1010 melee, 2001-2010 ranged).",
+ "jobs": {
+  "101_arm": {
+   "index": 101,
+   "slot": "arm",
+   "tier": 1,
+   "job_id": "6c519732-506d-41d6-96c6-da9d2cabf7b9",
+   "file": "101_arm_t1_scrap_tin.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 1 'Scrap Tin' style: flimsy dented rusted tin sheets and old cans hammered together, bent nails, twisted wire, holes, flaking orange rust, very crude and poor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "102_leg": {
+   "index": 102,
+   "slot": "leg",
+   "tier": 1,
+   "job_id": "43850197-3657-4a29-a42c-443a1e0f9472",
+   "file": "102_leg_t1_scrap_tin.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 1 'Scrap Tin' style: flimsy dented rusted tin sheets and old cans hammered together, bent nails, twisted wire, holes, flaking orange rust, very crude and poor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "103_chest": {
+   "index": 103,
+   "slot": "chest",
+   "tier": 1,
+   "job_id": "38d68168-f04d-4223-8822-2d78d17de77b",
+   "file": "103_chest_t1_scrap_tin.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 1 'Scrap Tin' style: flimsy dented rusted tin sheets and old cans hammered together, bent nails, twisted wire, holes, flaking orange rust, very crude and poor. Helmet: a crude dented tin-can helmet with punched eye holes. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "201_arm": {
+   "index": 201,
+   "slot": "arm",
+   "tier": 2,
+   "job_id": "278bacca-071b-4eaa-abf3-5bb94ad750e7",
+   "file": "201_arm_t2_junkyard_iron.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 2 'Junkyard Iron' style: corroded mismatched iron plates, chains, oversized bolts, patched welds, heavy rust streaks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "202_leg": {
+   "index": 202,
+   "slot": "leg",
+   "tier": 2,
+   "job_id": "392d58c2-843c-48c3-b463-9576c7ef9743",
+   "file": "202_leg_t2_junkyard_iron.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 2 'Junkyard Iron' style: corroded mismatched iron plates, chains, oversized bolts, patched welds, heavy rust streaks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "203_chest": {
+   "index": 203,
+   "slot": "chest",
+   "tier": 2,
+   "job_id": "783d401d-4ab8-44e8-9a6e-25a13ad86295",
+   "file": "203_chest_t2_junkyard_iron.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 2 'Junkyard Iron' style: corroded mismatched iron plates, chains, oversized bolts, patched welds, heavy rust streaks. Helmet: a bucket-like iron helmet with a chain-hung visor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "301_arm": {
+   "index": 301,
+   "slot": "arm",
+   "tier": 3,
+   "job_id": "72720b1e-b4b1-4ebc-85af-64d53b0fb83c",
+   "file": "301_arm_t3_boilerplate.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 3 'Boilerplate' style: thick pitted boiler plates, rows of rivets, a cracked pressure gauge, leaking steam valve, soot and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "302_leg": {
+   "index": 302,
+   "slot": "leg",
+   "tier": 3,
+   "job_id": "aebfd58a-bc7a-46c5-9eb1-2abbc5932a59",
+   "file": "302_leg_t3_boilerplate.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 3 'Boilerplate' style: thick pitted boiler plates, rows of rivets, a cracked pressure gauge, leaking steam valve, soot and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "303_chest": {
+   "index": 303,
+   "slot": "chest",
+   "tier": 3,
+   "job_id": "fed952e6-eedf-4fd5-81bf-4d5caff54f11",
+   "file": "303_chest_t3_boilerplate.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 3 'Boilerplate' style: thick pitted boiler plates, rows of rivets, a cracked pressure gauge, leaking steam valve, soot and rust. Helmet: a riveted boiler-tank helmet with a round porthole visor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "401_arm": {
+   "index": 401,
+   "slot": "arm",
+   "tier": 4,
+   "job_id": "366e32b1-589d-4dcc-964d-5b311bfaddac",
+   "file": "401_arm_t4_verdigris_copper.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 4 'Verdigris Copper' style: riveted copper panels with green verdigris patina, dented copper pipes, small leaking steam vents. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "402_leg": {
+   "index": 402,
+   "slot": "leg",
+   "tier": 4,
+   "job_id": "21dd2019-29ac-402a-8d45-7d9f95f45149",
+   "file": "402_leg_t4_verdigris_copper.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 4 'Verdigris Copper' style: riveted copper panels with green verdigris patina, dented copper pipes, small leaking steam vents. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "403_chest": {
+   "index": 403,
+   "slot": "chest",
+   "tier": 4,
+   "job_id": "01df3b1f-dd29-48d6-b53a-64983c4973ac",
+   "file": "403_chest_t4_verdigris_copper.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 4 'Verdigris Copper' style: riveted copper panels with green verdigris patina, dented copper pipes, small leaking steam vents. Helmet: a copper diving-bell style helmet with a green-patina grille. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "501_arm": {
+   "index": 501,
+   "slot": "arm",
+   "tier": 5,
+   "job_id": "ef9e7288-15a0-4427-915c-894f1d95e880",
+   "file": "501_arm_t5_coalworks.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 5 'Coalworks' style: soot-black cast iron, furnace grille with glowing orange embers inside, smoke chimney vents, scorched rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "502_leg": {
+   "index": 502,
+   "slot": "leg",
+   "tier": 5,
+   "job_id": "e99ba729-786e-451e-897b-9672c523ced0",
+   "file": "502_leg_t5_coalworks.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 5 'Coalworks' style: soot-black cast iron, furnace grille with glowing orange embers inside, smoke chimney vents, scorched rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "503_chest": {
+   "index": 503,
+   "slot": "chest",
+   "tier": 5,
+   "job_id": "6e5dfa7d-fa66-40df-8a9c-6547f9b7f87e",
+   "file": "503_chest_t5_coalworks.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 5 'Coalworks' style: soot-black cast iron, furnace grille with glowing orange embers inside, smoke chimney vents, scorched rust. Helmet: a cast-iron furnace-door faceplate with glowing ember eye slits. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "601_arm": {
+   "index": 601,
+   "slot": "arm",
+   "tier": 6,
+   "job_id": "d3320555-bb76-4214-886c-f14bed8bc4f3",
+   "file": "601_arm_t6_brass_piston.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 6 'Brass Piston' style: tarnished brass plates, exposed hydraulic pistons and rods, pressure hoses, oil stains, dents. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "602_leg": {
+   "index": 602,
+   "slot": "leg",
+   "tier": 6,
+   "job_id": "54ce7cb5-d726-4fb4-9c3f-9fec83737a01",
+   "file": "602_leg_t6_brass_piston.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 6 'Brass Piston' style: tarnished brass plates, exposed hydraulic pistons and rods, pressure hoses, oil stains, dents. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "603_chest": {
+   "index": 603,
+   "slot": "chest",
+   "tier": 6,
+   "job_id": "0554417f-1a6c-497c-83f3-b73e97db82bf",
+   "file": "603_chest_t6_brass_piston.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 6 'Brass Piston' style: tarnished brass plates, exposed hydraulic pistons and rods, pressure hoses, oil stains, dents. Helmet: a brass helmet with piston-driven jaw plates. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "701_arm": {
+   "index": 701,
+   "slot": "arm",
+   "tier": 7,
+   "job_id": "d879fed5-4bfc-4917-8225-3cecf5713591",
+   "file": "701_arm_t7_clockwork.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 7 'Clockwork' style: exposed brass gears and cogs, cracked glass gauge dials, springs, chipped bronze casing. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "702_leg": {
+   "index": 702,
+   "slot": "leg",
+   "tier": 7,
+   "job_id": "b8c08a66-c0a0-4dda-8b50-b7c4429f5d12",
+   "file": "702_leg_t7_clockwork.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 7 'Clockwork' style: exposed brass gears and cogs, cracked glass gauge dials, springs, chipped bronze casing. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "703_chest": {
+   "index": 703,
+   "slot": "chest",
+   "tier": 7,
+   "job_id": "873ada1d-fdf0-44a6-9018-e99683a57c1e",
+   "file": "703_chest_t7_clockwork.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 7 'Clockwork' style: exposed brass gears and cogs, cracked glass gauge dials, springs, chipped bronze casing. Helmet: a bronze helmet with a clockface visor and gear crest. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "801_arm": {
+   "index": 801,
+   "slot": "arm",
+   "tier": 8,
+   "job_id": "9bbae1c1-8234-4f62-a86b-954c839cc6fe",
+   "file": "801_arm_t8_foundry.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 8 'Foundry' style: heavy iron with molten orange glowing seams, crucible shapes, heat-blued steel, scorched rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "802_leg": {
+   "index": 802,
+   "slot": "leg",
+   "tier": 8,
+   "job_id": "d166772f-1a07-4670-91c5-6fe9d9f78332",
+   "file": "802_leg_t8_foundry.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 8 'Foundry' style: heavy iron with molten orange glowing seams, crucible shapes, heat-blued steel, scorched rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "803_chest": {
+   "index": 803,
+   "slot": "chest",
+   "tier": 8,
+   "job_id": "4a207dca-223e-4aa7-bb66-72ba76675fff",
+   "file": "803_chest_t8_foundry.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 8 'Foundry' style: heavy iron with molten orange glowing seams, crucible shapes, heat-blued steel, scorched rust. Helmet: an iron crucible helmet with molten glowing eye slit. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "901_arm": {
+   "index": 901,
+   "slot": "arm",
+   "tier": 9,
+   "job_id": "6e8be45b-210a-4d0e-a008-5ff70f9ce4fa",
+   "file": "901_arm_t9_rail_baron.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 9 'Rail Baron' style: built from locomotive parts, cowcatcher grille, smokestacks, chipped red and black painted steel, brass trim. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "902_leg": {
+   "index": 902,
+   "slot": "leg",
+   "tier": 9,
+   "job_id": "1fa81df8-0126-4ef2-97db-cd4f2a5ea60e",
+   "file": "902_leg_t9_rail_baron.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 9 'Rail Baron' style: built from locomotive parts, cowcatcher grille, smokestacks, chipped red and black painted steel, brass trim. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "903_chest": {
+   "index": 903,
+   "slot": "chest",
+   "tier": 9,
+   "job_id": "1f206b72-e7ba-4c7b-8838-8ca0f06e57fa",
+   "file": "903_chest_t9_rail_baron.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 9 'Rail Baron' style: built from locomotive parts, cowcatcher grille, smokestacks, chipped red and black painted steel, brass trim. Helmet: a locomotive-front helmet with headlamp and smokestack crest. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1001_arm": {
+   "index": 1001,
+   "slot": "arm",
+   "tier": 10,
+   "job_id": "e00d2892-24d1-4569-8ee0-9f5ff2430e89",
+   "file": "1001_arm_t10_ironclad.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 10 'Ironclad' style: battleship armor plating, portholes with glowing glass, anchor chains, naval grey steel weathered with rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1001_melee": {
+   "index": 1001,
+   "slot": "melee",
+   "job_id": "667f38c6-2d5e-48af-a497-7a949beb1f60",
+   "file": "1001_melee_pipe_wrench_club.png",
+   "prompt": "Game weapon concept sheet. Scrap Pipe-Wrench Club. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1002_leg": {
+   "index": 1002,
+   "slot": "leg",
+   "tier": 10,
+   "job_id": "ccd12556-c59c-4ed8-95fd-3ffe5d233d49",
+   "file": "1002_leg_t10_ironclad.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 10 'Ironclad' style: battleship armor plating, portholes with glowing glass, anchor chains, naval grey steel weathered with rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1002_melee": {
+   "index": 1002,
+   "slot": "melee",
+   "job_id": "e7383226-b84b-4dd1-b5be-ae0b915614cc",
+   "file": "1002_melee_chain_cleaver.png",
+   "prompt": "Game weapon concept sheet. Junkyard Chain Cleaver. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1003_chest": {
+   "index": 1003,
+   "slot": "chest",
+   "tier": 10,
+   "job_id": "3a54c77a-7713-451b-8062-da6af2e60538",
+   "file": "1003_chest_t10_ironclad.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 10 'Ironclad' style: battleship armor plating, portholes with glowing glass, anchor chains, naval grey steel weathered with rust. Helmet: a naval helmet with a glowing porthole visor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1003_melee": {
+   "index": 1003,
+   "slot": "melee",
+   "job_id": "0eca184f-6c6f-401c-a433-50800f0e4caa",
+   "file": "1003_melee_rivet_sledgehammer.png",
+   "prompt": "Game weapon concept sheet. Boilerplate Rivet Sledgehammer. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1004_melee": {
+   "index": 1004,
+   "slot": "melee",
+   "job_id": "e2c75326-0eaf-42e5-b0ee-c16132e57a4c",
+   "file": "1004_melee_furnace_axe.png",
+   "prompt": "Game weapon concept sheet. Coal Furnace Axe with glowing ember edge. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1005_melee": {
+   "index": 1005,
+   "slot": "melee",
+   "job_id": "011c5b78-ee02-4145-b19f-fc2205ab52e8",
+   "file": "1005_melee_buzzsaw_greatsword.png",
+   "prompt": "Game weapon concept sheet. Clockwork Buzzsaw Greatsword with spinning gear teeth. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1006_melee": {
+   "index": 1006,
+   "slot": "melee",
+   "job_id": "38c60575-155b-4684-89c2-c376b65236c7",
+   "file": "1006_melee_piston_warhammer.png",
+   "prompt": "Game weapon concept sheet. Locomotive Piston Warhammer venting steam. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1007_melee": {
+   "index": 1007,
+   "slot": "melee",
+   "job_id": "6d20337e-f6c8-4878-9850-55937ff5bbee",
+   "file": "1007_melee_tesla_arc_sabre.png",
+   "prompt": "Game weapon concept sheet. Tesla Arc Sabre crackling blue. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1008_melee": {
+   "index": 1008,
+   "slot": "melee",
+   "job_id": "cc3f2004-a184-472f-be89-abbb80547916",
+   "file": "1008_melee_anchor_greatblade.png",
+   "prompt": "Game weapon concept sheet. Dreadnought Anchor Greatblade. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1009_melee": {
+   "index": 1009,
+   "slot": "melee",
+   "job_id": "c0e0d631-ff80-4267-9dcd-5d62d02ce9ea",
+   "file": "1009_melee_rune_scythe.png",
+   "prompt": "Game weapon concept sheet. Arcanum Rune Scythe glowing violet. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1010_melee": {
+   "index": 1010,
+   "slot": "melee",
+   "job_id": "82d25e96-0c63-493b-ab0e-b68a03a49051",
+   "file": "1010_melee_clockwork_halberd.png",
+   "prompt": "Game weapon concept sheet. Emperor's Clockwork Halberd, gold and gemstones. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "1101_arm": {
+   "index": 1101,
+   "slot": "arm",
+   "tier": 11,
+   "job_id": "cf3cd9db-0c42-4d1a-899b-c819df549faf",
+   "file": "1101_arm_t11_tesla.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 11 'Tesla' style: copper tesla coils and glass insulators crackling with blue electric arcs, dark steel with brass bands, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1102_leg": {
+   "index": 1102,
+   "slot": "leg",
+   "tier": 11,
+   "job_id": "543ecbfc-05c3-4348-be5b-6daa0cc799c5",
+   "file": "1102_leg_t11_tesla.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 11 'Tesla' style: copper tesla coils and glass insulators crackling with blue electric arcs, dark steel with brass bands, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1103_chest": {
+   "index": 1103,
+   "slot": "chest",
+   "tier": 11,
+   "job_id": "6bf4d32e-42a2-4023-a93d-d67c5d88c0d3",
+   "file": "1103_chest_t11_tesla.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 11 'Tesla' style: copper tesla coils and glass insulators crackling with blue electric arcs, dark steel with brass bands, scorch marks. Helmet: a steel helmet with tesla coil horns arcing blue. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1201_arm": {
+   "index": 1201,
+   "slot": "arm",
+   "tier": 12,
+   "job_id": "4bc97a36-6679-4dc1-a98c-0f50232f6d03",
+   "file": "1201_arm_t12_aether_diver.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 12 'Aether Diver' style: deep-sea diving-suit brass, round glass domes of glowing green aether liquid, bubbling tubes, dents and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1202_leg": {
+   "index": 1202,
+   "slot": "leg",
+   "tier": 12,
+   "job_id": "aeed33d9-db7a-4db2-b7bf-883d62856877",
+   "file": "1202_leg_t12_aether_diver.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 12 'Aether Diver' style: deep-sea diving-suit brass, round glass domes of glowing green aether liquid, bubbling tubes, dents and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1203_chest": {
+   "index": 1203,
+   "slot": "chest",
+   "tier": 12,
+   "job_id": "0ccc778e-37a5-4ab9-a9da-58835e501774",
+   "file": "1203_chest_t12_aether_diver.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 12 'Aether Diver' style: deep-sea diving-suit brass, round glass domes of glowing green aether liquid, bubbling tubes, dents and rust. Helmet: a brass diving dome helmet filled with glowing green aether. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1301_arm": {
+   "index": 1301,
+   "slot": "arm",
+   "tier": 13,
+   "job_id": "0adf6753-e68a-4bf0-adf8-d2a41fa92d2e",
+   "file": "1301_arm_t13_dreadnought.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1302_leg": {
+   "index": 1302,
+   "slot": "leg",
+   "tier": 13,
+   "job_id": "68e2ded8-b746-48e4-8c99-e874f02ba74a",
+   "file": "1302_leg_t13_dreadnought.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1303_chest": {
+   "index": 1303,
+   "slot": "chest",
+   "tier": 13,
+   "job_id": "9960e442-c472-44b1-8f0d-fbb8b7799cb0",
+   "file": "1303_chest_t13_dreadnought.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 13 'Dreadnought' style: colossal riveted dark steel, cannon-port shapes, layered thick slabs, huge rivets, battle scars and rust. Helmet: a massive slab helmet with a narrow armored slit visor. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1401_arm": {
+   "index": 1401,
+   "slot": "arm",
+   "tier": 14,
+   "job_id": "2e280c16-6bb4-4985-bab0-851186281196",
+   "file": "1401_arm_t14_gilded_engine.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 14 'Gilded Engine' style: polished brass and gold filigree engraving over steam machinery, chipped from battle, glowing amber gauges. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1402_leg": {
+   "index": 1402,
+   "slot": "leg",
+   "tier": 14,
+   "job_id": "7fd90427-d93c-4b47-b210-44bc64bca277",
+   "file": "1402_leg_t14_gilded_engine.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 14 'Gilded Engine' style: polished brass and gold filigree engraving over steam machinery, chipped from battle, glowing amber gauges. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1403_chest": {
+   "index": 1403,
+   "slot": "chest",
+   "tier": 14,
+   "job_id": "7c32ce17-adc6-4cb8-bac7-235335ed78bd",
+   "file": "1403_chest_t14_gilded_engine.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 14 'Gilded Engine' style: polished brass and gold filigree engraving over steam machinery, chipped from battle, glowing amber gauges. Helmet: a gold filigree helmet with amber glowing gauge eyes. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1501_arm": {
+   "index": 1501,
+   "slot": "arm",
+   "tier": 15,
+   "job_id": "c4f916a5-a752-4110-be5a-c79de0e997cd",
+   "file": "1501_arm_t15_cog_royal.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 15 'Cog Royal' style: ornate royal steampunk, deep crimson enamel panels, gold engraving, ruby lenses, brass gears, worn edges. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1502_leg": {
+   "index": 1502,
+   "slot": "leg",
+   "tier": 15,
+   "job_id": "dddfb327-4b80-4f1c-b4ee-efb756c867d8",
+   "file": "1502_leg_t15_cog_royal.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 15 'Cog Royal' style: ornate royal steampunk, deep crimson enamel panels, gold engraving, ruby lenses, brass gears, worn edges. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1503_chest": {
+   "index": 1503,
+   "slot": "chest",
+   "tier": 15,
+   "job_id": "aa481f9f-4193-417b-9a99-7b2e273d7b26",
+   "file": "1503_chest_t15_cog_royal.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 15 'Cog Royal' style: ornate royal steampunk, deep crimson enamel panels, gold engraving, ruby lenses, brass gears, worn edges. Helmet: a crowned crimson-enamel helmet with ruby lens eyes. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1601_arm": {
+   "index": 1601,
+   "slot": "arm",
+   "tier": 16,
+   "job_id": "d4bb926e-aaa8-4ff1-b494-2377fe1e9e65",
+   "file": "1601_arm_t16_sky_admiral.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 16 'Sky Admiral' style: airship-admiral armor, brass propeller turbines, gold epaulette fins, navy leather straps, medals, weathered. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1602_leg": {
+   "index": 1602,
+   "slot": "leg",
+   "tier": 16,
+   "job_id": "f4429616-5015-43cf-ad36-2d0774b6e355",
+   "file": "1602_leg_t16_sky_admiral.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 16 'Sky Admiral' style: airship-admiral armor, brass propeller turbines, gold epaulette fins, navy leather straps, medals, weathered. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1603_chest": {
+   "index": 1603,
+   "slot": "chest",
+   "tier": 16,
+   "job_id": "151a2c75-30ea-4c67-89bc-8389300e8f84",
+   "file": "1603_chest_t16_sky_admiral.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 16 'Sky Admiral' style: airship-admiral armor, brass propeller turbines, gold epaulette fins, navy leather straps, medals, weathered. Helmet: an airship admiral helmet with brass goggles and gold fins. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1701_arm": {
+   "index": 1701,
+   "slot": "arm",
+   "tier": 17,
+   "job_id": "0075f570-137c-4770-b650-ac58f9a95962",
+   "file": "1701_arm_t17_arcanum.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 17 'Arcanum' style: brass armor etched with glowing violet runes, embedded purple crystals, floating gear rings, scorched edges. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1702_leg": {
+   "index": 1702,
+   "slot": "leg",
+   "tier": 17,
+   "job_id": "1bbc1561-a355-43a0-ae0f-885a68a22355",
+   "file": "1702_leg_t17_arcanum.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 17 'Arcanum' style: brass armor etched with glowing violet runes, embedded purple crystals, floating gear rings, scorched edges. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1703_chest": {
+   "index": 1703,
+   "slot": "chest",
+   "tier": 17,
+   "job_id": "822df018-586d-453d-9715-4bd2981e4a12",
+   "file": "1703_chest_t17_arcanum.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 17 'Arcanum' style: brass armor etched with glowing violet runes, embedded purple crystals, floating gear rings, scorched edges. Helmet: a brass helmet with a glowing violet rune visor and crystal crest. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1801_arm": {
+   "index": 1801,
+   "slot": "arm",
+   "tier": 18,
+   "job_id": "bfad3371-9955-4ea4-9d9b-4a6211189b51",
+   "file": "1801_arm_t18_sun_furnace.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1802_leg": {
+   "index": 1802,
+   "slot": "leg",
+   "tier": 18,
+   "job_id": "26d3617a-10cc-418b-846b-d0f7f71e364a",
+   "file": "1802_leg_t18_sun_furnace.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1803_chest": {
+   "index": 1803,
+   "slot": "chest",
+   "tier": 18,
+   "job_id": "951a4017-8afc-4565-8f9e-2555277d21ee",
+   "file": "1803_chest_t18_sun_furnace.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 18 'Sun Furnace' style: gleaming gold armor with a white-hot glowing reactor core, radiant sunburst fins, heat shimmer, scorch marks. Helmet: a golden sunburst-crested helmet with white-hot glowing eyes. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1901_arm": {
+   "index": 1901,
+   "slot": "arm",
+   "tier": 19,
+   "job_id": "8b1b554a-7ac2-4f9c-806a-179ef61f6d5d",
+   "file": "1901_arm_t19_celestial_orrery.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 19 'Celestial Orrery' style: gold and platinum armor with orbiting planetary rings and star-glass spheres, constellation engravings, glowing cyan. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1902_leg": {
+   "index": 1902,
+   "slot": "leg",
+   "tier": 19,
+   "job_id": "86bd1528-68a2-48a0-9795-c62b64e7bebf",
+   "file": "1902_leg_t19_celestial_orrery.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 19 'Celestial Orrery' style: gold and platinum armor with orbiting planetary rings and star-glass spheres, constellation engravings, glowing cyan. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "1903_chest": {
+   "index": 1903,
+   "slot": "chest",
+   "tier": 19,
+   "job_id": "6dd4a596-1f43-41ed-9d8c-23654203ff02",
+   "file": "1903_chest_t19_celestial_orrery.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 19 'Celestial Orrery' style: gold and platinum armor with orbiting planetary rings and star-glass spheres, constellation engravings, glowing cyan. Helmet: a gold-platinum helmet ringed by an orbiting planetary halo. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "2001_arm": {
+   "index": 2001,
+   "slot": "arm",
+   "tier": 20,
+   "job_id": "e9256a21-c74c-48fa-8300-3c3233a3e39f",
+   "file": "2001_arm_t20_emperors_clockheart.png",
+   "prompt": "Game armor concept sheet. ARMOR ARM piece for a mech exoskeleton (shoulder pauldron, upper arm, elbow guard, forearm gauntlet, mechanical hand), single right arm only. Tier 20 'Emperor's Clockheart' style: ultra-extravagant legendary armor, gold and platinum, huge glowing gemstone clockwork heart, halo of rotating gold gears, jewel-encrusted filigree, plumes of steam, battle-worn but magnificent. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "2001_ranged": {
+   "index": 2001,
+   "slot": "ranged",
+   "job_id": "65efc34a-23db-48da-962e-6c7116410ba2",
+   "file": "2001_ranged_rivet_pistol.png",
+   "prompt": "Game weapon concept sheet. Scrap Rivet Pistol. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2002_leg": {
+   "index": 2002,
+   "slot": "leg",
+   "tier": 20,
+   "job_id": "daf80e8f-3f0a-44bc-8336-8f76d1a8f55c",
+   "file": "2002_leg_t20_emperors_clockheart.png",
+   "prompt": "Game armor concept sheet. ARMOR LEG piece for a mech exoskeleton (hip plate, thigh, knee guard, shin, heavy boot), single right leg only. Tier 20 'Emperor's Clockheart' style: ultra-extravagant legendary armor, gold and platinum, huge glowing gemstone clockwork heart, halo of rotating gold gears, jewel-encrusted filigree, plumes of steam, battle-worn but magnificent. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "2002_ranged": {
+   "index": 2002,
+   "slot": "ranged",
+   "job_id": "c9ba8d4c-4fae-451e-a10b-bb295c65f9fe",
+   "file": "2002_ranged_junk_blunderbuss.png",
+   "prompt": "Game weapon concept sheet. Junk Blunderbuss. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2003_chest": {
+   "index": 2003,
+   "slot": "chest",
+   "tier": 20,
+   "job_id": "3de5e441-128a-45c6-b452-2538d2b688a0",
+   "file": "2003_chest_t20_emperors_clockheart.png",
+   "prompt": "Game armor concept sheet. CHEST ARMOR WITH INTEGRATED HELMET as one connected piece (helmet head fused onto the chest cuirass, collar, back plate), no arms, no legs. Tier 20 'Emperor's Clockheart' style: ultra-extravagant legendary armor, gold and platinum, huge glowing gemstone clockwork heart, halo of rotating gold gears, jewel-encrusted filigree, plumes of steam, battle-worn but magnificent. Helmet: a jeweled gold crown-helmet with a halo of rotating gold gears. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox. Show FRONT, SIDE and BACK orthographic views side by side, isolated on plain light grey background, no text, no labels, no person."
+  },
+  "2003_ranged": {
+   "index": 2003,
+   "slot": "ranged",
+   "job_id": "66147068-e103-464c-a901-2967addb6fae",
+   "file": "2003_ranged_steam_crossbow.png",
+   "prompt": "Game weapon concept sheet. Boilerplate Steam Crossbow. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2004_ranged": {
+   "index": 2004,
+   "slot": "ranged",
+   "job_id": "09e6d80d-0624-430c-86e2-0157cc0b55e1",
+   "file": "2004_ranged_harpoon_gun.png",
+   "prompt": "Game weapon concept sheet. Verdigris Copper Harpoon Gun. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2005_ranged": {
+   "index": 2005,
+   "slot": "ranged",
+   "job_id": "c8f89640-0751-4009-b1bf-7eff29b7b556",
+   "file": "2005_ranged_mortar_hand_cannon.png",
+   "prompt": "Game weapon concept sheet. Coal Mortar Hand-Cannon. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2006_ranged": {
+   "index": 2006,
+   "slot": "ranged",
+   "job_id": "ff21e755-cda7-49b6-a367-fa9031a4dc5f",
+   "file": "2006_ranged_gatling_pepperbox.png",
+   "prompt": "Game weapon concept sheet. Brass Gatling Pepperbox. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2007_ranged": {
+   "index": 2007,
+   "slot": "ranged",
+   "job_id": "63427d21-697b-4026-b87c-9e30e6b30f2d",
+   "file": "2007_ranged_flamethrower.png",
+   "prompt": "Game weapon concept sheet. Foundry Flamethrower with molten tank. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2008_ranged": {
+   "index": 2008,
+   "slot": "ranged",
+   "job_id": "8e3f73db-3bfa-4c44-b2fd-8eaa1345553c",
+   "file": "2008_ranged_tesla_coil_rifle.png",
+   "prompt": "Game weapon concept sheet. Tesla Coil Rifle. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2009_ranged": {
+   "index": 2009,
+   "slot": "ranged",
+   "job_id": "61294786-6fd2-48a5-b2bd-906988dbbb87",
+   "file": "2009_ranged_aether_ray_blaster.png",
+   "prompt": "Game weapon concept sheet. Aether Ray Blaster with green glass chambers. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  },
+  "2010_ranged": {
+   "index": 2010,
+   "slot": "ranged",
+   "job_id": "3d2dc4bf-c28e-4349-a83f-fba8d0778f23",
+   "file": "2010_ranged_orrery_railgun.png",
+   "prompt": "Game weapon concept sheet. Celestial Orrery Railgun, gold with orbiting rings. Steampunk rusted battle-damaged style, chunky blocky bold shapes easy to model in Roblox, sized for a giant mech's hand. Show a large SIDE view plus a smaller 3/4 view, isolated on plain light grey background, no text, no labels, no hands, no person."
+  }
+ }
+}
